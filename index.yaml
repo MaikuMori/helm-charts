@@ -1,3 +1,15 @@
 apiVersion: v1
-entries: {}
-generated: "2022-11-16T18:00:47.5003906-05:00"
+entries:
+  gotenberg:
+  - apiVersion: v2
+    appVersion: 7.7.0
+    created: "2022-11-16T23:11:42.670849671Z"
+    description: A Helm chart for Gotenberg
+    digest: 54714467ac539d1279be1aa79e47cc6bda0c15697fdd8f65aae1ba20b485c988
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    name: gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-11-16T23:11:42.670861071Z"
