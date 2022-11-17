@@ -16,10 +16,35 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: '0.1.0'
+version: '0.1.1'
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: '7.7.0'
+
+keywords:
+  - gotenberg
+  - pdf
+
+sources:
+  - https://github.com/gotenberg/gotenberg
+  - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+
+maintainers:
+  - name: MaikuMori
+    email: mikskalnins@maikumori.com
+    url: maikumori.com
+
+annotations:
+  # This annotation allows including named links, which will be rendered nicely in Artifact Hub.
+  # You can use this annotation to include links not included previously in the Chart.yaml file,
+  # or you can use it to name links already present (in the sources section, for example).
+  artifacthub.io/links: |
+    - name: Projects Homepage
+      url: https://gotenberg.dev/
+    - name: Projects GitHub
+      url: https://github.com/gotenberg/gotenberg
+    - name: Chart's GitHub
+      url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
