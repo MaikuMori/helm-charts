@@ -48,6 +48,109 @@ spec:
           {{- if .Values.api.disableHealthCheckLogging }}
           - --api-disable-health-check-logging
           {{- end }}
+
+          {{- if .Values.chromium.allowFileAccessFromFiles }}
+          - --chromium-allow-file-access-from-files
+          {{- end }}
+          {{- if .Values.chromium.allowInsecureLocalhost }}
+          - --chromium-allow-insecure-localhost
+          {{- end }}
+          {{- if .Values.chromium.allowList }}
+          - --chromium-allow-list={{ .Values.chromium.allowList }}
+          {{- end }}
+          {{- if .Values.chromium.denyList }}
+          - --chromium-deny-list={{ .Values.chromium.denyList }}
+          {{- end }}
+          {{- if .Values.chromium.ignoreCertificateErrors }}
+          - --chromium-ignore-certificate-errors 
+          {{- end }}
+          {{- if .Values.chromium.disableWebSecurity }}
+          - --chromium-disable-web-security
+          {{- end }}
+          {{- if .Values.chromium.incognito }}
+          - --chromium-incognito
+          {{- end }}
+          {{- if .Values.chromium.hostResolverRules }}
+          - --chromium-host-resolver-rules={{ .Values.chromium.hostResolverRules }}
+          {{- end }}
+          {{- if .Values.chromium.proxyServer }}
+          - --chromium-proxy-server={{ .Values.chromium.proxyServer }}
+          {{- end }}
+          {{- if .Values.chromium.disableJavaScript }}
+          - --chromium-disable-javascript
+          {{- end }}
+          {{- if .Values.chromium.disableRoutes }}
+          - --chromium-disable-routes
+          {{- end }}
+
+          {{- if .Values.libreOffice.disableRoutes }}
+          - --libreoffice-disable-routes
+          {{- end }}
+          {{- if .Values.libreOffice.unoListenerStartTimeout }}
+          - --uno-listener-start-timeout={{ .Values.libreOffice.unoListenerStartTimeout }}
+          {{- end }}
+          {{- if .Values.libreOffice.unoListenerRestartThreshold }}
+          - --uno-listener-restart-threshold={{ .Values.libreOffice.unoListenerRestartThreshold }}
+          {{- end }}
+
+          {{- if .Values.pdfEngines.engines }}
+          - --pdfengines-engines={{ .Values.pdfEngines.engines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.disableRoutes }}
+          - --pdfengines-disable-routes
+          {{- end }}
+
+          {{- if .Values.webhook.allowList }}
+          - --webhook-allow-list={{ .Values.webhook.allowList }}
+          {{- end }}
+          {{- if .Values.webhook.denyList }}
+          - --webhook-deny-list={{ .Values.webhook.denyList }}
+          {{- end }}
+          {{- if .Values.webhook.errorAllowList }}
+          - --webhook-error-allow-list={{ .Values.webhook.errorAllowList }}
+          {{- end }}
+          {{- if .Values.webhook.errorDenyList }}
+          - --webhook-error-deny-list={{ .Values.webhook.errorDenyList }}
+          {{- end }}
+          {{- if .Values.webhook.maxRetry }}
+          - --webhook-max-retry={{ .Values.webhook.maxRetry }}
+          {{- end }}
+          {{- if .Values.webhook.retryMinWait }}
+          - --webhook-retry-min-wait={{ .Values.webhook.retryMinWait }}
+          {{- end }}
+          {{- if .Values.webhook.retryMaxWait }}
+          - --webhook-retry-max-wait={{ .Values.webhook.retryMaxWait }}
+          {{- end }}
+          {{- if .Values.webhook.clientTimeout }}
+          - --webhook-client-timeout={{ .Values.webhook.clientTimeout }}
+          {{- end }}
+          {{- if .Values.webhook.disable }}
+          - --webhook-disable
+          {{- end }}
+
+          {{- if .Values.prometheus.collectInterval }}
+          - --prometheus-collect-interval={{ .Values.prometheus.collectInterval }}
+          {{- end }}
+          {{- if .Values.prometheus.namespace }}
+          - --prometheus-namespace={{ .Values.prometheus.namespace }}
+          {{- end }}
+          {{- if .Values.prometheus.disableCollect  }}
+          - --prometheus-disable-collect
+          {{- end }}
+          {{- if .Values.prometheus.disableRouterLogging }}
+          - --prometheus-disable-route-logging
+          {{- end }}
+
+          {{- if .Values.logging.format }}
+          - --log-format={{ .Values.logging.format }}
+          {{- end }}
+          {{- if .Values.logging.level }}
+          - --log-level={{ .Values.logging.level }}
+          {{- end }}
+
+          {{- if .Values.gotenberg.gracefulShutdownDurationSec }}
+          - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.api.port }}
@@ -62,7 +165,7 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          terminationGracePeriodSeconds: 30
+          terminationGracePeriodSeconds: {{ .Values.gotenberg.gracefulShutdownDurationSec }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

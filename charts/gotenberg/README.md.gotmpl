@@ -1,0 +1,48 @@
+# Gotenberg
+
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/search?repo=gotenberg)
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+This is a HELM chart for Gotenberg.
+
+Gotenberg provides a developer-friendly API to interact with powerful tools like Chromium and LibreOffice for converting numerous document formats (HTML, Markdown, Word, Excel, etc.) into PDF files, and more!
+
+Upstream links:
+
+- [Homepage](https://gotenberg.dev/)
+- [Documentation](https://gotenberg.dev/docs/about)
+- [GitHub](https://github.com/gotenberg/gotenberg)
+
+## Get Repo Info
+
+```console
+helm repo add maikumori https://maikumori.github.io/helm-charts
+helm repo update
+```
+
+## Installing the Chart
+
+To install the chart with the release name `my-release`:
+
+```console
+helm install my-release --namespace gotenberg maikumori/gotenberg
+```
+
+## Uninstalling the Chart
+
+To uninstall/delete the `my-release` deployment:
+
+```console
+helm delete my-release
+```
+
+The command removes all the Kubernetes components associated with the chart and deletes the release.
+
+## Upgrading Chart
+
+```console
+helm upgrade my-release maikumori/gotenberg --install
+```
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
