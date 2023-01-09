@@ -165,7 +165,7 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          terminationGracePeriodSeconds: {{ .Values.gotenberg.gracefulShutdownDurationSec }}
+      terminationGracePeriodSeconds: {{ .Values.gotenberg.gracefulShutdownDurationSec }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
