@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- Fix `terminationGracePeriodSeconds` set in the wrong place. (Thanks to Szczepan Rędzioch | @redzioch)
+
 ## 0.2.1
 
 - Bump app version to `7.2.2`.
