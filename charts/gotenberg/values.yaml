@@ -25,6 +25,9 @@ serviceAccount:
 
 podAnnotations: {}
 
+# -- List of additional pod labels
+podLabels: {}
+
 podSecurityContext:
   {}
   # fsGroup: 2000

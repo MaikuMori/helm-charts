@@ -1,8 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Add `podLabels`. (Thanks to Pascal M | [@bagl3y](https://github.com/bagl3y))
+
 ## 0.2.2
 
-- Fix `terminationGracePeriodSeconds` set in the wrong place. (Thanks to Szczepan Rędzioch | @redzioch)
+- Fix `terminationGracePeriodSeconds` set in the wrong place. (Thanks to Szczepan Rędzioch | [@redzioch](https://github.com/redzioch))
 
 ## 0.2.1
 
