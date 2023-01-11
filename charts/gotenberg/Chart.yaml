@@ -16,7 +16,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: '0.2.2'
+version: '0.3.0'
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -48,3 +48,5 @@ annotations:
       url: https://github.com/gotenberg/gotenberg
     - name: Chart's GitHub
       url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    - name: Chart's Changelog
+      url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
