@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- Bump `gotenberg` version `7.7.2` -> `7.8.0`
+
 ## 0.3.0
 
 - Add `podLabels`. (Thanks to Pascal M | [@bagl3y](https://github.com/bagl3y))
