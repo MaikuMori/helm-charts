@@ -7,5 +7,6 @@ Any contributions are welcome and will be considered.
 Ideally here's the flow:
 
 - Make the changes
-- Update CHANGELOG for the chart
+- Bump chart's version in `Chart.yaml`
+- Update `CHANGELOG.md` for the chart
 - Run [`helm-docs`](https://github.com/norwoodj/helm-docs)
