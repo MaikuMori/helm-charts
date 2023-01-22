@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/search?repo=gotenberg)
-![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.8.0](https://img.shields.io/badge/AppVersion-7.8.0-informational?style=flat-square)
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.8.0](https://img.shields.io/badge/AppVersion-7.8.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -75,6 +75,11 @@ helm upgrade my-release maikumori/gotenberg --install
 | image.repository | string | `"gotenberg/gotenberg"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` |  |
+| ingress.annotations | object | `{}` | Set the annotations of the ingress |
+| ingress.className | string | `""` | Set the class name of the ingress |
+| ingress.enabled | bool | `false` | Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet. |
+| ingress.hosts | list | `[]` | Set the hostnames of the ingress, see values.yaml for an example. |
+| ingress.tls | list | `[]` | Set the TLS configuration for the ingress, see values.yaml for an example. |
 | libreOffice.disableRoutes | bool | `false` | Disable the routes |
 | libreOffice.unoListenerRestartThreshold | string | `""` | Conversions limit after which the LibreOffice listener is restarted - 0 means no long-running LibreOffice listener (default 10) |
 | libreOffice.unoListenerStartTimeout | string | `""` | Time limit for starting the LibreOffice listener (default 10s) |
