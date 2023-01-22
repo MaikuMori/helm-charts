@@ -1,8 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- Add `Ingress` resource.
+
 ## 0.3.1
 
-- Bump `gotenberg` version `7.7.2` -> `7.8.0`
+- Bump `gotenberg` version `7.7.2` -> `7.8.0`.
 
 ## 0.3.0
 
