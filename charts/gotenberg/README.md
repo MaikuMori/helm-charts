@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/search?repo=gotenberg)
-![Version: 0.4.2](https://img.shields.io/badge/Version-0.4.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.8.2](https://img.shields.io/badge/AppVersion-7.8.2-informational?style=flat-square)
+![Version: 0.4.3](https://img.shields.io/badge/Version-0.4.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.8.3](https://img.shields.io/badge/AppVersion-7.8.3-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -65,6 +65,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | chromium.disableJavaScript | bool | `false` | Disable JavaScript |
 | chromium.disableRoutes | bool | `false` | Disable the routes |
 | chromium.disableWebSecurity | bool | `false` | Don't enforce the same-origin policy |
+| chromium.failedStartsThreshold | string | `""` | Set the number of consecutive failed starts after which the module is considered unhealthy - 0 means ignore (default 5) |
 | chromium.hostResolverRules | string | `""` | Set custom mappings to the host resolver |
 | chromium.ignoreCertificateErrors | bool | `false` | Ignore the certificate errors |
 | chromium.incognito | bool | `false` | Start Chromium with incognito mode |

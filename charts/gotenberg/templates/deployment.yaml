@@ -85,6 +85,9 @@ spec:
           {{- if .Values.chromium.disableRoutes }}
           - --chromium-disable-routes
           {{- end }}
+          {{- if .Values.chromium.failedStartsThreshold }}
+          - --chromium-failed-starts-threshold={{ .Values.chromium.failedStartsThreshold }}
+          {{- end }}
 
           {{- if .Values.libreOffice.disableRoutes }}
           - --libreoffice-disable-routes
