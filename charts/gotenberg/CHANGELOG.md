@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.3
+
+- Add `chromium.failedStartsThreshold` value.
+- Bump `gotenberg` version `7.8.2` -> `7.8.3`.
+
 ## 0.4.2
 
 - Bump `gotenberg` version `7.8.1` -> `7.8.2`.

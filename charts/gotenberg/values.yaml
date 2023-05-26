@@ -128,6 +128,8 @@ chromium:
   disableJavaScript: false
   # -- Disable the routes
   disableRoutes: false
+  # -- Set the number of consecutive failed starts after which the module is considered unhealthy - 0 means ignore (default 5)
+  failedStartsThreshold: ''
 
 # The LibreOffice module interacts with LibreOffice to convert documents to PDF, thanks to unoconv.
 # https://gotenberg.dev/docs/modules/libreoffice
