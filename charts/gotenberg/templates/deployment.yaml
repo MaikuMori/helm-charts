@@ -153,6 +153,9 @@ spec:
           {{- if .Values.logging.level }}
           - --log-level={{ .Values.logging.level }}
           {{- end }}
+          {{- if .Values.logging.fieldsPrefix }}
+          - --log-fields-prefix={{ .Values.logging.fieldsPrefix }}
+          {{- end }}
 
           {{- if .Values.gotenberg.gracefulShutdownDurationSec }}
           - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s

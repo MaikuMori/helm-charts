@@ -191,6 +191,8 @@ logging:
   format: ''
   # -- Set the log level - error, warn, info, or debug (default "info")
   level: ''
+  # -- Prepend a specified prefix to each field in the logs
+  fieldsPrefix: ""
 
 # Misc.
 # https://gotenberg.dev/docs/modules/more
