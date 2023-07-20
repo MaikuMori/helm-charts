@@ -1,0 +1,13 @@
+serviceAccount:
+  create: true
+
+autoscaling:
+  enabled: true
+
+ingress:
+  enabled: true
+  hosts:
+    - host: test.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
