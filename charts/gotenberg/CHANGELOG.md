@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0
+
+- Fix [#15](https://github.com/MaikuMori/helm-charts/issues/15) - `HorizontalPodAutoscaler` API version is now `autoscaling/v2` (Thanks to [@tweiss-mdm](https://github.com/tweiss-mdm)).
+- Bump `gotenberg` version `7.8.3` -> `7.9.1`.
+- Add `logging.fieldsPrefix` value (`--log-fields-prefix`).
+- CI: Test install chart on multiple Kubernetes versions (v1.27.3, v1.26.6, v1.25.11, v1.24.15, v1.23.17).
+- CI: Test chart upgrades.
+- CI: Generate and test as many resources from the chart as possible.
+
 ## 0.4.3
 
 - Add `chromium.failedStartsThreshold` value.

@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/search?repo=gotenberg)
-![Version: 0.4.3](https://img.shields.io/badge/Version-0.4.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.8.3](https://img.shields.io/badge/AppVersion-7.8.3-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.9.1](https://img.shields.io/badge/AppVersion-7.9.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -84,6 +84,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | libreOffice.disableRoutes | bool | `false` | Disable the routes |
 | libreOffice.unoListenerRestartThreshold | string | `""` | Conversions limit after which the LibreOffice listener is restarted - 0 means no long-running LibreOffice listener (default 10) |
 | libreOffice.unoListenerStartTimeout | string | `""` | Time limit for starting the LibreOffice listener (default 10s) |
+| logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
 | logging.format | string | `""` | Set log format - auto, json, or text (default "auto") |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
 | nameOverride | string | `""` |  |

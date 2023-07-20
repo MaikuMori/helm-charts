@@ -8,11 +8,11 @@ image:
   repository: gotenberg/gotenberg
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: ''
+  tag: ""
 
 imagePullSecrets: []
-nameOverride: ''
-fullnameOverride: ''
+nameOverride: ""
+fullnameOverride: ""
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -21,7 +21,7 @@ serviceAccount:
   annotations: {}
   # -- The name of the service account to use.
   ## If not set and create is true, a name is generated using the fullname template
-  name: ''
+  name: ""
 
 podAnnotations: {}
 
@@ -70,7 +70,7 @@ ingress:
   # -- Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet.
   enabled: false
   # -- Set the class name of the ingress
-  className: ''
+  className: ""
   # -- Set the annotations of the ingress
   annotations:
     {}
@@ -95,11 +95,11 @@ api:
   # -- Set the port on which the API should listen (default 3000)
   port: 3000
   # -- Set the time limit for requests (default 30s)
-  timeout: ''
+  timeout: ""
   # -- Set the root path of the API - for service discovery via URL paths (default "/")
-  rootPath: ''
+  rootPath: ""
   # -- Set the header name to use for identifying requests (default "Gotenberg-Trace")
-  traceHeader: ''
+  traceHeader: ""
   # -- Disable health check logging
   disableHealthCheckLogging: false
 
@@ -111,9 +111,9 @@ chromium:
   # -- Ignore TLS/SSL errors on localhost
   allowInsecureLocalhost: false
   # -- Set the allowed URLs for Chromium using a regular expression
-  allowList: ''
+  allowList: ""
   # -- Set the denied URLs for Chromium using a regular expression (default "^file:///[^tmp].*")
-  denyList: ''
+  denyList: ""
   # -- Ignore the certificate errors
   ignoreCertificateErrors: false
   # -- Don't enforce the same-origin policy
@@ -121,15 +121,15 @@ chromium:
   # -- Start Chromium with incognito mode
   incognito: false
   # -- Set custom mappings to the host resolver
-  hostResolverRules: ''
+  hostResolverRules: ""
   # -- Set the outbound proxy server; this switch only affects HTTP and HTTPS requests
-  proxyServer: ''
+  proxyServer: ""
   # -- Disable JavaScript
   disableJavaScript: false
   # -- Disable the routes
   disableRoutes: false
   # -- Set the number of consecutive failed starts after which the module is considered unhealthy - 0 means ignore (default 5)
-  failedStartsThreshold: ''
+  failedStartsThreshold: ""
 
 # The LibreOffice module interacts with LibreOffice to convert documents to PDF, thanks to unoconv.
 # https://gotenberg.dev/docs/modules/libreoffice
@@ -137,15 +137,15 @@ libreOffice:
   # -- Disable the routes
   disableRoutes: false
   # -- Time limit for starting the LibreOffice listener (default 10s)
-  unoListenerStartTimeout: ''
+  unoListenerStartTimeout: ""
   # -- Conversions limit after which the LibreOffice listener is restarted - 0 means no long-running LibreOffice listener (default 10)
-  unoListenerRestartThreshold: ''
+  unoListenerRestartThreshold: ""
 
 # The PDF Engines module gathers all engines that can manipulate PDF files.
 # https://gotenberg.dev/docs/modules/pdf-engines
 pdfEngines:
   # -- Set the PDF engines and their order - all by default
-  engines: ''
+  engines: ""
   # -- Disable the routes
   disableRoutes: false
 
@@ -154,21 +154,21 @@ pdfEngines:
 # https://gotenberg.dev/docs/modules/webhook
 webhook:
   # -- Set the allowed URLs for the webhook feature using a regular expression
-  allowList: ''
+  allowList: ""
   # -- Set the denied URLs for the webhook feature using a regular expression
-  denyList: ''
+  denyList: ""
   # -- Set the allowed URLs in case of an error for the webhook feature using a regular expression
-  errorAllowList: ''
+  errorAllowList: ""
   # -- Set the denied URLs in case of an error for the webhook feature using a regular expression
-  errorDenyList: ''
+  errorDenyList: ""
   # -- Set the maximum number of retries for the webhook feature (default 4)
-  maxRetry: ''
+  maxRetry: ""
   # -- Set the minimum duration to wait before trying to call the webhook again (default 1s)
-  retryMinWait: ''
+  retryMinWait: ""
   # -- Set the maximum duration to wait before trying to call the webhook again (default 30s)
-  retryMaxWait: ''
+  retryMaxWait: ""
   # -- Set the time limit for requests to the webhook (default 30s)
-  clientTimeout: ''
+  clientTimeout: ""
   # -- Disable the webhook feature
   disable: false
 
@@ -176,9 +176,9 @@ webhook:
 # https://gotenberg.dev/docs/modules/prometheus
 prometheus:
   # -- Set the interval for collecting modules' metrics (default 1s)
-  collectInterval: ''
+  collectInterval: ""
   # -- Set the namespace of modules' metrics (default "gotenberg")
-  namespece: ''
+  namespece: ""
   # -- Disable the collect of metrics
   disableCollect: false
   # -- Disable the route logging
@@ -188,9 +188,11 @@ prometheus:
 # https://gotenberg.dev/docs/modules/logging
 logging:
   # -- Set log format - auto, json, or text (default "auto")
-  format: ''
+  format: ""
   # -- Set the log level - error, warn, info, or debug (default "info")
-  level: ''
+  level: ""
+  # -- Prepend a specified prefix to each field in the logs
+  fieldsPrefix: ""
 
 # Misc.
 # https://gotenberg.dev/docs/modules/more
