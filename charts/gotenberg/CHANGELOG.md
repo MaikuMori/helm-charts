@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+- Bump `gotenberg` version `7.9.1` -> `7.9.2`.
+
 ## 0.5.0
 
 - Fix [#15](https://github.com/MaikuMori/helm-charts/issues/15) - `HorizontalPodAutoscaler` API version is now `autoscaling/v2` (Thanks to [@tweiss-mdm](https://github.com/tweiss-mdm)).
