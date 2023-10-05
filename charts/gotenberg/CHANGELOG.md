@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+- Add `volumes` and `volumeMounts`
+
 ## 0.5.1
 
 - Bump `gotenberg` version `7.9.1` -> `7.9.2`.

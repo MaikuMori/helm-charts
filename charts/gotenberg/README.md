@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/search?repo=gotenberg)
-![Version: 0.5.1](https://img.shields.io/badge/Version-0.5.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.9.2](https://img.shields.io/badge/AppVersion-7.9.2-informational?style=flat-square)
+![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.9.2](https://img.shields.io/badge/AppVersion-7.9.2-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -108,6 +108,8 @@ helm upgrade my-release maikumori/gotenberg --install
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
 | tolerations | list | `[]` |  |
+| volumeMounts | list | `[]` |  |
+| volumes | list | `[]` |  |
 | webhook.allowList | string | `""` | Set the allowed URLs for the webhook feature using a regular expression |
 | webhook.clientTimeout | string | `""` | Set the time limit for requests to the webhook (default 30s) |
 | webhook.denyList | string | `""` | Set the denied URLs for the webhook feature using a regular expression |
