@@ -2,7 +2,7 @@
 
 ## 0.6.0
 
-- Add `volumes` and `volumeMounts`
+- Add `volumes` and `volumeMounts`. (Thanks to [@pschumacher](https://github.com/pschumacher))
 
 ## 0.5.1
 
