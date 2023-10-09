@@ -66,6 +66,16 @@ tolerations: []
 
 affinity: {}
 
+volumes: []
+#  - name: tmp-volume
+#    emptyDir:
+#      medium: Memory
+#      sizeLimit: 2Gi
+
+volumeMounts: []
+#  - name: tmp-volume
+#    mountPath: /tmp
+
 ingress:
   # -- Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet.
   enabled: false
