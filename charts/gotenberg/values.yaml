@@ -117,7 +117,7 @@ api:
 # https://gotenberg.dev/docs/modules/chromium
 chromium:
   # -- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature
-  restartAfter: 0
+  restartAfter: ""
   # -- Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion
   autoStart: false
   # -- Maximum duration to wait for Chromium to start or restart
@@ -151,7 +151,7 @@ chromium:
 # https://gotenberg.dev/docs/modules/libreoffice
 libreOffice:
   # -- Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)
-  restartAfter: 10
+  restartAfter: ""
   # -- Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)
   autoStart: false
   # -- Maximum duration to wait for LibreOffice to start or restart (default 10s)

@@ -71,7 +71,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | chromium.ignoreCertificateErrors | bool | `false` | Ignore the certificate errors |
 | chromium.incognito | bool | `false` | Start Chromium with incognito mode |
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
-| chromium.restartAfter | int | `0` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature |
+| chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
 | fullnameOverride | string | `""` |  |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
@@ -86,7 +86,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | ingress.tls | list | `[]` | Set the TLS configuration for the ingress, see values.yaml for an example. |
 | libreOffice.autoStart | bool | `false` | Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false) |
 | libreOffice.disableRoutes | bool | `false` | Disable the routes |
-| libreOffice.restartAfter | int | `10` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10) |
+| libreOffice.restartAfter | string | `""` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10) |
 | libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 10s) |
 | libreOffice.unoListenerRestartThreshold | string | `""` | Conversions limit after which the LibreOffice listener is restarted - 0 means no long-running LibreOffice listener (default 10) |
 | libreOffice.unoListenerStartTimeout | string | `""` | Time limit for starting the LibreOffice listener (default 10s) |
