@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0
+
+- Bump `gotenberg` version `7.9.2` -> `7.10.1`.
+- Add values for the following flags:
+
+  - `--chromium-restart-after`
+  - `--chromium-auto-start`
+  - `--chromium-start-timeout`
+  - `--libreoffice-restart-after`
+  - `--libreoffice-auto-start`
+  - `--libreoffice-start-timeout`
+
 ## 0.6.0
 
 - Add `volumes` and `volumeMounts`. (Thanks to [@pschumacher](https://github.com/pschumacher))

@@ -116,6 +116,12 @@ api:
 # The Chromium module interacts with the Chromium browser to convert HTML documents to PDF.
 # https://gotenberg.dev/docs/modules/chromium
 chromium:
+  # -- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature
+  restartAfter: ""
+  # -- Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion
+  autoStart: false
+  # -- Maximum duration to wait for Chromium to start or restart
+  startTimeout: ""
   # -- Allow file:// URIs to read other file:// URIs
   allowFileAccessFromFiles: false
   # -- Ignore TLS/SSL errors on localhost
@@ -144,6 +150,12 @@ chromium:
 # The LibreOffice module interacts with LibreOffice to convert documents to PDF, thanks to unoconv.
 # https://gotenberg.dev/docs/modules/libreoffice
 libreOffice:
+  # -- Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)
+  restartAfter: ""
+  # -- Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)
+  autoStart: false
+  # -- Maximum duration to wait for LibreOffice to start or restart (default 10s)
+  startTimeout: ""
   # -- Disable the routes
   disableRoutes: false
   # -- Time limit for starting the LibreOffice listener (default 10s)
