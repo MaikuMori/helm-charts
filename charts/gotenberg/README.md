@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/search?repo=gotenberg)
-![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.9.2](https://img.shields.io/badge/AppVersion-7.9.2-informational?style=flat-square)
+![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.10.1](https://img.shields.io/badge/AppVersion-7.10.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -61,6 +61,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | chromium.allowFileAccessFromFiles | bool | `false` | Allow file:// URIs to read other file:// URIs |
 | chromium.allowInsecureLocalhost | bool | `false` | Ignore TLS/SSL errors on localhost |
 | chromium.allowList | string | `""` | Set the allowed URLs for Chromium using a regular expression |
+| chromium.autoStart | bool | `false` | Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion |
 | chromium.denyList | string | `""` | Set the denied URLs for Chromium using a regular expression (default "^file:///[^tmp].*") |
 | chromium.disableJavaScript | bool | `false` | Disable JavaScript |
 | chromium.disableRoutes | bool | `false` | Disable the routes |
@@ -70,6 +71,8 @@ helm upgrade my-release maikumori/gotenberg --install
 | chromium.ignoreCertificateErrors | bool | `false` | Ignore the certificate errors |
 | chromium.incognito | bool | `false` | Start Chromium with incognito mode |
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
+| chromium.restartAfter | int | `0` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature |
+| chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
 | fullnameOverride | string | `""` |  |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -81,7 +84,10 @@ helm upgrade my-release maikumori/gotenberg --install
 | ingress.enabled | bool | `false` | Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet. |
 | ingress.hosts | list | `[]` | Set the hostnames of the ingress, see values.yaml for an example. |
 | ingress.tls | list | `[]` | Set the TLS configuration for the ingress, see values.yaml for an example. |
+| libreOffice.autoStart | bool | `false` | Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false) |
 | libreOffice.disableRoutes | bool | `false` | Disable the routes |
+| libreOffice.restartAfter | int | `10` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10) |
+| libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 10s) |
 | libreOffice.unoListenerRestartThreshold | string | `""` | Conversions limit after which the LibreOffice listener is restarted - 0 means no long-running LibreOffice listener (default 10) |
 | libreOffice.unoListenerStartTimeout | string | `""` | Time limit for starting the LibreOffice listener (default 10s) |
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |

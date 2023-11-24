@@ -52,6 +52,15 @@ spec:
           - --api-disable-health-check-logging
           {{- end }}
 
+          {{- if .Values.chromium.restartAfter }}
+          - --chromium-restart-after={{ .Values.chromium.restartAfter }}
+          {{- end }}
+          {{- if .Values.chromium.autoStart }}
+          - --chromium-auto-start
+          {{- end }}
+          {{- if .Values.chromium.startTimeout }}
+          - --chromium-start-timeout={{ .Values.chromium.startTimeout }}
+          {{- end }}
           {{- if .Values.chromium.allowFileAccessFromFiles }}
           - --chromium-allow-file-access-from-files
           {{- end }}
@@ -89,6 +98,15 @@ spec:
           - --chromium-failed-starts-threshold={{ .Values.chromium.failedStartsThreshold }}
           {{- end }}
 
+          {{- if .Values.libreOffice.restartAfter }}
+          - --libreoffice-restart-after={{ .Values.libreOffice.restartAfter }}
+          {{- end }}
+          {{- if .Values.libreOffice.autoStart }}
+          - --libreoffice-auto-start
+          {{- end }}
+          {{- if .Values.libreOffice.startTimeout }}
+          - --libreoffice-start-timeout={{ .Values.libreOffice.startTimeout }}
+          {{- end }}
           {{- if .Values.libreOffice.disableRoutes }}
           - --libreoffice-disable-routes
           {{- end }}
