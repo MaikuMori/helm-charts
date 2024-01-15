@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0
+
+- Bump `gotenberg` version `7.10.1` -> `8.0.1`.
+- Update configuration options according to upstream changes:
+  - Remove `chromium.failedStartsThreshold`.
+  - Remove `libreOffice.unoListenerStartTimeout`.
+  - Remove `libreOffice.unoListenerRestartThreshold`.
+  - Add `chromium.clearCache`.
+  - Add `chromium.clearCookies`.
+
 ## 0.7.0
 
 - Bump `gotenberg` version `7.9.2` -> `7.10.1`.
