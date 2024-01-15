@@ -94,8 +94,11 @@ spec:
           {{- if .Values.chromium.disableRoutes }}
           - --chromium-disable-routes
           {{- end }}
-          {{- if .Values.chromium.failedStartsThreshold }}
-          - --chromium-failed-starts-threshold={{ .Values.chromium.failedStartsThreshold }}
+          {{- if .Values.chromium.clearCache }}
+          - --chromium-clear-cache
+          {{- end }}
+          {{- if .Values.chromium.clearCookies }}
+          - --chromium-clear-cookies
           {{- end }}
 
           {{- if .Values.libreOffice.restartAfter }}
@@ -109,12 +112,6 @@ spec:
           {{- end }}
           {{- if .Values.libreOffice.disableRoutes }}
           - --libreoffice-disable-routes
-          {{- end }}
-          {{- if .Values.libreOffice.unoListenerStartTimeout }}
-          - --uno-listener-start-timeout={{ .Values.libreOffice.unoListenerStartTimeout }}
-          {{- end }}
-          {{- if .Values.libreOffice.unoListenerRestartThreshold }}
-          - --uno-listener-restart-threshold={{ .Values.libreOffice.unoListenerRestartThreshold }}
           {{- end }}
 
           {{- if .Values.pdfEngines.engines }}

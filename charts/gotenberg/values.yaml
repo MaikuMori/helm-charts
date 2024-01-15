@@ -144,8 +144,10 @@ chromium:
   disableJavaScript: false
   # -- Disable the routes
   disableRoutes: false
-  # -- Set the number of consecutive failed starts after which the module is considered unhealthy - 0 means ignore (default 5)
-  failedStartsThreshold: ""
+  # -- Clear Chromium cache between each conversion.
+  clearCache: false
+  # -- Clear Chromium cookies between each conversion.
+  clearCookies: false
 
 # The LibreOffice module interacts with LibreOffice to convert documents to PDF, thanks to unoconv.
 # https://gotenberg.dev/docs/modules/libreoffice
@@ -158,10 +160,6 @@ libreOffice:
   startTimeout: ""
   # -- Disable the routes
   disableRoutes: false
-  # -- Time limit for starting the LibreOffice listener (default 10s)
-  unoListenerStartTimeout: ""
-  # -- Conversions limit after which the LibreOffice listener is restarted - 0 means no long-running LibreOffice listener (default 10)
-  unoListenerRestartThreshold: ""
 
 # The PDF Engines module gathers all engines that can manipulate PDF files.
 # https://gotenberg.dev/docs/modules/pdf-engines
