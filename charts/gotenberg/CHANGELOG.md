@@ -9,6 +9,7 @@
   - Remove `libreOffice.unoListenerRestartThreshold`.
   - Add `chromium.clearCache`.
   - Add `chromium.clearCookies`.
+- CI: Fix warning about missing `GITHUB_TOKEN` when setting up Helm.
 
 ## 0.7.0
 
