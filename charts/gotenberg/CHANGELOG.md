@@ -2,7 +2,8 @@
 
 ## 1.0.1
 
-- Fix typo in `.Values.prometheus.namespace`.
+- Fix typo in `.Values.prometheus.namespace`. (Thanks to Szczepan Rędzioch | [@redzioch](https://github.com/redzioch))
+- Bump `gotenberg` version `8.0.1` -> `8.0.2`.
 
 ## 1.0.0
 
