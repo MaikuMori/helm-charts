@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- Fix typo in `.Values.prometheus.namespace`.
+
 ## 1.0.0
 
 - Bump `gotenberg` version `7.10.1` -> `8.0.1`.
