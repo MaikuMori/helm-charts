@@ -198,7 +198,7 @@ prometheus:
   # -- Set the interval for collecting modules' metrics (default 1s)
   collectInterval: ""
   # -- Set the namespace of modules' metrics (default "gotenberg")
-  namespece: ""
+  namespace: ""
   # -- Disable the collect of metrics
   disableCollect: false
   # -- Disable the route logging

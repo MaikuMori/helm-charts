@@ -102,7 +102,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | prometheus.collectInterval | string | `""` | Set the interval for collecting modules' metrics (default 1s) |
 | prometheus.disableCollect | bool | `false` | Disable the collect of metrics |
 | prometheus.disableRouterLogging | bool | `false` | Disable the route logging |
-| prometheus.namespece | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
+| prometheus.namespace | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext.privileged | bool | `false` |  |
