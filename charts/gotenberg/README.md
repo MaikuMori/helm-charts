@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/search?repo=gotenberg)
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.0.1](https://img.shields.io/badge/AppVersion-8.0.1-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.0.2](https://img.shields.io/badge/AppVersion-8.0.2-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -102,7 +102,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | prometheus.collectInterval | string | `""` | Set the interval for collecting modules' metrics (default 1s) |
 | prometheus.disableCollect | bool | `false` | Disable the collect of metrics |
 | prometheus.disableRouterLogging | bool | `false` | Disable the route logging |
-| prometheus.namespece | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
+| prometheus.namespace | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext.privileged | bool | `false` |  |
