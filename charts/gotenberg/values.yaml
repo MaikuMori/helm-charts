@@ -148,6 +148,8 @@ chromium:
   clearCache: false
   # -- Clear Chromium cookies between each conversion.
   clearCookies: false
+  # -- Maximum request queue size for Chromium. Set to 0 to disable this feature.
+  maxQueueSize: 0
 
 # The LibreOffice module interacts with LibreOffice to convert documents to PDF, thanks to unoconv.
 # https://gotenberg.dev/docs/modules/libreoffice
@@ -160,6 +162,8 @@ libreOffice:
   startTimeout: ""
   # -- Disable the routes
   disableRoutes: false
+  # -- Maximum request queue size for LibreOffice. Set to 0 to disable this feature.
+  maxQueueSize: 0
 
 # The PDF Engines module gathers all engines that can manipulate PDF files.
 # https://gotenberg.dev/docs/modules/pdf-engines

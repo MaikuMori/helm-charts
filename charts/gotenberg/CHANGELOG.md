@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0
+
+- Bump `gotenberg` version `8.0.2` -> `8.1.0`.
+
+- Add new flags:
+
+  - `--chromium-max-queue-size`
+  - `--libreoffice-max-queue-size`
+
 ## 1.0.1
 
 - Fix typo in `.Values.prometheus.namespace`. (Thanks to Szczepan Rędzioch | [@redzioch](https://github.com/redzioch))

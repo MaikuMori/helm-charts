@@ -100,6 +100,9 @@ spec:
           {{- if .Values.chromium.clearCookies }}
           - --chromium-clear-cookies
           {{- end }}
+          {{- if .Values.chromium.maxQueueSize }}
+          - --chromium-max-queue-size={{ .Values.chromium.maxQueueSize }}
+          {{- end }}
 
           {{- if .Values.libreOffice.restartAfter }}
           - --libreoffice-restart-after={{ .Values.libreOffice.restartAfter }}
@@ -112,6 +115,9 @@ spec:
           {{- end }}
           {{- if .Values.libreOffice.disableRoutes }}
           - --libreoffice-disable-routes
+          {{- end }}
+          {{- if .Values.libreOffice.maxQueueSize }}
+          - --libreoffice-max-queue-size={{ .Values.libreOffice.maxQueueSize }}
           {{- end }}
 
           {{- if .Values.pdfEngines.engines }}
