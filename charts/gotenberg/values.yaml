@@ -112,6 +112,12 @@ api:
   traceHeader: ""
   # -- Disable health check logging
   disableHealthCheckLogging: false
+  # -- Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values
+  enableBasicAuth: false
+  # -- Set the basic authentication username
+  basicAuthUsername:
+  # -- Set the basic authentication password
+  basicAuthPassword:
 
 # The Chromium module interacts with the Chromium browser to convert HTML documents to PDF.
 # https://gotenberg.dev/docs/modules/chromium

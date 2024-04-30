@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0
+
+- Bump `gotenberg` version `8.1.0` -> `8.5.0`.
+- Add new options:
+
+  - `enableBasicAuth`
+  - `basicAuthUsername`
+  - `basicAuthPassword`
+
 ## 1.1.0
 
 - Bump `gotenberg` version `8.0.2` -> `8.1.0`.

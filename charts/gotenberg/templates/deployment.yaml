@@ -51,6 +51,9 @@ spec:
           {{- if .Values.api.disableHealthCheckLogging }}
           - --api-disable-health-check-logging
           {{- end }}
+          {{- if .Values.api.enableBasicAuth }}
+          - --api-enable-basic-auth
+          {{- end }}
 
           {{- if .Values.chromium.restartAfter }}
           - --chromium-restart-after={{ .Values.chromium.restartAfter }}
@@ -180,6 +183,13 @@ spec:
 
           {{- if .Values.gotenberg.gracefulShutdownDurationSec }}
           - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s
+          {{- end }}
+          env:
+          {{- if and .Values.api.enableBasicAuth .Values.api.basicAuthUsername .Values.api.basicAuthPassword }}
+            - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+              value: {{ .Values.api.basicAuthUsername }}
+            - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+              value: {{ .Values.api.basicAuthPassword }}
           {{- end }}
           ports:
             - name: http

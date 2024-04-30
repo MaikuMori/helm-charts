@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/search?repo=gotenberg)
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.1.0](https://img.shields.io/badge/AppVersion-8.1.0-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.5.0](https://img.shields.io/badge/AppVersion-8.5.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -49,7 +49,10 @@ helm upgrade my-release maikumori/gotenberg --install
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
+| api.basicAuthPassword | string | `nil` | Set the basic authentication password |
+| api.basicAuthUsername | string | `nil` | Set the basic authentication username |
 | api.disableHealthCheckLogging | bool | `false` | Disable health check logging |
+| api.enableBasicAuth | bool | `false` | Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values |
 | api.port | int | `3000` | Set the port on which the API should listen (default 3000) |
 | api.rootPath | string | `""` | Set the root path of the API - for service discovery via URL paths (default "/") |
 | api.timeout | string | `""` | Set the time limit for requests (default 30s) |
