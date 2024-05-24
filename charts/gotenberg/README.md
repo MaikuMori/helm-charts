@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.5.0](https://img.shields.io/badge/AppVersion-8.5.0-informational?style=flat-square)
+![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.5.0](https://img.shields.io/badge/AppVersion-8.5.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -78,6 +78,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
 | chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
+| compatibility.openshift.adaptSecurityContext | string | `"auto"` | Adapt the securityContext sections of the deployment to make them compatible with Openshift restricted-v2 SCC: remove runAsUser, runAsGroup and fsGroup and let the platform use their allowed default IDs. Possible values: auto (apply if the detected running cluster is Openshift), force (perform the adaptation always), disabled (do not perform adaptation) |
 | fullnameOverride | string | `""` |  |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
