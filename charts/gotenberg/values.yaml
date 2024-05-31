@@ -33,8 +33,7 @@ podSecurityContext:
   # fsGroup: 2000
 
 securityContext:
-  privileged: false
-  runAsUser: 1001
+  {}
 
 service:
   type: ClusterIP

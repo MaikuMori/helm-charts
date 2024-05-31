@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.5.0](https://img.shields.io/badge/AppVersion-8.5.0-informational?style=flat-square)
+![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.5.1](https://img.shields.io/badge/AppVersion-8.5.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -110,8 +110,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | prometheus.namespace | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext.privileged | bool | `false` |  |
-| securityContext.runAsUser | int | `1001` |  |
+| securityContext | object | `{}` |  |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
