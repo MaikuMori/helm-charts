@@ -32,6 +32,8 @@ podSecurityContext:
   {}
   # fsGroup: 2000
 
+# -- Define the security context for the container. By default will use upstream recommended values.
+# @default -- `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set.
 securityContext:
   {}
 
