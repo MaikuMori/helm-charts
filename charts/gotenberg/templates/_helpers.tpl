@@ -60,3 +60,25 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create a security context
+
+If .Values.securityContext is set, use it. Otherwise, use the defaults.
+
+Defaults:
+If we detect OpenShift, we remove the "runAsUser", fsGroup, "runAsGroup" fields since they're not supported.
+And apply recommended settings from upstream project.
+*/}}
+{{- define "gotenberg.securityContext" -}}
+{{- if .Values.securityContext }}
+{{- toYaml .Values.securityContext }}
+{{- else}}
+{{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
+privileged: false
+{{- else -}}
+privileged: false
+runAsUser: 1001
+{{- end}}
+{{- end}}
+{{- end}}

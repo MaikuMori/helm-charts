@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+- Add `securityContext` compatibility with OpenShift platform. (Thanks to Jonas Geiler | [@jonasgeiler](https://github.com/jonasgeiler))
+- Bump `gotenberg` version `8.5.0` -> `8.5.1`.
+
 ## 1.2.0
 
 - Bump `gotenberg` version `8.1.0` -> `8.5.0`.
