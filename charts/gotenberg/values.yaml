@@ -43,6 +43,10 @@ service:
   # -- Annotations to add to the service
   annotations: {}
 
+# Strategy is utilized to configure the desired upgrade approach and
+# configuration for the deployment.
+strategy: {}
+
 resources:
   {}
   # We usually recommend not to specify default resources and to leave this as a conscious
