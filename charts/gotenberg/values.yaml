@@ -69,6 +69,12 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+pdb:
+  create: false
+  minAvailable: 1
+  maxUnavailable: ""
+  unhealthyPodEvictionPolicy: AlwaysAllow
+
 nodeSelector: {}
 
 tolerations: []
