@@ -44,6 +44,12 @@ spec:
           args:
           - gotenberg
           - --api-port={{ .Values.api.port }}
+          {{- if .Values.api.tlsCertFile }}
+          - --api-tls-cert-file={{ .Values.api.tlsCertFile }}
+          {{- end }}
+          {{- if .Values.api.tlsKeyFile }}
+          - --api-tls-key-file={{ .Values.api.tlsKeyFile }}
+          {{- end }}
           {{- if .Values.api.timeout }}
           - --api-timeout={{ .Values.api.timeout }}
           {{- end }}
