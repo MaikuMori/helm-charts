@@ -212,6 +212,7 @@ spec:
           volumeMounts:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
       terminationGracePeriodSeconds: {{ .Values.gotenberg.gracefulShutdownDurationSec }}
+      progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
