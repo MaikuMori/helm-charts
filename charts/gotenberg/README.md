@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.5.1](https://img.shields.io/badge/AppVersion-8.5.1-informational?style=flat-square)
+![Version: 1.4.0](https://img.shields.io/badge/Version-1.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.5.1](https://img.shields.io/badge/AppVersion-8.5.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -99,11 +99,16 @@ helm upgrade my-release maikumori/gotenberg --install
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
+| pdb.create | bool | `false` |  |
+| pdb.maxUnavailable | string | `""` |  |
+| pdb.minAvailable | int | `1` |  |
+| pdb.unhealthyPodEvictionPolicy | string | `"AlwaysAllow"` |  |
 | pdfEngines.disableRoutes | bool | `false` | Disable the routes |
 | pdfEngines.engines | string | `""` | Set the PDF engines and their order - all by default |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` | List of additional pod labels |
 | podSecurityContext | object | `{}` |  |
+| progressDeadlineSeconds | int | `120` |  |
 | prometheus.collectInterval | string | `""` | Set the interval for collecting modules' metrics (default 1s) |
 | prometheus.disableCollect | bool | `false` | Disable the collect of metrics |
 | prometheus.disableRouterLogging | bool | `false` | Disable the route logging |
@@ -111,12 +116,15 @@ helm upgrade my-release maikumori/gotenberg --install
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set. | Define the security context for the container. By default will use upstream recommended values. |
+| service.annotations | object | `{}` | Annotations to add to the service |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
+| strategy | object | `{}` |  |
 | tolerations | list | `[]` |  |
+| topologySpreadConstraints | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |
 | webhook.allowList | string | `""` | Set the allowed URLs for the webhook feature using a regular expression |

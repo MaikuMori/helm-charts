@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0
+
+- Add ability to create and configure `PodDisruptionBudget`
+- Add ability to configure Deployment `topologySpreadConstraints`
+- Add ability to override Deployment `progressDeadlineSeconds`
+- Add ability to configure Deployment `strategy`
+- Add ability to set Service `annotations`
+
 ## 1.3.0
 
 - Add `securityContext` compatibility with OpenShift platform. (Thanks to Jonas Geiler | [@jonasgeiler](https://github.com/jonasgeiler))
