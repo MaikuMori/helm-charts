@@ -15,5 +15,7 @@ spec:
   {{- if .Values.pdb.maxUnavailable }}
   maxUnavailable: {{ .Values.pdb.maxUnavailable }}
   {{- end }}
+  {{- if .Values.pdb.unhealthyPodEvictionPolicy }}
   unhealthyPodEvictionPolicy: {{ .Values.pdb.unhealthyPodEvictionPolicy }}
+  {{- end }}
 {{- end }}

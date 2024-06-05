@@ -102,7 +102,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | pdb.create | bool | `false` |  |
 | pdb.maxUnavailable | string | `""` |  |
 | pdb.minAvailable | int | `1` |  |
-| pdb.unhealthyPodEvictionPolicy | string | `"AlwaysAllow"` |  |
+| pdb.unhealthyPodEvictionPolicy | string | `nil` | This is a beta feature, so it's not enabled by default. |
 | pdfEngines.disableRoutes | bool | `false` | Disable the routes |
 | pdfEngines.engines | string | `""` | Set the PDF engines and their order - all by default |
 | podAnnotations | object | `{}` |  |
