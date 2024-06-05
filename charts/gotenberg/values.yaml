@@ -40,6 +40,14 @@ securityContext:
 service:
   type: ClusterIP
   port: 80
+  # -- Annotations to add to the service
+  annotations: {}
+
+# Strategy is utilized to configure the desired upgrade approach and
+# configuration for the deployment.
+strategy: {}
+
+progressDeadlineSeconds: 120
 
 resources:
   {}
@@ -61,11 +69,20 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+pdb:
+  create: false
+  minAvailable: 1
+  maxUnavailable: ""
+  # -- This is a beta feature, so it's not enabled by default.
+  unhealthyPodEvictionPolicy:
+
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+topologySpreadConstraints: []
 
 volumes: []
 #  - name: tmp-volume
