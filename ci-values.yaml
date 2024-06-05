@@ -1,3 +1,9 @@
+pdb:
+  create: true
+  minAvailable: 1
+  maxUnavailable: ""
+  unhealthyPodEvictionPolicy: AlwaysAllow
+
 serviceAccount:
   create: true
 

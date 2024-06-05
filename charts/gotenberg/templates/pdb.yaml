@@ -1,4 +1,4 @@
-{{- if .Values.pdb.create }}
+{{- if .Values.pdb.create -}}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
