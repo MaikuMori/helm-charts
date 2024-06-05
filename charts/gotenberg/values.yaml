@@ -75,6 +75,8 @@ tolerations: []
 
 affinity: {}
 
+topologySpreadConstraints: []
+
 volumes: []
 #  - name: tmp-volume
 #    emptyDir:
