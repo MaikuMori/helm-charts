@@ -12,6 +12,7 @@ spec:
   strategy:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
   selector:
     matchLabels:
       {{- include "gotenberg.selectorLabels" . | nindent 6 }}
@@ -212,7 +213,6 @@ spec:
           volumeMounts:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
       terminationGracePeriodSeconds: {{ .Values.gotenberg.gracefulShutdownDurationSec }}
-      progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
