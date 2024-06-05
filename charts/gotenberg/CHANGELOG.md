@@ -2,11 +2,11 @@
 
 ## 1.4.0
 
-- Add ability to create and configure `PodDisruptionBudget`
-- Add ability to configure Deployment `topologySpreadConstraints`
-- Add ability to override Deployment `progressDeadlineSeconds`
-- Add ability to configure Deployment `strategy`
-- Add ability to set Service `annotations`
+- Add ability to create and configure `PodDisruptionBudget` (Thanks to Aurel Canciu | [@relu](https://github.com/relu))
+- Add ability to configure Deployment `topologySpreadConstraints` (Thanks to Aurel Canciu | [@relu](https://github.com/relu))
+- Add ability to override Deployment `progressDeadlineSeconds` (Thanks to Aurel Canciu | [@relu](https://github.com/relu))
+- Add ability to configure Deployment `strategy` (Thanks to Aurel Canciu | [@relu](https://github.com/relu))
+- Add ability to set Service `annotations` (Thanks to Aurel Canciu | [@relu](https://github.com/relu))
 
 ## 1.3.0
 
