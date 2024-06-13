@@ -2,7 +2,7 @@
 
 ## 1.5.0
 
-- Bump `gotenberg` version `8.5.1` -> `8.6.0`.
+- Bump `gotenberg` version `8.5.1` -> `8.7.0`.
 - Add values for the following flags (Thanks to Jonas Geiler | [@jonasgeiler](https://github.com/jonasgeiler)):
 
   - `--api-tls-cert-file`
