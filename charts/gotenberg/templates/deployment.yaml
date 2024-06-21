@@ -44,11 +44,11 @@ spec:
           args:
           - gotenberg
           - --api-port={{ .Values.api.port }}
-          {{- if .Values.api.tlsCertFile }}
-          - --api-tls-cert-file={{ .Values.api.tlsCertFile }}
+          {{- if .Values.api.tlsSecretName }}
+          - --api-tls-cert-file=/tls/tls.crt
           {{- end }}
-          {{- if .Values.api.tlsKeyFile }}
-          - --api-tls-key-file={{ .Values.api.tlsKeyFile }}
+          {{- if .Values.api.tlsSecretName }}
+          - --api-tls-key-file=/tls/tls.key
           {{- end }}
           {{- if .Values.api.timeout }}
           - --api-timeout={{ .Values.api.timeout }}
@@ -218,6 +218,11 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- if .Values.api.tlsSecretName }}
+            - name: tls
+              mountPath: /tls
+              readOnly: true
+            {{- end }}
       terminationGracePeriodSeconds: {{ .Values.gotenberg.gracefulShutdownDurationSec }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -238,4 +243,9 @@ spec:
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
+        {{- if .Values.api.tlsSecretName }}
+        - name: tls
+          secret:
+            secretName: {{ .Values.api.tlsSecretName }}
+        {{- end }}
       {{- end }}
