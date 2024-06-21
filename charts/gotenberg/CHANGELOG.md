@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0
+
+- Bump `gotenberg` version `8.5.1` -> `8.7.0`.
+- Add support for the following flags (Thanks to Jonas Geiler | [@jonasgeiler](https://github.com/jonasgeiler)):
+
+  - `--api-tls-cert-file`
+  - `--api-tls-key-file`
+
 ## 1.4.0
 
 - Add ability to create and configure `PodDisruptionBudget` (Thanks to Aurel Canciu | [@relu](https://github.com/relu))
