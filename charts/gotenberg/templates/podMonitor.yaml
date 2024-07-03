@@ -1,0 +1,21 @@
+{{- if .Values.prometheus.podMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "gotenberg.fullname" . }}
+  labels:
+    {{- include "gotenberg.labels" . | nindent 4 }}
+    {{- with .Values.prometheus.podMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    {{- include "gotenberg.selectorLabels" . | nindent 4 }}
+  podMetricsEndpoints:
+    - port: http
+      scheme: http
+      path: /prometheus/metrics
+    {{- with .Values.prometheus.podMonitor.interval }}
+      interval: {{ . }}
+    {{- end }}
+{{- end }}
