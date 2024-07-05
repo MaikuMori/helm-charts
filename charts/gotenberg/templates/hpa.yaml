@@ -12,6 +12,8 @@ spec:
     name: {{ include "gotenberg.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  behavior:
+    {{- toYaml .Values.autoscaling.behavior | nindent 4 }}
   metrics:
     {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
