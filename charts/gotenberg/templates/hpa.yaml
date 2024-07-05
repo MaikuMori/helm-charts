@@ -12,7 +12,7 @@ spec:
     name: {{ include "gotenberg.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
-  {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
+  {{- if .Values.autoscaling.behavior }}
   behavior:
     {{- toYaml .Values.autoscaling.behavior | nindent 4 }}
   {{- end }}
