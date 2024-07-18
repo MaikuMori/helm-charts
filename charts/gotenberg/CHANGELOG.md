@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.1
+
+- Fix [#39](https://github.com/MaikuMori/helm-charts/issues/39) - Use global scope in a with block when using custom volumes
+
 ## 1.5.0
 
 - Bump `gotenberg` version `8.5.1` -> `8.7.0`.
