@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.1
+
+- Bump `gotenberg` version `8.7.0` -> `8.8.1`.
+- Fix [#39](https://github.com/MaikuMori/helm-charts/issues/39) (Thanks to Šimon Woidig | [@SimonWoidig](https://github.com/SimonWoidig))
+
 ## 1.5.0
 
 - Bump `gotenberg` version `8.5.1` -> `8.7.0`.

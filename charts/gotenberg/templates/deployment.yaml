@@ -243,9 +243,9 @@ spec:
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
-        {{- if .Values.api.tlsSecretName }}
+        {{- if $.Values.api.tlsSecretName }}
         - name: tls
           secret:
-            secretName: {{ .Values.api.tlsSecretName }}
+            secretName: {{ $.Values.api.tlsSecretName }}
         {{- end }}
       {{- end }}
