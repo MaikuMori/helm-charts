@@ -94,6 +94,10 @@ volumeMounts: []
 #  - name: tmp-volume
 #    mountPath: /tmp
 
+extraEnv: []
+#  - name: FOO
+#    value: bar
+
 ingress:
   # -- Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet.
   enabled: false

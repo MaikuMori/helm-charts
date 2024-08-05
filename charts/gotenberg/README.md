@@ -79,6 +79,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
 | chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
+| extraEnv | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
