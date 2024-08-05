@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.5.1](https://img.shields.io/badge/Version-1.5.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.8.1](https://img.shields.io/badge/AppVersion-8.8.1-informational?style=flat-square)
+![Version: 1.6.0](https://img.shields.io/badge/Version-1.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.8.1](https://img.shields.io/badge/AppVersion-8.8.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -79,7 +79,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
 | chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
-| extraEnv | list | `[]` |  |
+| extraEnv | list | `[]` | List of extra environment variables for gotenberg container |
 | fullnameOverride | string | `""` |  |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
 | image.pullPolicy | string | `"IfNotPresent"` |  |

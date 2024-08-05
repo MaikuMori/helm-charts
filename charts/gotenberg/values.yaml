@@ -94,6 +94,7 @@ volumeMounts: []
 #  - name: tmp-volume
 #    mountPath: /tmp
 
+# -- List of extra environment variables for gotenberg container
 extraEnv: []
 #  - name: FOO
 #    value: bar
