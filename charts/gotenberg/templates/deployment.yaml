@@ -37,7 +37,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext: 
+          securityContext:
             {{- include "gotenberg.securityContext" . | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -88,7 +88,7 @@ spec:
           - --chromium-deny-list={{ .Values.chromium.denyList }}
           {{- end }}
           {{- if .Values.chromium.ignoreCertificateErrors }}
-          - --chromium-ignore-certificate-errors 
+          - --chromium-ignore-certificate-errors
           {{- end }}
           {{- if .Values.chromium.disableWebSecurity }}
           - --chromium-disable-web-security
@@ -201,6 +201,9 @@ spec:
               value: {{ .Values.api.basicAuthUsername }}
             - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
               value: {{ .Values.api.basicAuthPassword }}
+          {{- end }}
+          {{- with .Values.extraEnv }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
           ports:
             - name: http
