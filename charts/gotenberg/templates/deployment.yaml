@@ -37,7 +37,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext: 
+          securityContext:
             {{- include "gotenberg.securityContext" . | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -88,7 +88,7 @@ spec:
           - --chromium-deny-list={{ .Values.chromium.denyList }}
           {{- end }}
           {{- if .Values.chromium.ignoreCertificateErrors }}
-          - --chromium-ignore-certificate-errors 
+          - --chromium-ignore-certificate-errors
           {{- end }}
           {{- if .Values.chromium.disableWebSecurity }}
           - --chromium-disable-web-security
@@ -202,6 +202,9 @@ spec:
             - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
               value: {{ .Values.api.basicAuthPassword }}
           {{- end }}
+          {{- with .Values.extraEnv }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.api.port }}
@@ -250,10 +253,12 @@ spec:
       topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.volumes }}
       volumes:
-        {{- toYaml .Values.volumes | nindent 8 }}
-        {{- with .Values.api.tlsSecretName }}
+        {{- toYaml . | nindent 8 }}
+        {{- if $.Values.api.tlsSecretName }}
         - name: tls
           secret:
-            secretName: {{ . }}
+            secretName: {{ $.Values.api.tlsSecretName }}
         {{- end }}
+      {{- end }}
