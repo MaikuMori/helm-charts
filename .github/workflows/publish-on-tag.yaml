@@ -1,0 +1,35 @@
+name: Publish
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+
+  publish_helm_chart:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Login to harbor helm registry
+      run: echo $ACCOUNT_TOKEN | helm registry login -u $ACCOUNT_NAME --password-stdin harbor.modac.cloud
+      env:
+        ACCOUNT_NAME: ${{ secrets.HARBOR_ROBOT_ACCOUNT_NAME }}
+        ACCOUNT_TOKEN: ${{ secrets.HARBOR_ROBOT_ACCOUNT_TOKEN }}
+
+    - name: Login to enterprise helm registry
+      run: echo $ACCOUNT_TOKEN | helm registry login -u $ACCOUNT_NAME --password-stdin enterprise-registry.modac.cloud
+      env:
+        ACCOUNT_NAME: ${{ secrets.ENTERPRISE_REGISTRY_ACCOUNT_NAME }}
+        ACCOUNT_TOKEN: ${{ secrets.ENTERPRISE_REGISTRY_ACCOUNT_TOKEN }}
+
+    - name: Package helm chart
+      run: |
+        helm package charts/gotenberg --app-version ${GITHUB_REF/refs\/tags\//} --version ${GITHUB_REF/refs\/tags\//}
+
+    - name: Upload helm chart
+      run: |
+        helm push gotenberg-${GITHUB_REF/refs\/tags\//}.tgz oci://harbor.modac.cloud/library/charts
+        helm push gotenberg-${GITHUB_REF/refs\/tags\//}.tgz oci://enterprise-registry.modac.cloud/library/charts
