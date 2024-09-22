@@ -255,3 +255,26 @@ logging:
 gotenberg:
   # -- Set the graceful shutdown duration (default 30s)
   gracefulShutdownDurationSec: 30
+
+metrics:
+  serviceMonitor:
+    # -- Enable ServiceMonitor
+    enabled: false
+    # -- (string) Namespace for ServiceMonitor, defaults to release namespace
+    namespace:
+    # -- (string) Optional job label for the target service in Prometheus
+    jobLabel:
+    # -- (string) Interval at which metrics should be scraped
+    interval:
+    # -- (string) Timeout after which the scrape is ended
+    scrapeTimeout:
+    # -- HonorLabels chooses the metric’s labels on collisions with target labels
+    honorLabels: false
+    # -- List of metric relabel configs to apply to samples before ingestion
+    metricRelabelings: []
+    # -- List of relabel configs to apply to samples before scraping
+    relabelings: []
+    # -- Additional annotations for the service monitor
+    annotations: {}
+    # -- Additional labels for the service monitor
+    labels: {}
