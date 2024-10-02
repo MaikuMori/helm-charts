@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0
+
+- Add `allowPrivilegeEscalation: false` to default `securityContext`.
+
 ## 1.6.0
 
 - Bump `gotenberg` version `8.8.1` -> `8.9.0`.
