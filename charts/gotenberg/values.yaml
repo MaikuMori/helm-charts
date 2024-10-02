@@ -34,8 +34,7 @@ podSecurityContext:
 
 # -- Define the security context for the container. By default will use upstream recommended values.
 # @default -- `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set.
-securityContext:
-  {}
+securityContext: {}
 
 service:
   type: ClusterIP
@@ -95,6 +94,11 @@ volumeMounts: []
 #  - name: tmp-volume
 #    mountPath: /tmp
 
+# -- List of extra environment variables for gotenberg container
+extraEnv: []
+#  - name: FOO
+#    value: bar
+
 ingress:
   # -- Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet.
   enabled: false
@@ -119,7 +123,7 @@ ingress:
   #      - chart-example.local
 
 # The API module is an HTTP/1 and HTTP/2 (H2C) server. Other modules may add routes, middlewares, and health checks.
-# https://gotenberg.dev/docs/modules/api
+# https://gotenberg.dev/docs/configuration#api
 api:
   # -- Set the port on which the API should listen (default 3000)
   port: 3000
@@ -139,9 +143,17 @@ api:
   basicAuthUsername:
   # -- Set the basic authentication password
   basicAuthPassword:
+  # -- Set the allowed URLs for the download from feature using a regular expression
+  downloadFromAllowList: ""
+  # -- Set the denied URLs for the download from feature using a regular expression
+  downloadFromDenyList: ""
+  # -- Set the maximum number of retries for the download from feature (default 4)
+  downloadFromMaxRetry: 4
+  # -- Disable the download from feature
+  disableDownloadFrom: false
 
 # The Chromium module interacts with the Chromium browser to convert HTML documents to PDF.
-# https://gotenberg.dev/docs/modules/chromium
+# https://gotenberg.dev/docs/configuration#chromium
 chromium:
   # -- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature
   restartAfter: ""
@@ -179,7 +191,7 @@ chromium:
   maxQueueSize: 0
 
 # The LibreOffice module interacts with LibreOffice to convert documents to PDF, thanks to unoconv.
-# https://gotenberg.dev/docs/modules/libreoffice
+# https://gotenberg.dev/docs/configuration#libreoffice
 libreOffice:
   # -- Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)
   restartAfter: ""
@@ -193,7 +205,7 @@ libreOffice:
   maxQueueSize: 0
 
 # The PDF Engines module gathers all engines that can manipulate PDF files.
-# https://gotenberg.dev/docs/modules/pdf-engines
+# https://gotenberg.dev/docs/configuration#pdf-engines
 pdfEngines:
   # -- Set the PDF engines and their order - all by default
   engines: ""
@@ -202,7 +214,7 @@ pdfEngines:
 
 # The Webhook module provides a middleware that allows you to upload the output file
 # from multipart/form-data routes to the destination of your choice.
-# https://gotenberg.dev/docs/modules/webhook
+# https://gotenberg.dev/docs/configuration#webhook
 webhook:
   # -- Set the allowed URLs for the webhook feature using a regular expression
   allowList: ""
@@ -224,7 +236,7 @@ webhook:
   disable: false
 
 # The Prometheus module collects metrics from other modules.
-# https://gotenberg.dev/docs/modules/prometheus
+# https://gotenberg.dev/docs/configuration#prometheus
 prometheus:
   # -- Set the interval for collecting modules' metrics (default 1s)
   collectInterval: ""
@@ -236,7 +248,7 @@ prometheus:
   disableRouterLogging: false
 
 # The Logging module provides a logger to Gotenberg.
-# https://gotenberg.dev/docs/modules/logging
+# https://gotenberg.dev/docs/configuration#logging
 logging:
   # -- Set log format - auto, json, or text (default "auto")
   format: ""
@@ -246,7 +258,30 @@ logging:
   fieldsPrefix: ""
 
 # Misc.
-# https://gotenberg.dev/docs/modules/more
+# https://gotenberg.dev/docs/configuration#graceful-shutdown
 gotenberg:
   # -- Set the graceful shutdown duration (default 30s)
   gracefulShutdownDurationSec: 30
+
+metrics:
+  serviceMonitor:
+    # -- Enable ServiceMonitor
+    enabled: false
+    # -- (string) Namespace for ServiceMonitor, defaults to release namespace
+    namespace:
+    # -- (string) Optional job label for the target service in Prometheus
+    jobLabel:
+    # -- (string) Interval at which metrics should be scraped
+    interval:
+    # -- (string) Timeout after which the scrape is ended
+    scrapeTimeout:
+    # -- HonorLabels chooses the metric’s labels on collisions with target labels
+    honorLabels: false
+    # -- List of metric relabel configs to apply to samples before ingestion
+    metricRelabelings: []
+    # -- List of relabel configs to apply to samples before scraping
+    relabelings: []
+    # -- Additional annotations for the service monitor
+    annotations: {}
+    # -- Additional labels for the service monitor
+    labels: {}

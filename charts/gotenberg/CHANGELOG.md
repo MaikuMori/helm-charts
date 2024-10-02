@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.7.0
+
+- Fix documentation links (Thanks to m² | [@mmoscher](https://github.com/mmoscher))
+- Bump `gotenberg` version `8.9.0` -> `8.11.0`.
+- Add ability to create `ServiceMonitor` (Thanks to Nazar Vovk | [@Vovcharaa](https://github.com/Vovcharaa))
+- Add `allowPrivilegeEscalation: false` to default `securityContext`.
+- Add support for the following flags:
+
+  - `--api-download-from-allow-list`
+  - `--api-download-from-deny-list`
+  - `--api-download-from-max-retry`
+  - `--api-disable-download-from`
+
+## 1.6.0
+
+- Bump `gotenberg` version `8.8.1` -> `8.9.0`.
+- Add support for `extraEnv` annotations to provide extra environment variables to `gotenberg` container.
+
+## 1.5.1
+
+- Bump `gotenberg` version `8.7.0` -> `8.8.1`.
+- Fix [#39](https://github.com/MaikuMori/helm-charts/issues/39) (Thanks to Šimon Woidig | [@SimonWoidig](https://github.com/SimonWoidig))
+
 ## 1.5.0
 
 - Bump `gotenberg` version `8.5.1` -> `8.7.0`.

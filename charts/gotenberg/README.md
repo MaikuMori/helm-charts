@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.7.0](https://img.shields.io/badge/AppVersion-8.7.0-informational?style=flat-square)
+![Version: 1.7.0](https://img.shields.io/badge/Version-1.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.11.0](https://img.shields.io/badge/AppVersion-8.11.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -51,7 +51,11 @@ helm upgrade my-release maikumori/gotenberg --install
 | affinity | object | `{}` |  |
 | api.basicAuthPassword | string | `nil` | Set the basic authentication password |
 | api.basicAuthUsername | string | `nil` | Set the basic authentication username |
+| api.disableDownloadFrom | bool | `false` | Disable the download from feature |
 | api.disableHealthCheckLogging | bool | `false` | Disable health check logging |
+| api.downloadFromAllowList | string | `""` | Set the allowed URLs for the download from feature using a regular expression |
+| api.downloadFromDenyList | string | `""` | Set the denied URLs for the download from feature using a regular expression |
+| api.downloadFromMaxRetry | int | `4` | Set the maximum number of retries for the download from feature (default 4) |
 | api.enableBasicAuth | bool | `false` | Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values |
 | api.port | int | `3000` | Set the port on which the API should listen (default 3000) |
 | api.rootPath | string | `""` | Set the root path of the API - for service discovery via URL paths (default "/") |
@@ -79,6 +83,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
 | chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
+| extraEnv | list | `[]` | List of extra environment variables for gotenberg container |
 | fullnameOverride | string | `""` |  |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -98,6 +103,16 @@ helm upgrade my-release maikumori/gotenberg --install
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
 | logging.format | string | `""` | Set log format - auto, json, or text (default "auto") |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
+| metrics.serviceMonitor.annotations | object | `{}` | Additional annotations for the service monitor |
+| metrics.serviceMonitor.enabled | bool | `false` | Enable ServiceMonitor |
+| metrics.serviceMonitor.honorLabels | bool | `false` | HonorLabels chooses the metric’s labels on collisions with target labels |
+| metrics.serviceMonitor.interval | string | `nil` | Interval at which metrics should be scraped |
+| metrics.serviceMonitor.jobLabel | string | `nil` | Optional job label for the target service in Prometheus |
+| metrics.serviceMonitor.labels | object | `{}` | Additional labels for the service monitor |
+| metrics.serviceMonitor.metricRelabelings | list | `[]` | List of metric relabel configs to apply to samples before ingestion |
+| metrics.serviceMonitor.namespace | string | `nil` | Namespace for ServiceMonitor, defaults to release namespace |
+| metrics.serviceMonitor.relabelings | list | `[]` | List of relabel configs to apply to samples before scraping |
+| metrics.serviceMonitor.scrapeTimeout | string | `nil` | Timeout after which the scrape is ended |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | pdb.create | bool | `false` |  |
