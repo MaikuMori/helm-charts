@@ -76,9 +76,15 @@ And apply recommended settings from upstream project.
 {{- else}}
 {{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
 privileged: false
+allowPrivilegeEscalation: false
+# Issue with Chromium, see: https://github.com/gotenberg/gotenberg/issues/949
+readOnlyRootFilesystem: false
 {{- else -}}
 privileged: false
 runAsUser: 1001
+allowPrivilegeEscalation: false
+# Issue with Chromium, see: https://github.com/gotenberg/gotenberg/issues/949
+readOnlyRootFilesystem: false
 {{- end}}
 {{- end}}
 {{- end}}

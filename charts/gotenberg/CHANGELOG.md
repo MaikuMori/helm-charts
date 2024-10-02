@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.7.0
+
+- Add ability to customize HorizontalPodAutoscaler behavior (Thanks to Anthony | [@anthosz](https://github.com/anthosz))
+- Fix documentation links (Thanks to m² | [@mmoscher](https://github.com/mmoscher))
+- Bump `gotenberg` version `8.9.0` -> `8.11.0`.
+- Add ability to create `ServiceMonitor` (Thanks to Nazar Vovk | [@Vovcharaa](https://github.com/Vovcharaa))
+- Add `allowPrivilegeEscalation: false` to default `securityContext`.
+- Add support for the following flags:
+
+  - `--api-download-from-allow-list`
+  - `--api-download-from-deny-list`
+  - `--api-download-from-max-retry`
+  - `--api-disable-download-from`
+
 ## 1.6.0
 
 - Bump `gotenberg` version `8.8.1` -> `8.9.0`.
