@@ -122,7 +122,7 @@ ingress:
   #      - chart-example.local
 
 # The API module is an HTTP/1 and HTTP/2 (H2C) server. Other modules may add routes, middlewares, and health checks.
-# https://gotenberg.dev/docs/modules/api
+# https://gotenberg.dev/docs/configuration#api
 api:
   # -- Set the port on which the API should listen (default 3000)
   port: 3000
@@ -152,7 +152,7 @@ api:
   disableDownloadFrom: false
 
 # The Chromium module interacts with the Chromium browser to convert HTML documents to PDF.
-# https://gotenberg.dev/docs/modules/chromium
+# https://gotenberg.dev/docs/configuration#chromium
 chromium:
   # -- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature
   restartAfter: ""
@@ -190,7 +190,7 @@ chromium:
   maxQueueSize: 0
 
 # The LibreOffice module interacts with LibreOffice to convert documents to PDF, thanks to unoconv.
-# https://gotenberg.dev/docs/modules/libreoffice
+# https://gotenberg.dev/docs/configuration#libreoffice
 libreOffice:
   # -- Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)
   restartAfter: ""
@@ -204,7 +204,7 @@ libreOffice:
   maxQueueSize: 0
 
 # The PDF Engines module gathers all engines that can manipulate PDF files.
-# https://gotenberg.dev/docs/modules/pdf-engines
+# https://gotenberg.dev/docs/configuration#pdf-engines
 pdfEngines:
   # -- Set the PDF engines and their order - all by default
   engines: ""
@@ -213,7 +213,7 @@ pdfEngines:
 
 # The Webhook module provides a middleware that allows you to upload the output file
 # from multipart/form-data routes to the destination of your choice.
-# https://gotenberg.dev/docs/modules/webhook
+# https://gotenberg.dev/docs/configuration#webhook
 webhook:
   # -- Set the allowed URLs for the webhook feature using a regular expression
   allowList: ""
@@ -235,7 +235,7 @@ webhook:
   disable: false
 
 # The Prometheus module collects metrics from other modules.
-# https://gotenberg.dev/docs/modules/prometheus
+# https://gotenberg.dev/docs/configuration#prometheus
 prometheus:
   # -- Set the interval for collecting modules' metrics (default 1s)
   collectInterval: ""
@@ -247,7 +247,7 @@ prometheus:
   disableRouterLogging: false
 
 # The Logging module provides a logger to Gotenberg.
-# https://gotenberg.dev/docs/modules/logging
+# https://gotenberg.dev/docs/configuration#logging
 logging:
   # -- Set log format - auto, json, or text (default "auto")
   format: ""
@@ -257,7 +257,7 @@ logging:
   fieldsPrefix: ""
 
 # Misc.
-# https://gotenberg.dev/docs/modules/more
+# https://gotenberg.dev/docs/configuration#graceful-shutdown
 gotenberg:
   # -- Set the graceful shutdown duration (default 30s)
   gracefulShutdownDurationSec: 30
