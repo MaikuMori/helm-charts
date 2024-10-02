@@ -34,8 +34,7 @@ podSecurityContext:
 
 # -- Define the security context for the container. By default will use upstream recommended values.
 # @default -- `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set.
-securityContext:
-  {}
+securityContext: {}
 
 service:
   type: ClusterIP
@@ -143,6 +142,14 @@ api:
   basicAuthUsername:
   # -- Set the basic authentication password
   basicAuthPassword:
+  # -- Set the allowed URLs for the download from feature using a regular expression
+  downloadFromAllowList: ""
+  # -- Set the denied URLs for the download from feature using a regular expression
+  downloadFromDenyList: ""
+  # -- Set the maximum number of retries for the download from feature (default 4)
+  downloadFromMaxRetry: 4
+  # -- Disable the download from feature
+  disableDownloadFrom: false
 
 # The Chromium module interacts with the Chromium browser to convert HTML documents to PDF.
 # https://gotenberg.dev/docs/modules/chromium
