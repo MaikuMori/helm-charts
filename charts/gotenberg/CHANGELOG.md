@@ -2,6 +2,7 @@
 
 ## 1.7.0
 
+- Add ability to customize HorizontalPodAutoscaler behavior (Thanks to Anthony | [@anthosz](https://github.com/anthosz))
 - Fix documentation links (Thanks to m² | [@mmoscher](https://github.com/mmoscher))
 - Bump `gotenberg` version `8.9.0` -> `8.11.0`.
 - Add ability to create `ServiceMonitor` (Thanks to Nazar Vovk | [@Vovcharaa](https://github.com/Vovcharaa))
