@@ -65,6 +65,18 @@ spec:
           {{- if .Values.api.enableBasicAuth }}
           - --api-enable-basic-auth
           {{- end }}
+          {{- if .Values.api.downloadFromAllowList }}
+          - --api-download-from-allow-list={{ .Values.api.downloadFromAllowList }}
+          {{- end }}
+          {{- if .Values.api.downloadFromDenyList }}
+          - --api-download-from-deny-list={{ .Values.api.downloadFromDenyList }}
+          {{- end }}
+          {{- if .Values.api.downloadFromMaxRetry }}
+          - --api-download-from-max-retry={{ .Values.api.downloadFromMaxRetry }}
+          {{- end }}
+          {{- if .Values.api.disableDownloadFrom }}
+          - --api-disable-download-from
+          {{- end }}
 
           {{- if .Values.chromium.restartAfter }}
           - --chromium-restart-after={{ .Values.chromium.restartAfter }}
