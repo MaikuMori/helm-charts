@@ -2,6 +2,7 @@
 
 ## 1.7.0
 
+- Add ability to create `ServiceMonitor`
 - Add `allowPrivilegeEscalation: false` to default `securityContext`.
 
 ## 1.6.0

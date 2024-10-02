@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.6.0](https://img.shields.io/badge/Version-1.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.9.0](https://img.shields.io/badge/AppVersion-8.9.0-informational?style=flat-square)
+![Version: 1.7.0](https://img.shields.io/badge/Version-1.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.9.0](https://img.shields.io/badge/AppVersion-8.9.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -99,6 +99,16 @@ helm upgrade my-release maikumori/gotenberg --install
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
 | logging.format | string | `""` | Set log format - auto, json, or text (default "auto") |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
+| metrics.serviceMonitor.annotations | object | `{}` | Additional annotations for the service monitor |
+| metrics.serviceMonitor.enabled | bool | `false` | Enable ServiceMonitor |
+| metrics.serviceMonitor.honorLabels | bool | `false` | HonorLabels chooses the metric’s labels on collisions with target labels |
+| metrics.serviceMonitor.interval | string | `nil` | Interval at which metrics should be scraped |
+| metrics.serviceMonitor.jobLabel | string | `nil` | Optional job label for the target service in Prometheus |
+| metrics.serviceMonitor.labels | object | `{}` | Additional labels for the service monitor |
+| metrics.serviceMonitor.metricRelabelings | list | `[]` | List of metric relabel configs to apply to samples before ingestion |
+| metrics.serviceMonitor.namespace | string | `nil` | Namespace for ServiceMonitor, defaults to release namespace |
+| metrics.serviceMonitor.relabelings | list | `[]` | List of relabel configs to apply to samples before scraping |
+| metrics.serviceMonitor.scrapeTimeout | string | `nil` | Timeout after which the scrape is ended |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | pdb.create | bool | `false` |  |
