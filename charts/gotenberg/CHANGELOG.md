@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.0
+
+- Bump `gotenberg` version `8.9.11` -> `8.12.0`.
+- Add Helm schema file.
+- Update K8S to test against recent K8S versions.
+
 ## 1.7.0
 
 - Add ability to customize HorizontalPodAutoscaler behavior (Thanks to Anthony | [@anthosz](https://github.com/anthosz))
