@@ -23,7 +23,7 @@ jobs:
         run: |
           pushd charts/gotenberg  
           helm-tool lint
-          helm-tool schema > generated-schema.json
+          helm-tool schema | jq . > generated-schema.json
           CURRENT_SCHEMA=$(cat values.schema.json)
           GENERATED_SCHEMA=$(cat generated-schema.json)
           if [ "$CURRENT_SCHEMA" != "$GENERATED_SCHEMA" ]; then
