@@ -14,10 +14,12 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "stable"
+          # We don't have go.sum file, but if this file changes we might as well download new dependencies.
+          cache-dependency-path: .github/workflows/test.yml
 
       - name: Install helm-tools
         run: |
-          go install github.com/cert-manager/helm-tool@latest
+          go install github.com/cert-manager/helm-tool@v0.5.3
 
       - name: Run helm-tools
         run: |
