@@ -67,6 +67,7 @@ autoscaling:
   maxReplicas: 100
   behavior: {}
   targetCPUUtilizationPercentage: 80
+  # +docs:property
   # targetMemoryUtilizationPercentage: 80
 
 pdb:

@@ -31,6 +31,27 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
 
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+
+      - name: Install helm-tools
+        run: |
+          go install github.com/cert-manager/helm-tool@latest
+
+      - name: Run helm-tools
+        run: |
+          pushd charts/gotenberg  
+          helm-tool lint
+          helm-tool schema > generated-schema.json
+          CURRENT_SCHEMA=$(cat values.schema.json)
+          GENERATED_SCHEMA=$(cat generated-schema.json)
+          if [ "$CURRENT_SCHEMA" != "$GENERATED_SCHEMA" ]; then
+            echo "Outdated schema, regenerate it with 'helm-tool schema > values.schema.json'"
+            exit 1
+          fi
+          popd
+
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
