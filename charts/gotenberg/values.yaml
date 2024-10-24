@@ -285,3 +285,34 @@ metrics:
     annotations: {}
     # -- Additional labels for the service monitor
     labels: {}
+
+# Enable or Disable Network Policy.
+# See also: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+networkPolicy:
+  enabled: false
+
+  # Allow all connections from any source. To be set to false if extraIngress is used.
+  allowIngress: true
+
+  # Allow all connections to any destinations. To be set to false if extraEgress is used.
+  allowEgress: true
+  # Config custom ingress rules to the NetworkPolicy.
+  extraIngress: []
+  # extraIngress:
+  #   - from:
+  #     - podSelector:
+  #         matchLabels:
+  #           component: apache
+  #     ports:
+  #     - port: 8080
+  #       protocol: TCP
+  # Config custom egress rules to the NetworkPolicy.
+  extraEgress: []
+  # extraEgress:
+  #   - to:
+  #     - podSelector:
+  #         matchLabels:
+  #           component: apache
+  #     ports:
+  #     - port: 80
+  #       protocol: TCP

@@ -1,0 +1,27 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "varnish-cache.fullname" . }}
+  labels:
+    {{- include "varnish-cache.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "gotenberg.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+{{- if .Values.server.networkPolicy.allowIngress }}
+  - {}
+{{- else }}
+  {{- toYaml .Values.server.networkPolicy.extraIngress | nindent 2 }}
+{{- end }}
+  egress:
+{{- if .Values.server.networkPolicy.allowEgress }}
+  - {}
+{{- else }}
+  {{- toYaml .Values.server.networkPolicy.extraEgress | nindent 2 }}
+{{- end }}
+{{- end }}

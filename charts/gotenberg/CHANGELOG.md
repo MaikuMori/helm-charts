@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.8.0
+- Add ability to create and configure `networkPolicy`
+
 ## 1.7.0
 
 - Add ability to customize HorizontalPodAutoscaler behavior (Thanks to Anthony | [@anthosz](https://github.com/anthosz))

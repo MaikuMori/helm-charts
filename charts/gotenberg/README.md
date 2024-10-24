@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.7.0](https://img.shields.io/badge/Version-1.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.11.0](https://img.shields.io/badge/AppVersion-8.11.0-informational?style=flat-square)
+![Version: 1.8.0](https://img.shields.io/badge/Version-1.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.11.0](https://img.shields.io/badge/AppVersion-8.11.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -115,6 +115,11 @@ helm upgrade my-release maikumori/gotenberg --install
 | metrics.serviceMonitor.relabelings | list | `[]` | List of relabel configs to apply to samples before scraping |
 | metrics.serviceMonitor.scrapeTimeout | string | `nil` | Timeout after which the scrape is ended |
 | nameOverride | string | `""` |  |
+| networkPolicy.allowEgress | bool | `true` |  |
+| networkPolicy.allowIngress | bool | `true` |  |
+| networkPolicy.enabled | bool | `false` |  |
+| networkPolicy.extraEgress | list | `[]` |  |
+| networkPolicy.extraIngress | list | `[]` |  |
 | nodeSelector | object | `{}` |  |
 | pdb.create | bool | `false` |  |
 | pdb.maxUnavailable | string | `""` |  |
