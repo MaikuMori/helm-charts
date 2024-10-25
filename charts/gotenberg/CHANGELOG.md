@@ -4,6 +4,7 @@
 
 - Add ability to create and configure `networkPolicy` (Thanks to Anthony | [@anthosz](https://github.com/anthosz))
 - Add [SECURITY.md](../../SECURITY.md)
+- Adding podAnnotations for tests (kube-score) (Thanks to Anthony | [@anthosz](https://github.com/anthosz))
 
 ## 1.8.0
 
