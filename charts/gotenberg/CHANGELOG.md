@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.1
+
+- Adding podAnnotations for tests (kube-score) #50
+
 ## 1.8.0
 
 - Bump `gotenberg` version `8.9.11` -> `8.12.0`.
