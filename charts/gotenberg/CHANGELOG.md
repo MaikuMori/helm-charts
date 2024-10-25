@@ -1,7 +1,13 @@
 # Changelog
 
-## 1.8.0
+## 1.9.0
 - Add ability to create and configure `networkPolicy`
+
+## 1.8.0
+- Bump `gotenberg` version `8.9.11` -> `8.12.0`.
+- Add Helm schema file.
+- Update K8S to test against recent K8S versions.
+- Add chart signing to CI.
 
 ## 1.7.0
 

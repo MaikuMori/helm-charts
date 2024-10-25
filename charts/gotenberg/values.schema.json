@@ -1,0 +1,978 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/$defs/helm-values",
+  "$defs": {
+    "helm-values": {
+      "type": "object",
+      "properties": {
+        "affinity": {
+          "$ref": "#/$defs/helm-values.affinity"
+        },
+        "api": {
+          "$ref": "#/$defs/helm-values.api"
+        },
+        "autoscaling": {
+          "$ref": "#/$defs/helm-values.autoscaling"
+        },
+        "chromium": {
+          "$ref": "#/$defs/helm-values.chromium"
+        },
+        "extraEnv": {
+          "$ref": "#/$defs/helm-values.extraEnv"
+        },
+        "fullnameOverride": {
+          "$ref": "#/$defs/helm-values.fullnameOverride"
+        },
+        "global": {
+          "$ref": "#/$defs/helm-values.global"
+        },
+        "gotenberg": {
+          "$ref": "#/$defs/helm-values.gotenberg"
+        },
+        "image": {
+          "$ref": "#/$defs/helm-values.image"
+        },
+        "imagePullSecrets": {
+          "$ref": "#/$defs/helm-values.imagePullSecrets"
+        },
+        "ingress": {
+          "$ref": "#/$defs/helm-values.ingress"
+        },
+        "libreOffice": {
+          "$ref": "#/$defs/helm-values.libreOffice"
+        },
+        "logging": {
+          "$ref": "#/$defs/helm-values.logging"
+        },
+        "metrics": {
+          "$ref": "#/$defs/helm-values.metrics"
+        },
+        "nameOverride": {
+          "$ref": "#/$defs/helm-values.nameOverride"
+        },
+        "nodeSelector": {
+          "$ref": "#/$defs/helm-values.nodeSelector"
+        },
+        "pdb": {
+          "$ref": "#/$defs/helm-values.pdb"
+        },
+        "pdfEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines"
+        },
+        "podAnnotations": {
+          "$ref": "#/$defs/helm-values.podAnnotations"
+        },
+        "podLabels": {
+          "$ref": "#/$defs/helm-values.podLabels"
+        },
+        "podSecurityContext": {
+          "$ref": "#/$defs/helm-values.podSecurityContext"
+        },
+        "progressDeadlineSeconds": {
+          "$ref": "#/$defs/helm-values.progressDeadlineSeconds"
+        },
+        "prometheus": {
+          "$ref": "#/$defs/helm-values.prometheus"
+        },
+        "replicaCount": {
+          "$ref": "#/$defs/helm-values.replicaCount"
+        },
+        "resources": {
+          "$ref": "#/$defs/helm-values.resources"
+        },
+        "securityContext": {
+          "$ref": "#/$defs/helm-values.securityContext"
+        },
+        "service": {
+          "$ref": "#/$defs/helm-values.service"
+        },
+        "serviceAccount": {
+          "$ref": "#/$defs/helm-values.serviceAccount"
+        },
+        "strategy": {
+          "$ref": "#/$defs/helm-values.strategy"
+        },
+        "tolerations": {
+          "$ref": "#/$defs/helm-values.tolerations"
+        },
+        "topologySpreadConstraints": {
+          "$ref": "#/$defs/helm-values.topologySpreadConstraints"
+        },
+        "volumeMounts": {
+          "$ref": "#/$defs/helm-values.volumeMounts"
+        },
+        "volumes": {
+          "$ref": "#/$defs/helm-values.volumes"
+        },
+        "webhook": {
+          "$ref": "#/$defs/helm-values.webhook"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.affinity": {
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.api": {
+      "type": "object",
+      "properties": {
+        "basicAuthPassword": {
+          "$ref": "#/$defs/helm-values.api.basicAuthPassword"
+        },
+        "basicAuthUsername": {
+          "$ref": "#/$defs/helm-values.api.basicAuthUsername"
+        },
+        "disableDownloadFrom": {
+          "$ref": "#/$defs/helm-values.api.disableDownloadFrom"
+        },
+        "disableHealthCheckLogging": {
+          "$ref": "#/$defs/helm-values.api.disableHealthCheckLogging"
+        },
+        "downloadFromAllowList": {
+          "$ref": "#/$defs/helm-values.api.downloadFromAllowList"
+        },
+        "downloadFromDenyList": {
+          "$ref": "#/$defs/helm-values.api.downloadFromDenyList"
+        },
+        "downloadFromMaxRetry": {
+          "$ref": "#/$defs/helm-values.api.downloadFromMaxRetry"
+        },
+        "enableBasicAuth": {
+          "$ref": "#/$defs/helm-values.api.enableBasicAuth"
+        },
+        "port": {
+          "$ref": "#/$defs/helm-values.api.port"
+        },
+        "rootPath": {
+          "$ref": "#/$defs/helm-values.api.rootPath"
+        },
+        "timeout": {
+          "$ref": "#/$defs/helm-values.api.timeout"
+        },
+        "tlsSecretName": {
+          "$ref": "#/$defs/helm-values.api.tlsSecretName"
+        },
+        "traceHeader": {
+          "$ref": "#/$defs/helm-values.api.traceHeader"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.api.basicAuthPassword": {
+      "description": "-- Set the basic authentication password"
+    },
+    "helm-values.api.basicAuthUsername": {
+      "description": "-- Set the basic authentication username"
+    },
+    "helm-values.api.disableDownloadFrom": {
+      "description": "-- Disable the download from feature",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.api.disableHealthCheckLogging": {
+      "description": "-- Disable health check logging",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.api.downloadFromAllowList": {
+      "description": "-- Set the allowed URLs for the download from feature using a regular expression",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.api.downloadFromDenyList": {
+      "description": "-- Set the denied URLs for the download from feature using a regular expression",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.api.downloadFromMaxRetry": {
+      "description": "-- Set the maximum number of retries for the download from feature (default 4)",
+      "type": "number",
+      "default": 4
+    },
+    "helm-values.api.enableBasicAuth": {
+      "description": "-- Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.api.port": {
+      "description": "-- Set the port on which the API should listen (default 3000)",
+      "type": "number",
+      "default": 3000
+    },
+    "helm-values.api.rootPath": {
+      "description": "-- Set the root path of the API - for service discovery via URL paths (default \"/\")",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.api.timeout": {
+      "description": "-- Set the time limit for requests (default 30s)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.api.tlsSecretName": {
+      "description": "-- Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.api.traceHeader": {
+      "description": "-- Set the header name to use for identifying requests (default \"Gotenberg-Trace\")",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.autoscaling": {
+      "type": "object",
+      "properties": {
+        "behavior": {
+          "$ref": "#/$defs/helm-values.autoscaling.behavior"
+        },
+        "enabled": {
+          "$ref": "#/$defs/helm-values.autoscaling.enabled"
+        },
+        "maxReplicas": {
+          "$ref": "#/$defs/helm-values.autoscaling.maxReplicas"
+        },
+        "minReplicas": {
+          "$ref": "#/$defs/helm-values.autoscaling.minReplicas"
+        },
+        "targetCPUUtilizationPercentage": {
+          "$ref": "#/$defs/helm-values.autoscaling.targetCPUUtilizationPercentage"
+        },
+        "targetMemoryUtilizationPercentage": {
+          "$ref": "#/$defs/helm-values.autoscaling.targetMemoryUtilizationPercentage"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.autoscaling.behavior": {
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.autoscaling.enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.autoscaling.maxReplicas": {
+      "type": "number",
+      "default": 100
+    },
+    "helm-values.autoscaling.minReplicas": {
+      "type": "number",
+      "default": 1
+    },
+    "helm-values.autoscaling.targetCPUUtilizationPercentage": {
+      "type": "number",
+      "default": 80
+    },
+    "helm-values.autoscaling.targetMemoryUtilizationPercentage": {
+      "type": "number"
+    },
+    "helm-values.chromium": {
+      "type": "object",
+      "properties": {
+        "allowFileAccessFromFiles": {
+          "$ref": "#/$defs/helm-values.chromium.allowFileAccessFromFiles"
+        },
+        "allowInsecureLocalhost": {
+          "$ref": "#/$defs/helm-values.chromium.allowInsecureLocalhost"
+        },
+        "allowList": {
+          "$ref": "#/$defs/helm-values.chromium.allowList"
+        },
+        "autoStart": {
+          "$ref": "#/$defs/helm-values.chromium.autoStart"
+        },
+        "clearCache": {
+          "$ref": "#/$defs/helm-values.chromium.clearCache"
+        },
+        "clearCookies": {
+          "$ref": "#/$defs/helm-values.chromium.clearCookies"
+        },
+        "denyList": {
+          "$ref": "#/$defs/helm-values.chromium.denyList"
+        },
+        "disableJavaScript": {
+          "$ref": "#/$defs/helm-values.chromium.disableJavaScript"
+        },
+        "disableRoutes": {
+          "$ref": "#/$defs/helm-values.chromium.disableRoutes"
+        },
+        "disableWebSecurity": {
+          "$ref": "#/$defs/helm-values.chromium.disableWebSecurity"
+        },
+        "hostResolverRules": {
+          "$ref": "#/$defs/helm-values.chromium.hostResolverRules"
+        },
+        "ignoreCertificateErrors": {
+          "$ref": "#/$defs/helm-values.chromium.ignoreCertificateErrors"
+        },
+        "incognito": {
+          "$ref": "#/$defs/helm-values.chromium.incognito"
+        },
+        "maxQueueSize": {
+          "$ref": "#/$defs/helm-values.chromium.maxQueueSize"
+        },
+        "proxyServer": {
+          "$ref": "#/$defs/helm-values.chromium.proxyServer"
+        },
+        "restartAfter": {
+          "$ref": "#/$defs/helm-values.chromium.restartAfter"
+        },
+        "startTimeout": {
+          "$ref": "#/$defs/helm-values.chromium.startTimeout"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.chromium.allowFileAccessFromFiles": {
+      "description": "-- Allow file:// URIs to read other file:// URIs",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.allowInsecureLocalhost": {
+      "description": "-- Ignore TLS/SSL errors on localhost",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.allowList": {
+      "description": "-- Set the allowed URLs for Chromium using a regular expression",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.chromium.autoStart": {
+      "description": "-- Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.clearCache": {
+      "description": "-- Clear Chromium cache between each conversion.",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.clearCookies": {
+      "description": "-- Clear Chromium cookies between each conversion.",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.denyList": {
+      "description": "-- Set the denied URLs for Chromium using a regular expression (default \"^file:///[^tmp].*\")",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.chromium.disableJavaScript": {
+      "description": "-- Disable JavaScript",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.disableRoutes": {
+      "description": "-- Disable the routes",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.disableWebSecurity": {
+      "description": "-- Don't enforce the same-origin policy",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.hostResolverRules": {
+      "description": "-- Set custom mappings to the host resolver",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.chromium.ignoreCertificateErrors": {
+      "description": "-- Ignore the certificate errors",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.incognito": {
+      "description": "-- Start Chromium with incognito mode",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.maxQueueSize": {
+      "description": "-- Maximum request queue size for Chromium. Set to 0 to disable this feature.",
+      "type": "number",
+      "default": 0
+    },
+    "helm-values.chromium.proxyServer": {
+      "description": "-- Set the outbound proxy server; this switch only affects HTTP and HTTPS requests",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.chromium.restartAfter": {
+      "description": "-- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.chromium.startTimeout": {
+      "description": "-- Maximum duration to wait for Chromium to start or restart",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.extraEnv": {
+      "description": "-- List of extra environment variables for gotenberg container",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.fullnameOverride": {
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.global": {
+      "description": "Global values shared across all (sub)charts"
+    },
+    "helm-values.gotenberg": {
+      "type": "object",
+      "properties": {
+        "gracefulShutdownDurationSec": {
+          "$ref": "#/$defs/helm-values.gotenberg.gracefulShutdownDurationSec"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.gotenberg.gracefulShutdownDurationSec": {
+      "description": "-- Set the graceful shutdown duration (default 30s)",
+      "type": "number",
+      "default": 30
+    },
+    "helm-values.image": {
+      "type": "object",
+      "properties": {
+        "pullPolicy": {
+          "$ref": "#/$defs/helm-values.image.pullPolicy"
+        },
+        "repository": {
+          "$ref": "#/$defs/helm-values.image.repository"
+        },
+        "tag": {
+          "$ref": "#/$defs/helm-values.image.tag"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.image.pullPolicy": {
+      "type": "string",
+      "default": "IfNotPresent"
+    },
+    "helm-values.image.repository": {
+      "type": "string",
+      "default": "gotenberg/gotenberg"
+    },
+    "helm-values.image.tag": {
+      "description": "-- Overrides the image tag whose default is the chart appVersion.",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.imagePullSecrets": {
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.ingress": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/helm-values.ingress.annotations"
+        },
+        "className": {
+          "$ref": "#/$defs/helm-values.ingress.className"
+        },
+        "enabled": {
+          "$ref": "#/$defs/helm-values.ingress.enabled"
+        },
+        "hosts": {
+          "$ref": "#/$defs/helm-values.ingress.hosts"
+        },
+        "tls": {
+          "$ref": "#/$defs/helm-values.ingress.tls"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.ingress.annotations": {
+      "description": "-- Set the annotations of the ingress",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.ingress.className": {
+      "description": "-- Set the class name of the ingress",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.ingress.enabled": {
+      "description": "-- Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet.",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.ingress.hosts": {
+      "description": "kubernetes.io/ingress.class: nginx\nkubernetes.io/tls-acme: \"true\"\n-- Set the hostnames of the ingress, see values.yaml for an example.",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.ingress.tls": {
+      "description": "- host: chart-example.local\npaths:\n  - path: /\n    pathType: ImplementationSpecific\n-- Set the TLS configuration for the ingress, see values.yaml for an example.",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.libreOffice": {
+      "type": "object",
+      "properties": {
+        "autoStart": {
+          "$ref": "#/$defs/helm-values.libreOffice.autoStart"
+        },
+        "disableRoutes": {
+          "$ref": "#/$defs/helm-values.libreOffice.disableRoutes"
+        },
+        "maxQueueSize": {
+          "$ref": "#/$defs/helm-values.libreOffice.maxQueueSize"
+        },
+        "restartAfter": {
+          "$ref": "#/$defs/helm-values.libreOffice.restartAfter"
+        },
+        "startTimeout": {
+          "$ref": "#/$defs/helm-values.libreOffice.startTimeout"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.libreOffice.autoStart": {
+      "description": "-- Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.libreOffice.disableRoutes": {
+      "description": "-- Disable the routes",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.libreOffice.maxQueueSize": {
+      "description": "-- Maximum request queue size for LibreOffice. Set to 0 to disable this feature.",
+      "type": "number",
+      "default": 0
+    },
+    "helm-values.libreOffice.restartAfter": {
+      "description": "-- Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.libreOffice.startTimeout": {
+      "description": "-- Maximum duration to wait for LibreOffice to start or restart (default 10s)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.logging": {
+      "type": "object",
+      "properties": {
+        "fieldsPrefix": {
+          "$ref": "#/$defs/helm-values.logging.fieldsPrefix"
+        },
+        "format": {
+          "$ref": "#/$defs/helm-values.logging.format"
+        },
+        "level": {
+          "$ref": "#/$defs/helm-values.logging.level"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.logging.fieldsPrefix": {
+      "description": "-- Prepend a specified prefix to each field in the logs",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.logging.format": {
+      "description": "-- Set log format - auto, json, or text (default \"auto\")",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.logging.level": {
+      "description": "-- Set the log level - error, warn, info, or debug (default \"info\")",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.metrics": {
+      "type": "object",
+      "properties": {
+        "serviceMonitor": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.metrics.serviceMonitor": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.annotations"
+        },
+        "enabled": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.enabled"
+        },
+        "honorLabels": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.honorLabels"
+        },
+        "interval": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.interval"
+        },
+        "jobLabel": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.jobLabel"
+        },
+        "labels": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.labels"
+        },
+        "metricRelabelings": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.metricRelabelings"
+        },
+        "namespace": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.namespace"
+        },
+        "relabelings": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.relabelings"
+        },
+        "scrapeTimeout": {
+          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.scrapeTimeout"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.metrics.serviceMonitor.annotations": {
+      "description": "-- Additional annotations for the service monitor",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.metrics.serviceMonitor.enabled": {
+      "description": "-- Enable ServiceMonitor",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.metrics.serviceMonitor.honorLabels": {
+      "description": "-- HonorLabels chooses the metric’s labels on collisions with target labels",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.metrics.serviceMonitor.interval": {
+      "description": "-- (string) Interval at which metrics should be scraped"
+    },
+    "helm-values.metrics.serviceMonitor.jobLabel": {
+      "description": "-- (string) Optional job label for the target service in Prometheus"
+    },
+    "helm-values.metrics.serviceMonitor.labels": {
+      "description": "-- Additional labels for the service monitor",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.metrics.serviceMonitor.metricRelabelings": {
+      "description": "-- List of metric relabel configs to apply to samples before ingestion",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.metrics.serviceMonitor.namespace": {
+      "description": "-- (string) Namespace for ServiceMonitor, defaults to release namespace"
+    },
+    "helm-values.metrics.serviceMonitor.relabelings": {
+      "description": "-- List of relabel configs to apply to samples before scraping",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.metrics.serviceMonitor.scrapeTimeout": {
+      "description": "-- (string) Timeout after which the scrape is ended"
+    },
+    "helm-values.nameOverride": {
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.nodeSelector": {
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.pdb": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "$ref": "#/$defs/helm-values.pdb.create"
+        },
+        "maxUnavailable": {
+          "$ref": "#/$defs/helm-values.pdb.maxUnavailable"
+        },
+        "minAvailable": {
+          "$ref": "#/$defs/helm-values.pdb.minAvailable"
+        },
+        "unhealthyPodEvictionPolicy": {
+          "$ref": "#/$defs/helm-values.pdb.unhealthyPodEvictionPolicy"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.pdb.create": {
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.pdb.maxUnavailable": {
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdb.minAvailable": {
+      "type": "number",
+      "default": 1
+    },
+    "helm-values.pdb.unhealthyPodEvictionPolicy": {
+      "description": "-- This is a beta feature, so it's not enabled by default."
+    },
+    "helm-values.pdfEngines": {
+      "type": "object",
+      "properties": {
+        "disableRoutes": {
+          "$ref": "#/$defs/helm-values.pdfEngines.disableRoutes"
+        },
+        "engines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.engines"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.pdfEngines.disableRoutes": {
+      "description": "-- Disable the routes",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.pdfEngines.engines": {
+      "description": "-- Set the PDF engines and their order - all by default",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.podAnnotations": {
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.podLabels": {
+      "description": "-- List of additional pod labels",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.podSecurityContext": {
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.progressDeadlineSeconds": {
+      "type": "number",
+      "default": 120
+    },
+    "helm-values.prometheus": {
+      "type": "object",
+      "properties": {
+        "collectInterval": {
+          "$ref": "#/$defs/helm-values.prometheus.collectInterval"
+        },
+        "disableCollect": {
+          "$ref": "#/$defs/helm-values.prometheus.disableCollect"
+        },
+        "disableRouterLogging": {
+          "$ref": "#/$defs/helm-values.prometheus.disableRouterLogging"
+        },
+        "namespace": {
+          "$ref": "#/$defs/helm-values.prometheus.namespace"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.prometheus.collectInterval": {
+      "description": "-- Set the interval for collecting modules' metrics (default 1s)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.prometheus.disableCollect": {
+      "description": "-- Disable the collect of metrics",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.prometheus.disableRouterLogging": {
+      "description": "-- Disable the route logging",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.prometheus.namespace": {
+      "description": "-- Set the namespace of modules' metrics (default \"gotenberg\")",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.replicaCount": {
+      "type": "number",
+      "default": 1
+    },
+    "helm-values.resources": {
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.securityContext": {
+      "description": "-- Define the security context for the container. By default will use upstream recommended values.\n@default -- `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set.",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.service": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/helm-values.service.annotations"
+        },
+        "port": {
+          "$ref": "#/$defs/helm-values.service.port"
+        },
+        "type": {
+          "$ref": "#/$defs/helm-values.service.type"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.service.annotations": {
+      "description": "-- Annotations to add to the service",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.service.port": {
+      "type": "number",
+      "default": 80
+    },
+    "helm-values.service.type": {
+      "type": "string",
+      "default": "ClusterIP"
+    },
+    "helm-values.serviceAccount": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/helm-values.serviceAccount.annotations"
+        },
+        "create": {
+          "$ref": "#/$defs/helm-values.serviceAccount.create"
+        },
+        "name": {
+          "$ref": "#/$defs/helm-values.serviceAccount.name"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.serviceAccount.annotations": {
+      "description": "-- Annotations to add to the service account",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.serviceAccount.create": {
+      "description": "-- Specifies whether a service account should be created",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.serviceAccount.name": {
+      "description": "-- The name of the service account to use.\nIf not set and create is true, a name is generated using the fullname template",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.strategy": {
+      "description": "Strategy is utilized to configure the desired upgrade approach and configuration for the deployment.",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.tolerations": {
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.topologySpreadConstraints": {
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.volumeMounts": {
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.volumes": {
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.webhook": {
+      "type": "object",
+      "properties": {
+        "allowList": {
+          "$ref": "#/$defs/helm-values.webhook.allowList"
+        },
+        "clientTimeout": {
+          "$ref": "#/$defs/helm-values.webhook.clientTimeout"
+        },
+        "denyList": {
+          "$ref": "#/$defs/helm-values.webhook.denyList"
+        },
+        "disable": {
+          "$ref": "#/$defs/helm-values.webhook.disable"
+        },
+        "errorAllowList": {
+          "$ref": "#/$defs/helm-values.webhook.errorAllowList"
+        },
+        "errorDenyList": {
+          "$ref": "#/$defs/helm-values.webhook.errorDenyList"
+        },
+        "maxRetry": {
+          "$ref": "#/$defs/helm-values.webhook.maxRetry"
+        },
+        "retryMaxWait": {
+          "$ref": "#/$defs/helm-values.webhook.retryMaxWait"
+        },
+        "retryMinWait": {
+          "$ref": "#/$defs/helm-values.webhook.retryMinWait"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.webhook.allowList": {
+      "description": "-- Set the allowed URLs for the webhook feature using a regular expression",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.webhook.clientTimeout": {
+      "description": "-- Set the time limit for requests to the webhook (default 30s)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.webhook.denyList": {
+      "description": "-- Set the denied URLs for the webhook feature using a regular expression",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.webhook.disable": {
+      "description": "-- Disable the webhook feature",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.webhook.errorAllowList": {
+      "description": "-- Set the allowed URLs in case of an error for the webhook feature using a regular expression",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.webhook.errorDenyList": {
+      "description": "-- Set the denied URLs in case of an error for the webhook feature using a regular expression",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.webhook.maxRetry": {
+      "description": "-- Set the maximum number of retries for the webhook feature (default 4)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.webhook.retryMaxWait": {
+      "description": "-- Set the maximum duration to wait before trying to call the webhook again (default 30s)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.webhook.retryMinWait": {
+      "description": "-- Set the minimum duration to wait before trying to call the webhook again (default 1s)",
+      "type": "string",
+      "default": ""
+    }
+  }
+}
