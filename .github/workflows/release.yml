@@ -24,7 +24,23 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4
 
+      - name: Prepare keys for signing
+        env:
+          SIGNING_KEY_BASE64: ${{ secrets.HELM_SIGNING_PRIVATE_KEY }}
+          SIGNING_KEY_PASSPHRASE_BASE64: ${{ secrets.HELM_SIGNING_PRIVATE_KEY_PASSPHRASE }}
+          KEY_PATH: ".gpg-dir"
+          SIGNING_KEY_PATH: ".gpg-dir/secring.gpg"
+          SIGNING_KEY_PASSPHRASE_PATH: ".gpg-dir/passphrase"
+        run: |
+          mkdir "$KEY_PATH"
+          base64 -d <<< "$SIGNING_KEY_BASE64" > "$SIGNING_KEY_PATH"
+          base64 -d <<< "$SIGNING_KEY_PASSPHRASE_BASE64" > "$SIGNING_KEY_PASSPHRASE_PATH"
+          echo "CR_PASSPHRASE_FILE=$SIGNING_KEY_PASSPHRASE_PATH" >> "$GITHUB_ENV"
+          echo "CR_KEYRING=$SIGNING_KEY_PATH" >> "$GITHUB_ENV"
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        with:
+          config: .cr.yaml

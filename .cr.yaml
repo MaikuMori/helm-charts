@@ -1,0 +1,3 @@
+sign: true
+# UID of the GPG key to use
+key: helm@maikumori.com
