@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "varnish-cache.fullname" . }}
+  name: {{ include "gotenberg.fullname" . }}
   labels:
-    {{- include "varnish-cache.labels" . | nindent 4 }}
+    {{- include "gotenberg.labels" . | nindent 4 }}
 spec:
   podSelector:
     matchLabels:
