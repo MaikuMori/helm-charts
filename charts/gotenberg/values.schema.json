@@ -50,6 +50,9 @@
         "nameOverride": {
           "$ref": "#/$defs/helm-values.nameOverride"
         },
+        "networkPolicy": {
+          "$ref": "#/$defs/helm-values.networkPolicy"
+        },
         "nodeSelector": {
           "$ref": "#/$defs/helm-values.nodeSelector"
         },
@@ -91,6 +94,9 @@
         },
         "strategy": {
           "$ref": "#/$defs/helm-values.strategy"
+        },
+        "testPodAnnotations": {
+          "$ref": "#/$defs/helm-values.testPodAnnotations"
         },
         "tolerations": {
           "$ref": "#/$defs/helm-values.tolerations"
@@ -686,6 +692,53 @@
       "type": "string",
       "default": ""
     },
+    "helm-values.networkPolicy": {
+      "type": "object",
+      "properties": {
+        "allowEgress": {
+          "$ref": "#/$defs/helm-values.networkPolicy.allowEgress"
+        },
+        "allowIngress": {
+          "$ref": "#/$defs/helm-values.networkPolicy.allowIngress"
+        },
+        "enabled": {
+          "$ref": "#/$defs/helm-values.networkPolicy.enabled"
+        },
+        "extraEgress": {
+          "$ref": "#/$defs/helm-values.networkPolicy.extraEgress"
+        },
+        "extraIngress": {
+          "$ref": "#/$defs/helm-values.networkPolicy.extraIngress"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.networkPolicy.allowEgress": {
+      "description": "Allow all connections to any destinations. To be set to false if extraEgress is used.",
+      "type": "boolean",
+      "default": true
+    },
+    "helm-values.networkPolicy.allowIngress": {
+      "description": "Allow all connections from any source. To be set to false if extraIngress is used.",
+      "type": "boolean",
+      "default": true
+    },
+    "helm-values.networkPolicy.enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.networkPolicy.extraEgress": {
+      "description": "extraIngress:\n  - from:\n    - podSelector:\n        matchLabels:\n          component: apache\n    ports:\n    - port: 8080\n      protocol: TCP\nConfig custom egress rules to the NetworkPolicy.",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.networkPolicy.extraIngress": {
+      "description": "Config custom ingress rules to the NetworkPolicy.",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
     "helm-values.nodeSelector": {
       "type": "object",
       "default": {}
@@ -873,6 +926,11 @@
     },
     "helm-values.strategy": {
       "description": "Strategy is utilized to configure the desired upgrade approach and configuration for the deployment.",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.testPodAnnotations": {
+      "description": "-- Set annotations for the helm test pods (for example to disable certain kube-score checks)",
       "type": "object",
       "default": {}
     },

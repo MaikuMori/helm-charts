@@ -6,6 +6,9 @@ metadata:
     {{- include "gotenberg.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
+    {{- with .Values.testPodAnnotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   containers:
     - name: wget
