@@ -25,6 +25,9 @@ serviceAccount:
 
 podAnnotations: {}
 
+# -- Set annotations for the helm test pods (for example to disable certain kube-score checks)
+testPodAnnotations: {}
+
 # -- List of additional pod labels
 podLabels: {}
 
