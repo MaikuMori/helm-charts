@@ -2,6 +2,11 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Specifies that chart can be used as a condition when it is a dependency.
+# See https://helm.sh/docs/chart_best_practices/dependencies/#conditions-and-tags for more info.
+# @ignored
+enabled: true
+
 replicaCount: 1
 
 image:

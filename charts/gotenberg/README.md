@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.9.0](https://img.shields.io/badge/Version-1.9.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.12.0](https://img.shields.io/badge/AppVersion-8.12.0-informational?style=flat-square)
+![Version: 1.9.1](https://img.shields.io/badge/Version-1.9.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.12.0](https://img.shields.io/badge/AppVersion-8.12.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -145,6 +145,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
 | strategy | object | `{}` |  |
+| testPodAnnotations | object | `{}` | Set annotations for the helm test pods (for example to disable certain kube-score checks) |
 | tolerations | list | `[]` |  |
 | topologySpreadConstraints | list | `[]` |  |
 | volumeMounts | list | `[]` |  |

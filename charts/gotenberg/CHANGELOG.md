@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.1
+
+- Fixing 'Additional property enabled is not allowed' when using gotenberg in helm dependency
+
 ## 1.9.0
 
 - Add ability to create and configure `networkPolicy` (Thanks to Anthony | [@anthosz](https://github.com/anthosz))

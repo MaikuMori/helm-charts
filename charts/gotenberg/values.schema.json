@@ -5,6 +5,9 @@
     "helm-values": {
       "type": "object",
       "properties": {
+        "enabled": {
+          "$ref": "#/$defs/helm-values.enabled"
+        },
         "affinity": {
           "$ref": "#/$defs/helm-values.affinity"
         },
@@ -115,6 +118,11 @@
         }
       },
       "additionalProperties": false
+    },
+    "helm-values.enabled": {
+      "description": "-- Specifies that chart can be used as a condition when it is a dependency.",
+      "type": "boolean",
+      "default": true
     },
     "helm-values.affinity": {
       "type": "object",
