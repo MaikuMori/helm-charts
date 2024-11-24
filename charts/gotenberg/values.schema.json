@@ -5,9 +5,6 @@
     "helm-values": {
       "type": "object",
       "properties": {
-        "enabled": {
-          "$ref": "#/$defs/helm-values.enabled"
-        },
         "affinity": {
           "$ref": "#/$defs/helm-values.affinity"
         },
@@ -19,6 +16,9 @@
         },
         "chromium": {
           "$ref": "#/$defs/helm-values.chromium"
+        },
+        "enabled": {
+          "$ref": "#/$defs/helm-values.enabled"
         },
         "extraEnv": {
           "$ref": "#/$defs/helm-values.extraEnv"
@@ -118,11 +118,6 @@
         }
       },
       "additionalProperties": false
-    },
-    "helm-values.enabled": {
-      "description": "-- Specifies that chart can be used as a condition when it is a dependency.",
-      "type": "boolean",
-      "default": true
     },
     "helm-values.affinity": {
       "type": "object",
@@ -422,6 +417,11 @@
       "description": "-- Maximum duration to wait for Chromium to start or restart",
       "type": "string",
       "default": ""
+    },
+    "helm-values.enabled": {
+      "description": "-- Specifies that chart can be used as a condition when it is a dependency.\nSee https://helm.sh/docs/chart_best_practices/dependencies/#conditions-and-tags for more info.\n@ignored",
+      "type": "boolean",
+      "default": true
     },
     "helm-values.extraEnv": {
       "description": "-- List of extra environment variables for gotenberg container",

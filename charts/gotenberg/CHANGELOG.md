@@ -2,7 +2,9 @@
 
 ## 1.9.1
 
-- Fixing 'Additional property enabled is not allowed' when using gotenberg in helm dependency
+- Fixing 'Additional property enabled is not allowed' when using gotenberg in helm dependency (Thanks to Anthony | [@anthosz](https://github.com/anthosz))
+- Bump `gotenberg` version `8.12.0` -> `8.14.1`.
+- Publish the chart to OCI registry.
 
 ## 1.9.0
 
