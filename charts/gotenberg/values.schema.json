@@ -238,6 +238,9 @@
         "enabled": {
           "$ref": "#/$defs/helm-values.autoscaling.enabled"
         },
+        "extraMetrics": {
+          "$ref": "#/$defs/helm-values.autoscaling.extraMetrics"
+        },
         "maxReplicas": {
           "$ref": "#/$defs/helm-values.autoscaling.maxReplicas"
         },
@@ -260,6 +263,11 @@
     "helm-values.autoscaling.enabled": {
       "type": "boolean",
       "default": false
+    },
+    "helm-values.autoscaling.extraMetrics": {
+      "type": "array",
+      "default": [],
+      "items": {}
     },
     "helm-values.autoscaling.maxReplicas": {
       "type": "number",

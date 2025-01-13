@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.9.1](https://img.shields.io/badge/Version-1.9.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.14.1](https://img.shields.io/badge/AppVersion-8.14.1-informational?style=flat-square)
+![Version: 1.10.0](https://img.shields.io/badge/Version-1.10.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.14.1](https://img.shields.io/badge/AppVersion-8.14.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -64,6 +64,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | api.traceHeader | string | `""` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
 | autoscaling.behavior | object | `{}` |  |
 | autoscaling.enabled | bool | `false` |  |
+| autoscaling.extraMetrics | list | `[]` |  |
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
