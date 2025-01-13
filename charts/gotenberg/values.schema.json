@@ -235,7 +235,7 @@
         "behavior": {
           "$ref": "#/$defs/helm-values.autoscaling.behavior"
         },
-        "behavior": {
+        "customMetrics": {
           "$ref": "#/$defs/helm-values.autoscaling.customMetrics"
         },
         "enabled": {
@@ -257,6 +257,10 @@
       "additionalProperties": false
     },
     "helm-values.autoscaling.behavior": {
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.autoscaling.customMetrics": {
       "type": "object",
       "default": {}
     },
