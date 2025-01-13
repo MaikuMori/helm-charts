@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.0
+
+- Adding the ability to add customMetrics in hpa
+
 ## 1.9.1
 
 - Fixing 'Additional property enabled is not allowed' when using gotenberg in helm dependency (Thanks to Anthony | [@anthosz](https://github.com/anthosz))
