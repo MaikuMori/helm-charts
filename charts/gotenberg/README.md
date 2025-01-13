@@ -63,6 +63,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | api.tlsSecretName | string | `""` | Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key) |
 | api.traceHeader | string | `""` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
 | autoscaling.behavior | object | `{}` |  |
+| autoscaling.customMetrics | object | `{}` |  |
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |

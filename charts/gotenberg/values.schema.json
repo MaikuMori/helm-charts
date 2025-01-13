@@ -235,6 +235,9 @@
         "behavior": {
           "$ref": "#/$defs/helm-values.autoscaling.behavior"
         },
+        "behavior": {
+          "$ref": "#/$defs/helm-values.autoscaling.customMetrics"
+        },
         "enabled": {
           "$ref": "#/$defs/helm-values.autoscaling.enabled"
         },

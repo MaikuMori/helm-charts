@@ -74,6 +74,7 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 100
   behavior: {}
+  customMetrics: {}
   targetCPUUtilizationPercentage: 80
   # +docs:property
   # targetMemoryUtilizationPercentage: 80
