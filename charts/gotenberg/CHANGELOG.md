@@ -2,7 +2,7 @@
 
 ## 1.10.0
 
-- Adding the ability to add customMetrics in hpa
+- Adding the ability to add customMetrics in hpa ([@anthosz](https://github.com/anthosz))
 
 ## 1.9.1
 
