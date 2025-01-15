@@ -235,11 +235,11 @@
         "behavior": {
           "$ref": "#/$defs/helm-values.autoscaling.behavior"
         },
-        "customMetrics": {
-          "$ref": "#/$defs/helm-values.autoscaling.customMetrics"
-        },
         "enabled": {
           "$ref": "#/$defs/helm-values.autoscaling.enabled"
+        },
+        "extraMetrics": {
+          "$ref": "#/$defs/helm-values.autoscaling.extraMetrics"
         },
         "maxReplicas": {
           "$ref": "#/$defs/helm-values.autoscaling.maxReplicas"
@@ -260,13 +260,14 @@
       "type": "object",
       "default": {}
     },
-    "helm-values.autoscaling.customMetrics": {
-      "type": "object",
-      "default": {}
-    },
     "helm-values.autoscaling.enabled": {
       "type": "boolean",
       "default": false
+    },
+    "helm-values.autoscaling.extraMetrics": {
+      "type": "array",
+      "default": [],
+      "items": {}
     },
     "helm-values.autoscaling.maxReplicas": {
       "type": "number",
