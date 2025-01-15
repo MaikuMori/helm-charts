@@ -31,4 +31,7 @@ spec:
           type: Utilization
           averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
+    {{- with .Values.autoscaling.extraMetrics }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 {{- end }}
