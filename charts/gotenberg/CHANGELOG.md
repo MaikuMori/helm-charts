@@ -3,6 +3,7 @@
 ## 1.10.0
 
 - Add ability to set `extraMetrics` for HPA ([@anthosz](https://github.com/anthosz))
+- Bump `gotenberg` version `8.14.1` -> `8.15.3` ([@anthosz](https://github.com/anthosz))
 
 ## 1.9.1
 
