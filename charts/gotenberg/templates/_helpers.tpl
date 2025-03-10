@@ -88,3 +88,33 @@ readOnlyRootFilesystem: false
 {{- end}}
 {{- end}}
 {{- end}}
+
+{{/*
+Create a liveness probe context
+
+If .Values.livenessProbe is set, use it. Otherwise, use the defaults.
+*/}}
+{{- define "gotenberg.livenessProbe" -}}
+{{- if .Values.livenessProbe }}
+{{- toYaml .Values.livenessProbe }}
+{{- else -}}
+httpGet:
+  path: /health
+  port: http
+{{- end -}}
+{{- end }}
+
+{{/*
+Create a readiness probe context
+
+If .Values.readinessProbe is set, use it. Otherwise, use the defaults.
+*/}}
+{{- define "gotenberg.readinessProbe" -}}
+{{- if .Values.readinessProbe }}
+{{- toYaml .Values.readinessProbe }}
+{{- else -}}
+httpGet:
+  path: /health
+  port: http
+{{- end -}}
+{{- end }}

@@ -69,6 +69,14 @@ resources:
   #   cpu: 100m
   #   memory: 128Mi
 
+# -- Define the liveness probe object for for the container. By default will use upstream recommended values.
+# @default -- `{ httpGet: { path: /health, port: http } }`
+livenessProbe: {}
+
+# -- Define the readiness probe object for for the container. By default will use upstream recommended values.
+# @default -- `{ httpGet: { path: /health, port: http } }`
+readinessProbe: {}
+
 autoscaling:
   enabled: false
   minReplicas: 1
