@@ -592,9 +592,14 @@
       "default": ""
     },
     "helm-values.livenessProbe": {
-      "description": "-- Define the liveness probe object for the container. By default will use upstream recommended values.\n@default -- `{ httpGet: { path: /health, port: http } }`",
+      "description": "-- Define the liveness probe object for the container.\nlivenessProbe: {}",
       "type": "object",
-      "default": {}
+      "default": {
+        "httpGet": {
+          "path": "/health",
+          "port": "http"
+        }
+      }
     },
     "helm-values.logging": {
       "type": "object",
@@ -881,9 +886,14 @@
       "default": ""
     },
     "helm-values.readinessProbe": {
-      "description": "-- Define the readiness probe object for the container. By default will use upstream recommended values.\n@default -- `{ httpGet: { path: /health, port: http } }`",
+      "description": "-- Define the readiness probe object for the container.\nreadinessProbe: {}",
       "type": "object",
-      "default": {}
+      "default": {
+        "httpGet": {
+          "path": "/health",
+          "port": "http"
+        }
+      }
     },
     "helm-values.replicaCount": {
       "type": "number",
