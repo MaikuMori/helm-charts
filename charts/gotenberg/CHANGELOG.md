@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.10.1
+## 1.11.0
 
 - Add possibility to customize `livenessProbe` and `readinessProbe` for deployment ([@v-starodubov](https://github.com/v-starodubov))
 
