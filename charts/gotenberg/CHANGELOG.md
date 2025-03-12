@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11.0
+
+- Add possibility to customize `livenessProbe` and `readinessProbe` for deployment ([@v-starodubov](https://github.com/v-starodubov))
+
 ## 1.10.0
 
 - Add ability to set `extraMetrics` for HPA ([@anthosz](https://github.com/anthosz))

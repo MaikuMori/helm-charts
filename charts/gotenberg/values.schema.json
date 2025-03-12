@@ -44,6 +44,9 @@
         "libreOffice": {
           "$ref": "#/$defs/helm-values.libreOffice"
         },
+        "livenessProbe": {
+          "$ref": "#/$defs/helm-values.livenessProbe"
+        },
         "logging": {
           "$ref": "#/$defs/helm-values.logging"
         },
@@ -79,6 +82,9 @@
         },
         "prometheus": {
           "$ref": "#/$defs/helm-values.prometheus"
+        },
+        "readinessProbe": {
+          "$ref": "#/$defs/helm-values.readinessProbe"
         },
         "replicaCount": {
           "$ref": "#/$defs/helm-values.replicaCount"
@@ -585,6 +591,16 @@
       "type": "string",
       "default": ""
     },
+    "helm-values.livenessProbe": {
+      "description": "-- Define the liveness probe object for the container.\nlivenessProbe: {}",
+      "type": "object",
+      "default": {
+        "httpGet": {
+          "path": "/health",
+          "port": "http"
+        }
+      }
+    },
     "helm-values.logging": {
       "type": "object",
       "properties": {
@@ -868,6 +884,16 @@
       "description": "-- Set the namespace of modules' metrics (default \"gotenberg\")",
       "type": "string",
       "default": ""
+    },
+    "helm-values.readinessProbe": {
+      "description": "-- Define the readiness probe object for the container.\nreadinessProbe: {}",
+      "type": "object",
+      "default": {
+        "httpGet": {
+          "path": "/health",
+          "port": "http"
+        }
+      }
     },
     "helm-values.replicaCount": {
       "type": "number",

@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.10.0](https://img.shields.io/badge/Version-1.10.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.15.3](https://img.shields.io/badge/AppVersion-8.15.3-informational?style=flat-square)
+![Version: 1.11.0](https://img.shields.io/badge/Version-1.11.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.15.3](https://img.shields.io/badge/AppVersion-8.15.3-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -102,6 +102,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | libreOffice.maxQueueSize | int | `0` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. |
 | libreOffice.restartAfter | string | `""` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10) |
 | libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 10s) |
+| livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. +docs:property livenessProbe: {} |
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
 | logging.format | string | `""` | Set log format - auto, json, or text (default "auto") |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
@@ -136,6 +137,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | prometheus.disableCollect | bool | `false` | Disable the collect of metrics |
 | prometheus.disableRouterLogging | bool | `false` | Disable the route logging |
 | prometheus.namespace | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
+| readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. +docs:property readinessProbe: {} |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set. | Define the security context for the container. By default will use upstream recommended values. |
