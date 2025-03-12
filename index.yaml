@@ -13,6 +13,37 @@ entries:
           url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
     apiVersion: v2
     appVersion: 8.15.3
+    created: "2025-03-12T16:51:28.281560785Z"
+    description: A Helm chart for Gotenberg
+    digest: 09ec9cbdc740d8571357c806e5dd3858421b2f36d79fe55b1aa7254ded9ba44c
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.11.0/gotenberg-1.11.0.tgz
+    version: 1.11.0
+  - annotations:
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.15.3
     created: "2025-01-15T20:33:44.426817813Z"
     description: A Helm chart for Gotenberg
     digest: f277e4dbc87b0cd86989369f7bd866f438ce063111081f946296e05ad46f3c41
@@ -872,4 +903,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2025-01-15T20:33:44.427071106Z"
+generated: "2025-03-12T16:51:28.281876487Z"
