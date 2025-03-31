@@ -203,6 +203,9 @@ spec:
           {{- if .Values.logging.fieldsPrefix }}
           - --log-fields-prefix={{ .Values.logging.fieldsPrefix }}
           {{- end }}
+          {{- if .Values.logging.enableGcpFields }}
+          - --log-enable-gcp-fields
+          {{- end }}
 
           {{- if .Values.gotenberg.gracefulShutdownDurationSec }}
           - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s

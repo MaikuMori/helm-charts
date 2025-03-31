@@ -282,6 +282,8 @@ logging:
   level: ""
   # -- Prepend a specified prefix to each field in the logs
   fieldsPrefix: ""
+  # -- Enable GCP log field mapping for Cloud Run
+  enableGcpFields: false
 
 # Misc.
 # https://gotenberg.dev/docs/configuration#graceful-shutdown
