@@ -9,6 +9,7 @@
   - `--pdfengines-convert-engines`
   - `--pdfengines-read-metadata-engines`
   - `--pdfengines-write-metadata-engines`
+- (CI) Update kind to `v0.27.0` and test against recent K8S versions.
 
 ## 1.11.0
 
