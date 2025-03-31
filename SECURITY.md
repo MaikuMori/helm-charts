@@ -6,7 +6,7 @@ Adapted from the [Gotenberg Security Policy](https://github.com/gotenberg/gotenb
 
 Please ensure to keep your environment up-to-date and use only the latest version of charts and images.
 
-Supported Kubernetes versions are listed in test workflow file [here](.github/workflows/test.yaml).
+Supported Kubernetes versions are listed in test workflow file [here](.github/workflows/test.yml).
 
 ## Reporting a Vulnerability
 
