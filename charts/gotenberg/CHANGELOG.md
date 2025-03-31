@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.12.0
+
+- Bump `gotenberg` version `8.15.3` -> `8.19.0`.
+- Add support for `--log-enable-gcp-fields` flag for improved log field mapping for Cloud Run
+- Add support for selecting PDF engines per feature with the following flags:
+  - `--pdfengines-merge-engines`
+  - `--pdfengines-convert-engines`
+  - `--pdfengines-read-metadata-engines`
+  - `--pdfengines-write-metadata-engines`
+- (CI) Update kind to `v0.27.0` and test against recent K8S versions.
+
 ## 1.11.0
 
 - Add possibility to customize `livenessProbe` and `readinessProbe` for deployment ([@v-starodubov](https://github.com/v-starodubov))

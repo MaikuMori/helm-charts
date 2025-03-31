@@ -233,8 +233,16 @@ libreOffice:
 # The PDF Engines module gathers all engines that can manipulate PDF files.
 # https://gotenberg.dev/docs/configuration#pdf-engines
 pdfEngines:
-  # -- Set the PDF engines and their order - all by default
+  # -- (DEPRECATED in Gotenberg 8.13.0) Set the PDF engines and their order - all by default
   engines: ""
+  # -- Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk)
+  mergeEngines: ""
+  # -- Set the PDF engines and their order for the convert feature (default libreoffice-pdfengine)
+  convertEngines: ""
+  # -- Set the PDF engines and their order for the read metadata feature (default exiftool)
+  readMetadataEngines: ""
+  # -- Set the PDF engines and their order for the write metadata feature (default exiftool)
+  writeMetadataEngines: ""
   # -- Disable the routes
   disableRoutes: false
 
@@ -282,6 +290,8 @@ logging:
   level: ""
   # -- Prepend a specified prefix to each field in the logs
   fieldsPrefix: ""
+  # -- Enable GCP log field mapping for Cloud Run
+  enableGcpFields: false
 
 # Misc.
 # https://gotenberg.dev/docs/configuration#graceful-shutdown

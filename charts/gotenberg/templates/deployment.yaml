@@ -149,6 +149,18 @@ spec:
           {{- if .Values.pdfEngines.engines }}
           - --pdfengines-engines={{ .Values.pdfEngines.engines }}
           {{- end }}
+          {{- if .Values.pdfEngines.mergeEngines }}
+          - --pdfengines-merge-engines={{ .Values.pdfEngines.mergeEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.convertEngines }}
+          - --pdfengines-convert-engines={{ .Values.pdfEngines.convertEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.readMetadataEngines }}
+          - --pdfengines-read-metadata-engines={{ .Values.pdfEngines.readMetadataEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.writeMetadataEngines }}
+          - --pdfengines-write-metadata-engines={{ .Values.pdfEngines.writeMetadataEngines }}
+          {{- end }}
           {{- if .Values.pdfEngines.disableRoutes }}
           - --pdfengines-disable-routes
           {{- end }}
@@ -202,6 +214,9 @@ spec:
           {{- end }}
           {{- if .Values.logging.fieldsPrefix }}
           - --log-fields-prefix={{ .Values.logging.fieldsPrefix }}
+          {{- end }}
+          {{- if .Values.logging.enableGcpFields }}
+          - --log-enable-gcp-fields
           {{- end }}
 
           {{- if .Values.gotenberg.gracefulShutdownDurationSec }}
