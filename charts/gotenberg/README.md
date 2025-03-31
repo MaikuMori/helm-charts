@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.11.0](https://img.shields.io/badge/Version-1.11.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.15.3](https://img.shields.io/badge/AppVersion-8.15.3-informational?style=flat-square)
+![Version: 1.12.0](https://img.shields.io/badge/Version-1.12.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.19.0](https://img.shields.io/badge/AppVersion-8.19.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -103,6 +103,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | libreOffice.restartAfter | string | `""` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10) |
 | libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 10s) |
 | livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. +docs:property livenessProbe: {} |
+| logging.enableGcpFields | bool | `false` | Enable GCP log field mapping for Cloud Run |
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
 | logging.format | string | `""` | Set log format - auto, json, or text (default "auto") |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
@@ -127,8 +128,12 @@ helm upgrade my-release maikumori/gotenberg --install
 | pdb.maxUnavailable | string | `""` |  |
 | pdb.minAvailable | int | `1` |  |
 | pdb.unhealthyPodEvictionPolicy | string | `nil` | This is a beta feature, so it's not enabled by default. |
+| pdfEngines.convertEngines | string | `""` | Set the PDF engines and their order for the convert feature (default libreoffice-pdfengine) |
 | pdfEngines.disableRoutes | bool | `false` | Disable the routes |
-| pdfEngines.engines | string | `""` | Set the PDF engines and their order - all by default |
+| pdfEngines.engines | DEPRECATED in Gotenberg 8.13.0 | `""` | Set the PDF engines and their order - all by default |
+| pdfEngines.mergeEngines | string | `""` | Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk) |
+| pdfEngines.readMetadataEngines | string | `""` | Set the PDF engines and their order for the read metadata feature (default exiftool) |
+| pdfEngines.writeMetadataEngines | string | `""` | Set the PDF engines and their order for the write metadata feature (default exiftool) |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` | List of additional pod labels |
 | podSecurityContext | object | `{}` |  |

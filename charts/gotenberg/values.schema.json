@@ -604,6 +604,9 @@
     "helm-values.logging": {
       "type": "object",
       "properties": {
+        "enableGcpFields": {
+          "$ref": "#/$defs/helm-values.logging.enableGcpFields"
+        },
         "fieldsPrefix": {
           "$ref": "#/$defs/helm-values.logging.fieldsPrefix"
         },
@@ -615,6 +618,11 @@
         }
       },
       "additionalProperties": false
+    },
+    "helm-values.logging.enableGcpFields": {
+      "description": "-- Enable GCP log field mapping for Cloud Run",
+      "type": "boolean",
+      "default": false
     },
     "helm-values.logging.fieldsPrefix": {
       "description": "-- Prepend a specified prefix to each field in the logs",
@@ -811,14 +819,31 @@
     "helm-values.pdfEngines": {
       "type": "object",
       "properties": {
+        "convertEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.convertEngines"
+        },
         "disableRoutes": {
           "$ref": "#/$defs/helm-values.pdfEngines.disableRoutes"
         },
         "engines": {
           "$ref": "#/$defs/helm-values.pdfEngines.engines"
+        },
+        "mergeEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.mergeEngines"
+        },
+        "readMetadataEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.readMetadataEngines"
+        },
+        "writeMetadataEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.writeMetadataEngines"
         }
       },
       "additionalProperties": false
+    },
+    "helm-values.pdfEngines.convertEngines": {
+      "description": "-- Set the PDF engines and their order for the convert feature (default libreoffice-pdfengine)",
+      "type": "string",
+      "default": ""
     },
     "helm-values.pdfEngines.disableRoutes": {
       "description": "-- Disable the routes",
@@ -826,7 +851,22 @@
       "default": false
     },
     "helm-values.pdfEngines.engines": {
-      "description": "-- Set the PDF engines and their order - all by default",
+      "description": "-- (DEPRECATED in Gotenberg 8.13.0) Set the PDF engines and their order - all by default",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.mergeEngines": {
+      "description": "-- Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.readMetadataEngines": {
+      "description": "-- Set the PDF engines and their order for the read metadata feature (default exiftool)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.writeMetadataEngines": {
+      "description": "-- Set the PDF engines and their order for the write metadata feature (default exiftool)",
       "type": "string",
       "default": ""
     },

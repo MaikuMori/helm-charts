@@ -2,6 +2,7 @@
 
 ## 1.12.0
 
+- Bump `gotenberg` version `8.15.3` -> `8.19.0`.
 - Add support for `--log-enable-gcp-fields` flag for improved log field mapping for Cloud Run
 - Add support for selecting PDF engines per feature with the following flags:
   - `--pdfengines-merge-engines`
