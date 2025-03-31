@@ -3,6 +3,11 @@
 ## 1.12.0
 
 - Add support for `--log-enable-gcp-fields` flag for improved log field mapping for Cloud Run
+- Add support for selecting PDF engines per feature with the following flags:
+  - `--pdfengines-merge-engines`
+  - `--pdfengines-convert-engines`
+  - `--pdfengines-read-metadata-engines`
+  - `--pdfengines-write-metadata-engines`
 
 ## 1.11.0
 
