@@ -254,13 +254,17 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if or .Values.volumeMounts .Values.api.tlsSecretName }}
           volumeMounts:
-            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             {{- if .Values.api.tlsSecretName }}
             - name: tls
               mountPath: /tls
               readOnly: true
             {{- end }}
+          {{- end }}
       terminationGracePeriodSeconds: {{ .Values.gotenberg.gracefulShutdownDurationSec }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -278,9 +282,11 @@ spec:
       topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.volumes }}
+      {{- if or .Values.volumes .Values.api.tlsSecretName }}
       volumes:
+        {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
         {{- if $.Values.api.tlsSecretName }}
         - name: tls
           secret:
