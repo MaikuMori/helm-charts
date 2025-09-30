@@ -229,6 +229,18 @@ spec:
             - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
               value: {{ .Values.api.basicAuthPassword }}
           {{- end }}
+          {{- $runAsUser := 1001 }}
+          {{- if .Values.securityContext.runAsUser }}
+            {{- $runAsUser = int .Values.securityContext.runAsUser }}
+          {{- else if .Values.podSecurityContext.runAsUser }}
+            {{- $runAsUser = int .Values.podSecurityContext.runAsUser }}
+          {{- else if .Capabilities.APIVersions.Has "security.openshift.io/v1" }}
+            {{- $runAsUser = 0 }}
+          {{- end }}
+          {{- if ne $runAsUser 1001 }}
+            - name: HOME
+              value: /home/gotenberg
+          {{- end }}
           {{- with .Values.extraEnv }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
