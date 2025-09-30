@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.12.0](https://img.shields.io/badge/Version-1.12.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.19.0](https://img.shields.io/badge/AppVersion-8.19.0-informational?style=flat-square)
+![Version: 1.13.0](https://img.shields.io/badge/Version-1.13.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.23.2](https://img.shields.io/badge/AppVersion-8.23.2-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -49,14 +49,17 @@ helm upgrade my-release maikumori/gotenberg --install
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
-| api.basicAuthPassword | string | `nil` | Set the basic authentication password |
-| api.basicAuthUsername | string | `nil` | Set the basic authentication username |
+| api.basicAuthPassword | string | `nil` | Set the basic authentication password (ignored if existingSecret is set) |
+| api.basicAuthUsername | string | `nil` | Set the basic authentication username (ignored if existingSecret is set) |
 | api.disableDownloadFrom | bool | `false` | Disable the download from feature |
 | api.disableHealthCheckLogging | bool | `false` | Disable health check logging |
 | api.downloadFromAllowList | string | `""` | Set the allowed URLs for the download from feature using a regular expression |
 | api.downloadFromDenyList | string | `""` | Set the denied URLs for the download from feature using a regular expression |
 | api.downloadFromMaxRetry | int | `4` | Set the maximum number of retries for the download from feature (default 4) |
 | api.enableBasicAuth | bool | `false` | Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values |
+| api.existingSecret | string | `""` | Name of an existing secret containing basic auth credentials (keys: username, password) |
+| api.existingSecretPasswordKey | string | `""` | Key in existingSecret for the password (default: password) |
+| api.existingSecretUsernameKey | string | `""` | Key in existingSecret for the username (default: username) |
 | api.port | int | `3000` | Set the port on which the API should listen (default 3000) |
 | api.rootPath | string | `""` | Set the root path of the API - for service discovery via URL paths (default "/") |
 | api.timeout | string | `""` | Set the time limit for requests (default 30s) |
@@ -152,6 +155,7 @@ helm upgrade my-release maikumori/gotenberg --install
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
+| startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. +docs:property startupProbe: {} |
 | strategy | object | `{}` |  |
 | testPodAnnotations | object | `{}` | Set annotations for the helm test pods (for example to disable certain kube-score checks) |
 | tolerations | list | `[]` |  |

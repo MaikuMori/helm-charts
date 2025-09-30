@@ -101,6 +101,9 @@
         "serviceAccount": {
           "$ref": "#/$defs/helm-values.serviceAccount"
         },
+        "startupProbe": {
+          "$ref": "#/$defs/helm-values.startupProbe"
+        },
         "strategy": {
           "$ref": "#/$defs/helm-values.strategy"
         },
@@ -156,6 +159,15 @@
         "enableBasicAuth": {
           "$ref": "#/$defs/helm-values.api.enableBasicAuth"
         },
+        "existingSecret": {
+          "$ref": "#/$defs/helm-values.api.existingSecret"
+        },
+        "existingSecretPasswordKey": {
+          "$ref": "#/$defs/helm-values.api.existingSecretPasswordKey"
+        },
+        "existingSecretUsernameKey": {
+          "$ref": "#/$defs/helm-values.api.existingSecretUsernameKey"
+        },
         "port": {
           "$ref": "#/$defs/helm-values.api.port"
         },
@@ -175,10 +187,10 @@
       "additionalProperties": false
     },
     "helm-values.api.basicAuthPassword": {
-      "description": "-- Set the basic authentication password"
+      "description": "-- Set the basic authentication password (ignored if existingSecret is set)"
     },
     "helm-values.api.basicAuthUsername": {
-      "description": "-- Set the basic authentication username"
+      "description": "-- Set the basic authentication username (ignored if existingSecret is set)"
     },
     "helm-values.api.disableDownloadFrom": {
       "description": "-- Disable the download from feature",
@@ -209,6 +221,21 @@
       "description": "-- Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values",
       "type": "boolean",
       "default": false
+    },
+    "helm-values.api.existingSecret": {
+      "description": "-- Name of an existing secret containing basic auth credentials (keys: username, password)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.api.existingSecretPasswordKey": {
+      "description": "-- Key in existingSecret for the password (default: password)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.api.existingSecretUsernameKey": {
+      "description": "-- Key in existingSecret for the username (default: username)",
+      "type": "string",
+      "default": ""
     },
     "helm-values.api.port": {
       "description": "-- Set the port on which the API should listen (default 3000)",
@@ -1005,6 +1032,18 @@
       "description": "-- The name of the service account to use.\nIf not set and create is true, a name is generated using the fullname template",
       "type": "string",
       "default": ""
+    },
+    "helm-values.startupProbe": {
+      "description": "-- Define the startup probe object for the container.\nstartupProbe: {}",
+      "type": "object",
+      "default": {
+        "failureThreshold": 30,
+        "httpGet": {
+          "path": "/health",
+          "port": "http"
+        },
+        "periodSeconds": 10
+      }
     },
     "helm-values.strategy": {
       "description": "Strategy is utilized to configure the desired upgrade approach and configuration for the deployment.",
