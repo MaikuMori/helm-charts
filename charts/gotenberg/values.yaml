@@ -85,6 +85,16 @@ readinessProbe:
     path: /health
     port: http
 
+# -- Define the startup probe object for the container.
+# +docs:property
+# startupProbe: {}
+startupProbe:
+  httpGet:
+    path: /health
+    port: http
+  failureThreshold: 30
+  periodSeconds: 10
+
 autoscaling:
   enabled: false
   minReplicas: 1
@@ -165,9 +175,15 @@ api:
   disableHealthCheckLogging: false
   # -- Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values
   enableBasicAuth: false
-  # -- Set the basic authentication username
+  # -- Name of an existing secret containing basic auth credentials (keys: username, password)
+  existingSecret: ""
+  # -- Key in existingSecret for the username (default: username)
+  existingSecretUsernameKey: ""
+  # -- Key in existingSecret for the password (default: password)
+  existingSecretPasswordKey: ""
+  # -- Set the basic authentication username (ignored if existingSecret is set)
   basicAuthUsername:
-  # -- Set the basic authentication password
+  # -- Set the basic authentication password (ignored if existingSecret is set)
   basicAuthPassword:
   # -- Set the allowed URLs for the download from feature using a regular expression
   downloadFromAllowList: ""

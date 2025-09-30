@@ -44,6 +44,24 @@ The command removes all the Kubernetes components associated with the chart and 
 helm upgrade my-release maikumori/gotenberg --install
 ```
 
+### Using a Newer Gotenberg Version
+
+Chart releases are typically published when new features or breaking changes are added to Gotenberg that require chart modifications. However, you can use any version of Gotenberg by overriding the `image.tag` value.
+
+To use a specific version of Gotenberg:
+
+```console
+helm upgrade --install my-release maikumori/gotenberg --set image.tag="8.23.0"
+```
+
+Or with the `--atomic` flag for automatic rollback on failure:
+
+```console
+helm upgrade --install --atomic my-release maikumori/gotenberg --set image.tag="8.23.0"
+```
+
+This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes between versions.
+
 {{ template "chart.requirementsSection" . }}
 
 {{ template "chart.valuesSection" . }}

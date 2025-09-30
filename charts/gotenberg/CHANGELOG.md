@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.13.0
+
+- Bump `gotenberg` version `8.19.0` -> `8.23.2`.
+- Add `startupProbe` support for deployment.
+- Add `existingSecret` option to use an existing secret for basic auth credentials.
+- Auto set `HOME` environment variable if `runAsUser` is not the default one.
+- Fix issue with `volumes` and TLS secret configuration.
+- Minor output rendering fix in HPA template.
+
 ## 1.12.0
 
 - Bump `gotenberg` version `8.15.3` -> `8.19.0`.
