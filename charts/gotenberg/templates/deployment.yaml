@@ -223,11 +223,24 @@ spec:
           - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s
           {{- end }}
           env:
-          {{- if and .Values.api.enableBasicAuth .Values.api.basicAuthUsername .Values.api.basicAuthPassword }}
+          {{- if .Values.api.enableBasicAuth }}
+            {{- if .Values.api.existingSecret }}
+            - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.existingSecret }}
+                  key: {{ .Values.api.existingSecretUsernameKey | default "username" }}
+            - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.api.existingSecret }}
+                  key: {{ .Values.api.existingSecretPasswordKey | default "password" }}
+            {{- else if and .Values.api.basicAuthUsername .Values.api.basicAuthPassword }}
             - name: GOTENBERG_API_BASIC_AUTH_USERNAME
               value: {{ .Values.api.basicAuthUsername }}
             - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
               value: {{ .Values.api.basicAuthPassword }}
+            {{- end }}
           {{- end }}
           {{- $runAsUser := 1001 }}
           {{- if .Values.securityContext.runAsUser }}
