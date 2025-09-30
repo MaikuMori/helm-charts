@@ -85,6 +85,16 @@ readinessProbe:
     path: /health
     port: http
 
+# -- Define the startup probe object for the container.
+# +docs:property
+# startupProbe: {}
+startupProbe:
+  httpGet:
+    path: /health
+    port: http
+  failureThreshold: 30
+  periodSeconds: 10
+
 autoscaling:
   enabled: false
   minReplicas: 1
