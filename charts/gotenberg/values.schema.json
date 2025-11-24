@@ -539,6 +539,9 @@
         "hosts": {
           "$ref": "#/$defs/helm-values.ingress.hosts"
         },
+        "labels": {
+          "$ref": "#/$defs/helm-values.ingress.labels"
+        },
         "tls": {
           "$ref": "#/$defs/helm-values.ingress.tls"
         }
@@ -561,13 +564,18 @@
       "default": false
     },
     "helm-values.ingress.hosts": {
-      "description": "kubernetes.io/ingress.class: nginx\nkubernetes.io/tls-acme: \"true\"\n-- Set the hostnames of the ingress, see values.yaml for an example.",
+      "description": "-- Set the hostnames of the ingress, see values.yaml for an example.",
       "type": "array",
       "default": [],
       "items": {}
     },
+    "helm-values.ingress.labels": {
+      "description": "-- Set the labels of the ingress",
+      "type": "object",
+      "default": {}
+    },
     "helm-values.ingress.tls": {
-      "description": "- host: chart-example.local\npaths:\n  - path: /\n    pathType: ImplementationSpecific\n-- Set the TLS configuration for the ingress, see values.yaml for an example.",
+      "description": "-- Set the TLS configuration for the ingress, see values.yaml for an example.",
       "type": "array",
       "default": [],
       "items": {}

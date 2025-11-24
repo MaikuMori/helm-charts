@@ -145,6 +145,10 @@ ingress:
     {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+
+  # -- Set the labels of the ingress
+  labels:
+    {}
   # -- Set the hostnames of the ingress, see values.yaml for an example.
   hosts:
     []
@@ -152,6 +156,7 @@ ingress:
     #   paths:
     #     - path: /
     #       pathType: ImplementationSpecific
+
   # -- Set the TLS configuration for the ingress, see values.yaml for an example.
   tls: []
   #  - secretName: chart-example-tls

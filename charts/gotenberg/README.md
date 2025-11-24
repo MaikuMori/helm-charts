@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.13.0](https://img.shields.io/badge/Version-1.13.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.23.2](https://img.shields.io/badge/AppVersion-8.23.2-informational?style=flat-square)
+![Version: 1.14.0](https://img.shields.io/badge/Version-1.14.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.23.2](https://img.shields.io/badge/AppVersion-8.23.2-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -117,6 +117,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | ingress.className | string | `""` | Set the class name of the ingress |
 | ingress.enabled | bool | `false` | Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet. |
 | ingress.hosts | list | `[]` | Set the hostnames of the ingress, see values.yaml for an example. |
+| ingress.labels | object | `{}` | Set the labels of the ingress |
 | ingress.tls | list | `[]` | Set the TLS configuration for the ingress, see values.yaml for an example. |
 | libreOffice.autoStart | bool | `false` | Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false) |
 | libreOffice.disableRoutes | bool | `false` | Disable the routes |

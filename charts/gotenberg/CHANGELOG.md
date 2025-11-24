@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.14.0
+
+- Add ability to set `labels` on ingress resource.
+
 ## 1.13.0
 
 - Bump `gotenberg` version `8.19.0` -> `8.23.2`.
