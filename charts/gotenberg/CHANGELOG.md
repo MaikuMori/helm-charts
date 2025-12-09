@@ -3,6 +3,19 @@
 ## 1.14.0
 
 - Bump `gotenberg` version `8.23.2` -> `8.25.1`.
+- Mark `chromium.incognito` flag as deprecated (deprecated in Gotenberg 8.25.0, value is ignored).
+- Add support for new PDF Engines flags:
+  - `--pdfengines-split-engines` - Set PDF engines for split feature
+  - `--pdfengines-flatten-engines` - Set PDF engines for flatten feature
+  - `--pdfengines-encrypt-engines` - Set PDF engines for password protection
+  - `--pdfengines-embed-engines` - Set PDF engines for file embedding
+- Add support for additional configuration flags:
+  - `--api-body-limit` - Set request body limit for multipart/form-data
+  - `--api-enable-debug-route` - Enable debug endpoint
+  - `--api-start-timeout` - Set API startup timeout
+  - `--webhook-enable-sync-mode` - Enable synchronous webhook mode
+  - `--log-enable-gcp-severity` - Enable GCP severity field mapping
+  - `--gotenberg-hide-banner` - Hide startup banner
 - Add ability to set `labels` on ingress resource ([@Vovcharaa](https://github.com/Vovcharaa)).
 - Add changelog annotations to Chart.yaml for Artifact Hub.
 - Fix `HOME` environment variable conflict when set in `extraEnv` - user's explicit setting now takes precedence over automatic behavior.

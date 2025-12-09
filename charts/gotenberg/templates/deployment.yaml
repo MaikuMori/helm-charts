@@ -53,6 +53,9 @@ spec:
           {{- if .Values.api.timeout }}
           - --api-timeout={{ .Values.api.timeout }}
           {{- end }}
+          {{- if .Values.api.bodyLimit }}
+          - --api-body-limit={{ .Values.api.bodyLimit }}
+          {{- end }}
           {{- if .Values.api.rootPath }}
           - --api-root-path={{ .Values.api.rootPath }}
           {{- end }}
@@ -61,6 +64,12 @@ spec:
           {{- end }}
           {{- if .Values.api.disableHealthCheckLogging }}
           - --api-disable-health-check-logging
+          {{- end }}
+          {{- if .Values.api.enableDebugRoute }}
+          - --api-enable-debug-route
+          {{- end }}
+          {{- if .Values.api.startTimeout }}
+          - --api-start-timeout={{ .Values.api.startTimeout }}
           {{- end }}
           {{- if .Values.api.enableBasicAuth }}
           - --api-enable-basic-auth
@@ -152,6 +161,12 @@ spec:
           {{- if .Values.pdfEngines.mergeEngines }}
           - --pdfengines-merge-engines={{ .Values.pdfEngines.mergeEngines }}
           {{- end }}
+          {{- if .Values.pdfEngines.splitEngines }}
+          - --pdfengines-split-engines={{ .Values.pdfEngines.splitEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.flattenEngines }}
+          - --pdfengines-flatten-engines={{ .Values.pdfEngines.flattenEngines }}
+          {{- end }}
           {{- if .Values.pdfEngines.convertEngines }}
           - --pdfengines-convert-engines={{ .Values.pdfEngines.convertEngines }}
           {{- end }}
@@ -161,10 +176,19 @@ spec:
           {{- if .Values.pdfEngines.writeMetadataEngines }}
           - --pdfengines-write-metadata-engines={{ .Values.pdfEngines.writeMetadataEngines }}
           {{- end }}
+          {{- if .Values.pdfEngines.encryptEngines }}
+          - --pdfengines-encrypt-engines={{ .Values.pdfEngines.encryptEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.embedEngines }}
+          - --pdfengines-embed-engines={{ .Values.pdfEngines.embedEngines }}
+          {{- end }}
           {{- if .Values.pdfEngines.disableRoutes }}
           - --pdfengines-disable-routes
           {{- end }}
 
+          {{- if .Values.webhook.enableSyncMode }}
+          - --webhook-enable-sync-mode
+          {{- end }}
           {{- if .Values.webhook.allowList }}
           - --webhook-allow-list={{ .Values.webhook.allowList }}
           {{- end }}
@@ -218,9 +242,15 @@ spec:
           {{- if .Values.logging.enableGcpFields }}
           - --log-enable-gcp-fields
           {{- end }}
+          {{- if .Values.logging.enableGcpSeverity }}
+          - --log-enable-gcp-severity
+          {{- end }}
 
           {{- if .Values.gotenberg.gracefulShutdownDurationSec }}
           - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s
+          {{- end }}
+          {{- if .Values.gotenberg.hideBanner }}
+          - --gotenberg-hide-banner
           {{- end }}
           env:
           {{- if .Values.api.enableBasicAuth }}

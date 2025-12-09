@@ -172,12 +172,18 @@ api:
   tlsSecretName: ""
   # -- Set the time limit for requests (default 30s)
   timeout: ""
+  # -- Set the request body limit for multipart/form-data (e.g., "100MB")
+  bodyLimit: ""
   # -- Set the root path of the API - for service discovery via URL paths (default "/")
   rootPath: ""
   # -- Set the header name to use for identifying requests (default "Gotenberg-Trace")
   traceHeader: ""
   # -- Disable health check logging
   disableHealthCheckLogging: false
+  # -- Enable debug route for debugging purposes
+  enableDebugRoute: false
+  # -- Set the maximum duration to wait for the API to start
+  startTimeout: ""
   # -- Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values
   enableBasicAuth: false
   # -- Name of an existing secret containing basic auth credentials (keys: username, password)
@@ -220,7 +226,7 @@ chromium:
   ignoreCertificateErrors: false
   # -- Don't enforce the same-origin policy
   disableWebSecurity: false
-  # -- Start Chromium with incognito mode
+  # -- (DEPRECATED) Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored.
   incognito: false
   # -- Set custom mappings to the host resolver
   hostResolverRules: ""
@@ -254,16 +260,24 @@ libreOffice:
 # The PDF Engines module gathers all engines that can manipulate PDF files.
 # https://gotenberg.dev/docs/configuration#pdf-engines
 pdfEngines:
-  # -- (DEPRECATED in Gotenberg 8.13.0) Set the PDF engines and their order - all by default
+  # -- (DEPRECATED) Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines).
   engines: ""
   # -- Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk)
   mergeEngines: ""
+  # -- Set the PDF engines and their order for the split feature (default pdfcpu,qpdf,pdftk)
+  splitEngines: ""
+  # -- Set the PDF engines and their order for the flatten feature (default qpdf)
+  flattenEngines: ""
   # -- Set the PDF engines and their order for the convert feature (default libreoffice-pdfengine)
   convertEngines: ""
   # -- Set the PDF engines and their order for the read metadata feature (default exiftool)
   readMetadataEngines: ""
   # -- Set the PDF engines and their order for the write metadata feature (default exiftool)
   writeMetadataEngines: ""
+  # -- Set the PDF engines and their order for the password protection feature (default qpdf,pdftk,pdfcpu)
+  encryptEngines: ""
+  # -- Set the PDF engines and their order for the file embedding feature (default pdfcpu)
+  embedEngines: ""
   # -- Disable the routes
   disableRoutes: false
 
@@ -271,6 +285,8 @@ pdfEngines:
 # from multipart/form-data routes to the destination of your choice.
 # https://gotenberg.dev/docs/configuration#webhook
 webhook:
+  # -- Enable synchronous mode for the webhook feature
+  enableSyncMode: false
   # -- Set the allowed URLs for the webhook feature using a regular expression
   allowList: ""
   # -- Set the denied URLs for the webhook feature using a regular expression
@@ -313,12 +329,16 @@ logging:
   fieldsPrefix: ""
   # -- Enable GCP log field mapping for Cloud Run
   enableGcpFields: false
+  # -- Enable GCP severity field mapping
+  enableGcpSeverity: false
 
 # Misc.
 # https://gotenberg.dev/docs/configuration#graceful-shutdown
 gotenberg:
   # -- Set the graceful shutdown duration (default 30s)
   gracefulShutdownDurationSec: 30
+  # -- Hide the Gotenberg banner on startup
+  hideBanner: false
 
 metrics:
   serviceMonitor:

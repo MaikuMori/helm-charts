@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.14.0](https://img.shields.io/badge/Version-1.14.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.23.2](https://img.shields.io/badge/AppVersion-8.23.2-informational?style=flat-square)
+![Version: 1.14.0](https://img.shields.io/badge/Version-1.14.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.25.1](https://img.shields.io/badge/AppVersion-8.25.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -69,17 +69,20 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | affinity | object | `{}` |  |
 | api.basicAuthPassword | string | `nil` | Set the basic authentication password (ignored if existingSecret is set) |
 | api.basicAuthUsername | string | `nil` | Set the basic authentication username (ignored if existingSecret is set) |
+| api.bodyLimit | string | `""` | Set the request body limit for multipart/form-data (e.g., "100MB") |
 | api.disableDownloadFrom | bool | `false` | Disable the download from feature |
 | api.disableHealthCheckLogging | bool | `false` | Disable health check logging |
 | api.downloadFromAllowList | string | `""` | Set the allowed URLs for the download from feature using a regular expression |
 | api.downloadFromDenyList | string | `""` | Set the denied URLs for the download from feature using a regular expression |
 | api.downloadFromMaxRetry | int | `4` | Set the maximum number of retries for the download from feature (default 4) |
 | api.enableBasicAuth | bool | `false` | Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values |
+| api.enableDebugRoute | bool | `false` | Enable debug route for debugging purposes |
 | api.existingSecret | string | `""` | Name of an existing secret containing basic auth credentials (keys: username, password) |
 | api.existingSecretPasswordKey | string | `""` | Key in existingSecret for the password (default: password) |
 | api.existingSecretUsernameKey | string | `""` | Key in existingSecret for the username (default: username) |
 | api.port | int | `3000` | Set the port on which the API should listen (default 3000) |
 | api.rootPath | string | `""` | Set the root path of the API - for service discovery via URL paths (default "/") |
+| api.startTimeout | string | `""` | Set the maximum duration to wait for the API to start |
 | api.timeout | string | `""` | Set the time limit for requests (default 30s) |
 | api.tlsSecretName | string | `""` | Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key) |
 | api.traceHeader | string | `""` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
@@ -101,7 +104,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.disableWebSecurity | bool | `false` | Don't enforce the same-origin policy |
 | chromium.hostResolverRules | string | `""` | Set custom mappings to the host resolver |
 | chromium.ignoreCertificateErrors | bool | `false` | Ignore the certificate errors |
-| chromium.incognito | bool | `false` | Start Chromium with incognito mode |
+| chromium.incognito | DEPRECATED | `false` | Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored. |
 | chromium.maxQueueSize | int | `0` | Maximum request queue size for Chromium. Set to 0 to disable this feature. |
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
 | chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature |
@@ -109,6 +112,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | extraEnv | list | `[]` | List of extra environment variables for gotenberg container |
 | fullnameOverride | string | `""` |  |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
+| gotenberg.hideBanner | bool | `false` | Hide the Gotenberg banner on startup |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"gotenberg/gotenberg"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
@@ -126,6 +130,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 10s) |
 | livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. +docs:property livenessProbe: {} |
 | logging.enableGcpFields | bool | `false` | Enable GCP log field mapping for Cloud Run |
+| logging.enableGcpSeverity | bool | `false` | Enable GCP severity field mapping |
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
 | logging.format | string | `""` | Set log format - auto, json, or text (default "auto") |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
@@ -152,9 +157,13 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | pdb.unhealthyPodEvictionPolicy | string | `nil` | This is a beta feature, so it's not enabled by default. |
 | pdfEngines.convertEngines | string | `""` | Set the PDF engines and their order for the convert feature (default libreoffice-pdfengine) |
 | pdfEngines.disableRoutes | bool | `false` | Disable the routes |
-| pdfEngines.engines | DEPRECATED in Gotenberg 8.13.0 | `""` | Set the PDF engines and their order - all by default |
+| pdfEngines.embedEngines | string | `""` | Set the PDF engines and their order for the file embedding feature (default pdfcpu) |
+| pdfEngines.encryptEngines | string | `""` | Set the PDF engines and their order for the password protection feature (default qpdf,pdftk,pdfcpu) |
+| pdfEngines.engines | DEPRECATED | `""` | Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines). |
+| pdfEngines.flattenEngines | string | `""` | Set the PDF engines and their order for the flatten feature (default qpdf) |
 | pdfEngines.mergeEngines | string | `""` | Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk) |
 | pdfEngines.readMetadataEngines | string | `""` | Set the PDF engines and their order for the read metadata feature (default exiftool) |
+| pdfEngines.splitEngines | string | `""` | Set the PDF engines and their order for the split feature (default pdfcpu,qpdf,pdftk) |
 | pdfEngines.writeMetadataEngines | string | `""` | Set the PDF engines and their order for the write metadata feature (default exiftool) |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` | List of additional pod labels |
@@ -185,6 +194,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | webhook.clientTimeout | string | `""` | Set the time limit for requests to the webhook (default 30s) |
 | webhook.denyList | string | `""` | Set the denied URLs for the webhook feature using a regular expression |
 | webhook.disable | bool | `false` | Disable the webhook feature |
+| webhook.enableSyncMode | bool | `false` | Enable synchronous mode for the webhook feature |
 | webhook.errorAllowList | string | `""` | Set the allowed URLs in case of an error for the webhook feature using a regular expression |
 | webhook.errorDenyList | string | `""` | Set the denied URLs in case of an error for the webhook feature using a regular expression |
 | webhook.maxRetry | string | `""` | Set the maximum number of retries for the webhook feature (default 4) |
