@@ -2,6 +2,55 @@ apiVersion: v1
 entries:
   gotenberg:
   - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Ability to set labels on ingress resource
+          links:
+            - name: GitHub PR
+              url: https://github.com/MaikuMori/helm-charts/pull/77
+            - name: GitHub Contributor
+              url: https://github.com/Vovcharaa
+        - kind: added
+          description: Changelog annotations to Chart.yaml for Artifact Hub
+          links:
+            - name: GitHub Issue
+              url: https://github.com/MaikuMori/helm-charts/issues/65
+        - kind: fixed
+          description: HOME environment variable conflict when set in extraEnv - user's explicit setting now takes precedence
+          links:
+            - name: GitHub Issue
+              url: https://github.com/MaikuMori/helm-charts/issues/74
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.25.1
+    created: "2025-12-09T06:59:48.69866229Z"
+    description: A Helm chart for Gotenberg
+    digest: 1bce660fbb89aee825acd2edfedfbd8bdfc7281b68fd104bbb29f52ba5ff876e
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.14.0/gotenberg-1.14.0.tgz
+    version: 1.14.0
+  - annotations:
       artifacthub.io/links: |
         - name: Projects Homepage
           url: https://gotenberg.dev/
@@ -965,4 +1014,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2025-09-30T19:51:32.512059466Z"
+generated: "2025-12-09T06:59:48.698988169Z"
