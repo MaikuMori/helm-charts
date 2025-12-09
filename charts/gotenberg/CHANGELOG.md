@@ -2,6 +2,7 @@
 
 ## 1.14.0
 
+- Bump `gotenberg` version `8.23.2` -> `8.25.1`.
 - Add ability to set `labels` on ingress resource ([@Vovcharaa](https://github.com/Vovcharaa)).
 - Add changelog annotations to Chart.yaml for Artifact Hub.
 - Fix `HOME` environment variable conflict when set in `extraEnv` - user's explicit setting now takes precedence over automatic behavior.
