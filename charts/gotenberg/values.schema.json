@@ -141,6 +141,9 @@
         "basicAuthUsername": {
           "$ref": "#/$defs/helm-values.api.basicAuthUsername"
         },
+        "bodyLimit": {
+          "$ref": "#/$defs/helm-values.api.bodyLimit"
+        },
         "disableDownloadFrom": {
           "$ref": "#/$defs/helm-values.api.disableDownloadFrom"
         },
@@ -159,6 +162,9 @@
         "enableBasicAuth": {
           "$ref": "#/$defs/helm-values.api.enableBasicAuth"
         },
+        "enableDebugRoute": {
+          "$ref": "#/$defs/helm-values.api.enableDebugRoute"
+        },
         "existingSecret": {
           "$ref": "#/$defs/helm-values.api.existingSecret"
         },
@@ -173,6 +179,9 @@
         },
         "rootPath": {
           "$ref": "#/$defs/helm-values.api.rootPath"
+        },
+        "startTimeout": {
+          "$ref": "#/$defs/helm-values.api.startTimeout"
         },
         "timeout": {
           "$ref": "#/$defs/helm-values.api.timeout"
@@ -191,6 +200,11 @@
     },
     "helm-values.api.basicAuthUsername": {
       "description": "-- Set the basic authentication username (ignored if existingSecret is set)"
+    },
+    "helm-values.api.bodyLimit": {
+      "description": "-- Set the request body limit for multipart/form-data (e.g., \"100MB\")",
+      "type": "string",
+      "default": ""
     },
     "helm-values.api.disableDownloadFrom": {
       "description": "-- Disable the download from feature",
@@ -222,6 +236,11 @@
       "type": "boolean",
       "default": false
     },
+    "helm-values.api.enableDebugRoute": {
+      "description": "-- Enable debug route for debugging purposes",
+      "type": "boolean",
+      "default": false
+    },
     "helm-values.api.existingSecret": {
       "description": "-- Name of an existing secret containing basic auth credentials (keys: username, password)",
       "type": "string",
@@ -244,6 +263,11 @@
     },
     "helm-values.api.rootPath": {
       "description": "-- Set the root path of the API - for service discovery via URL paths (default \"/\")",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.api.startTimeout": {
+      "description": "-- Set the maximum duration to wait for the API to start",
       "type": "string",
       "default": ""
     },
@@ -435,7 +459,7 @@
       "default": false
     },
     "helm-values.chromium.incognito": {
-      "description": "-- Start Chromium with incognito mode",
+      "description": "-- (DEPRECATED) Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored.",
       "type": "boolean",
       "default": false
     },
@@ -482,6 +506,9 @@
       "properties": {
         "gracefulShutdownDurationSec": {
           "$ref": "#/$defs/helm-values.gotenberg.gracefulShutdownDurationSec"
+        },
+        "hideBanner": {
+          "$ref": "#/$defs/helm-values.gotenberg.hideBanner"
         }
       },
       "additionalProperties": false
@@ -490,6 +517,11 @@
       "description": "-- Set the graceful shutdown duration (default 30s)",
       "type": "number",
       "default": 30
+    },
+    "helm-values.gotenberg.hideBanner": {
+      "description": "-- Hide the Gotenberg banner on startup",
+      "type": "boolean",
+      "default": false
     },
     "helm-values.image": {
       "type": "object",
@@ -539,6 +571,9 @@
         "hosts": {
           "$ref": "#/$defs/helm-values.ingress.hosts"
         },
+        "labels": {
+          "$ref": "#/$defs/helm-values.ingress.labels"
+        },
         "tls": {
           "$ref": "#/$defs/helm-values.ingress.tls"
         }
@@ -561,13 +596,18 @@
       "default": false
     },
     "helm-values.ingress.hosts": {
-      "description": "kubernetes.io/ingress.class: nginx\nkubernetes.io/tls-acme: \"true\"\n-- Set the hostnames of the ingress, see values.yaml for an example.",
+      "description": "-- Set the hostnames of the ingress, see values.yaml for an example.",
       "type": "array",
       "default": [],
       "items": {}
     },
+    "helm-values.ingress.labels": {
+      "description": "-- Set the labels of the ingress",
+      "type": "object",
+      "default": {}
+    },
     "helm-values.ingress.tls": {
-      "description": "- host: chart-example.local\npaths:\n  - path: /\n    pathType: ImplementationSpecific\n-- Set the TLS configuration for the ingress, see values.yaml for an example.",
+      "description": "-- Set the TLS configuration for the ingress, see values.yaml for an example.",
       "type": "array",
       "default": [],
       "items": {}
@@ -634,6 +674,9 @@
         "enableGcpFields": {
           "$ref": "#/$defs/helm-values.logging.enableGcpFields"
         },
+        "enableGcpSeverity": {
+          "$ref": "#/$defs/helm-values.logging.enableGcpSeverity"
+        },
         "fieldsPrefix": {
           "$ref": "#/$defs/helm-values.logging.fieldsPrefix"
         },
@@ -648,6 +691,11 @@
     },
     "helm-values.logging.enableGcpFields": {
       "description": "-- Enable GCP log field mapping for Cloud Run",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.logging.enableGcpSeverity": {
+      "description": "-- Enable GCP severity field mapping",
       "type": "boolean",
       "default": false
     },
@@ -852,14 +900,26 @@
         "disableRoutes": {
           "$ref": "#/$defs/helm-values.pdfEngines.disableRoutes"
         },
+        "embedEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.embedEngines"
+        },
+        "encryptEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.encryptEngines"
+        },
         "engines": {
           "$ref": "#/$defs/helm-values.pdfEngines.engines"
+        },
+        "flattenEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.flattenEngines"
         },
         "mergeEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.mergeEngines"
         },
         "readMetadataEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.readMetadataEngines"
+        },
+        "splitEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.splitEngines"
         },
         "writeMetadataEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.writeMetadataEngines"
@@ -877,8 +937,23 @@
       "type": "boolean",
       "default": false
     },
+    "helm-values.pdfEngines.embedEngines": {
+      "description": "-- Set the PDF engines and their order for the file embedding feature (default pdfcpu)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.encryptEngines": {
+      "description": "-- Set the PDF engines and their order for the password protection feature (default qpdf,pdftk,pdfcpu)",
+      "type": "string",
+      "default": ""
+    },
     "helm-values.pdfEngines.engines": {
-      "description": "-- (DEPRECATED in Gotenberg 8.13.0) Set the PDF engines and their order - all by default",
+      "description": "-- (DEPRECATED) Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines).",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.flattenEngines": {
+      "description": "-- Set the PDF engines and their order for the flatten feature (default qpdf)",
       "type": "string",
       "default": ""
     },
@@ -889,6 +964,11 @@
     },
     "helm-values.pdfEngines.readMetadataEngines": {
       "description": "-- Set the PDF engines and their order for the read metadata feature (default exiftool)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.splitEngines": {
+      "description": "-- Set the PDF engines and their order for the split feature (default pdfcpu,qpdf,pdftk)",
       "type": "string",
       "default": ""
     },
@@ -1090,6 +1170,9 @@
         "disable": {
           "$ref": "#/$defs/helm-values.webhook.disable"
         },
+        "enableSyncMode": {
+          "$ref": "#/$defs/helm-values.webhook.enableSyncMode"
+        },
         "errorAllowList": {
           "$ref": "#/$defs/helm-values.webhook.errorAllowList"
         },
@@ -1125,6 +1208,11 @@
     },
     "helm-values.webhook.disable": {
       "description": "-- Disable the webhook feature",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.webhook.enableSyncMode": {
+      "description": "-- Enable synchronous mode for the webhook feature",
       "type": "boolean",
       "default": false
     },
