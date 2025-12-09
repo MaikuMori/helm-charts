@@ -250,7 +250,13 @@ spec:
           {{- else if .Capabilities.APIVersions.Has "security.openshift.io/v1" }}
             {{- $runAsUser = 0 }}
           {{- end }}
-          {{- if ne $runAsUser 1001 }}
+          {{- $homeSet := false }}
+          {{- range .Values.extraEnv }}
+            {{- if eq .name "HOME" }}
+              {{- $homeSet = true }}
+            {{- end }}
+          {{- end }}
+          {{- if and (ne $runAsUser 1001) (not $homeSet) }}
             - name: HOME
               value: /home/gotenberg
           {{- end }}

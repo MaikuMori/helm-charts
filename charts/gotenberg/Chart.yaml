@@ -50,3 +50,21 @@ annotations:
       url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
     - name: Chart's Changelog
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+  artifacthub.io/changes: |
+    - kind: added
+      description: Ability to set labels on ingress resource
+      links:
+        - name: GitHub PR
+          url: https://github.com/MaikuMori/helm-charts/pull/77
+        - name: GitHub Contributor
+          url: https://github.com/Vovcharaa
+    - kind: added
+      description: Changelog annotations to Chart.yaml for Artifact Hub
+      links:
+        - name: GitHub Issue
+          url: https://github.com/MaikuMori/helm-charts/issues/65
+    - kind: fixed
+      description: HOME environment variable conflict when set in extraEnv - user's explicit setting now takes precedence
+      links:
+        - name: GitHub Issue
+          url: https://github.com/MaikuMori/helm-charts/issues/74

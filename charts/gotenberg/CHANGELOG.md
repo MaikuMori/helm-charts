@@ -2,7 +2,9 @@
 
 ## 1.14.0
 
-- Add ability to set `labels` on ingress resource.
+- Add ability to set `labels` on ingress resource ([@Vovcharaa](https://github.com/Vovcharaa)).
+- Add changelog annotations to Chart.yaml for Artifact Hub.
+- Fix `HOME` environment variable conflict when set in `extraEnv` - user's explicit setting now takes precedence over automatic behavior.
 
 ## 1.13.0
 
