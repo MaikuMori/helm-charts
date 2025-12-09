@@ -19,6 +19,7 @@
 - Add ability to set `labels` on ingress resource ([@Vovcharaa](https://github.com/Vovcharaa)).
 - Add changelog annotations to Chart.yaml for Artifact Hub.
 - Fix `HOME` environment variable conflict when set in `extraEnv` - user's explicit setting now takes precedence over automatic behavior.
+- (CI) Update GitHub Actions matrix to test against Kubernetes v1.33.1, v1.32.5, v1.31.9, and v1.30.13.
 
 ## 1.13.0
 
