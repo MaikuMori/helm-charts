@@ -2,7 +2,7 @@
 
 ## 1.15.0
 
-- Add `initContainers` support for running initialization containers.
+- Add `initContainers` support for running initialization containers ([@teknatha136](https://github.com/teknatha136)).
 
 ## 1.14.0
 
