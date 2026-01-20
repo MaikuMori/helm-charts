@@ -16,7 +16,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: "1.15.0"
+version: "1.15.1"
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -51,8 +51,5 @@ annotations:
     - name: Chart's Changelog
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
-    - kind: added
-      description: initContainers support for running initialization containers
-      links:
-        - name: GitHub Contributor
-          url: https://github.com/teknatha136
+    - kind: fixed
+      description: Re-release to fix release assets upload

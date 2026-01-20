@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.15.1
+
+- Re-release to fix release assets upload.
+
 ## 1.15.0
 
 - Add `initContainers` support for running initialization containers ([@teknatha136](https://github.com/teknatha136)).
