@@ -3,6 +3,40 @@ entries:
   gotenberg:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: Re-release to fix release assets upload
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.25.1
+    created: "2026-01-20T16:09:01.22681704Z"
+    description: A Helm chart for Gotenberg
+    digest: 6d140410015362eb023fbd27debc5dc81723e9be4195d5cc533a8993ded5e541
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.15.1/gotenberg-1.15.1.tgz
+    version: 1.15.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: Ability to set labels on ingress resource
           links:
@@ -1014,4 +1048,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-09T06:59:48.698988169Z"
+generated: "2026-01-20T16:09:01.22716659Z"
