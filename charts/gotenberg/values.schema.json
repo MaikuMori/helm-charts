@@ -41,6 +41,9 @@
         "ingress": {
           "$ref": "#/$defs/helm-values.ingress"
         },
+        "initContainers": {
+          "$ref": "#/$defs/helm-values.initContainers"
+        },
         "libreOffice": {
           "$ref": "#/$defs/helm-values.libreOffice"
         },
@@ -608,6 +611,12 @@
     },
     "helm-values.ingress.tls": {
       "description": "-- Set the TLS configuration for the ingress, see values.yaml for an example.",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.initContainers": {
+      "description": "-- List of init containers for the gotenberg pod",
       "type": "array",
       "default": [],
       "items": {}

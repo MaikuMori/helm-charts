@@ -135,6 +135,12 @@ extraEnv: []
 #  - name: FOO
 #    value: bar
 
+# -- List of init containers for the gotenberg pod
+initContainers: []
+#  - name: init-myservice
+#    image: busybox:1.28
+#    command: ['sh', '-c', 'echo init container']
+
 ingress:
   # -- Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet.
   enabled: false

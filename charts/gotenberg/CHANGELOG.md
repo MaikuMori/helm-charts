@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.15.0
+
+- Add `initContainers` support for running initialization containers ([@teknatha136](https://github.com/teknatha136)).
+
 ## 1.14.0
 
 - Bump `gotenberg` version `8.23.2` -> `8.25.1`.
