@@ -105,6 +105,24 @@ autoscaling:
   # +docs:property
   # targetMemoryUtilizationPercentage: 80
 
+vpa:
+  # -- Create a VerticalPodAutoscaler resource for right-sizing pod resources.
+  # Requires the VPA controller to be installed in the cluster.
+  # See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  create: false
+  # -- Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only)
+  updateMode: "Auto"
+  # -- Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example.
+  resourcePolicy: {}
+  #  containerPolicies:
+  #    - containerName: gotenberg
+  #      minAllowed:
+  #        cpu: 100m
+  #        memory: 256Mi
+  #      maxAllowed:
+  #        cpu: 2
+  #        memory: 4Gi
+
 pdb:
   create: false
   minAvailable: 1

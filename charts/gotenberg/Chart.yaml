@@ -56,6 +56,8 @@ annotations:
     - kind: added
       description: Add support for --prometheus-metrics-path flag to set the metrics endpoint path
     - kind: added
+      description: Add experimental VerticalPodAutoscaler (VPA) support
+    - kind: added
       description: Add experimental Gateway API support
     - kind: added
       description: Add scheduled workflow to check for new Gotenberg releases

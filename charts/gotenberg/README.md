@@ -197,6 +197,9 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | topologySpreadConstraints | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |
+| vpa.create | bool | `false` | Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler |
+| vpa.resourcePolicy | object | `{}` | Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example. |
+| vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only) |
 | webhook.allowList | string | `""` | Set the allowed URLs for the webhook feature using a regular expression |
 | webhook.clientTimeout | string | `""` | Set the time limit for requests to the webhook (default 30s) |
 | webhook.denyList | string | `""` | Set the denied URLs for the webhook feature using a regular expression |
