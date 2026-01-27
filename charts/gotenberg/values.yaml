@@ -105,6 +105,24 @@ autoscaling:
   # +docs:property
   # targetMemoryUtilizationPercentage: 80
 
+vpa:
+  # -- Create a VerticalPodAutoscaler resource for right-sizing pod resources.
+  # Requires the VPA controller to be installed in the cluster.
+  # See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  create: false
+  # -- Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only)
+  updateMode: "Auto"
+  # -- Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example.
+  resourcePolicy: {}
+  #  containerPolicies:
+  #    - containerName: gotenberg
+  #      minAllowed:
+  #        cpu: 100m
+  #        memory: 256Mi
+  #      maxAllowed:
+  #        cpu: 2
+  #        memory: 4Gi
+
 pdb:
   create: false
   minAvailable: 1
@@ -168,6 +186,25 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+# Gateway API HTTPRoute configuration.
+# WARNING: Gotenberg shouldn't be exposed to the internet.
+# See also: https://gateway-api.sigs.k8s.io/
+gateway:
+  # -- Set to true to create an HTTPRoute resource
+  enabled: false
+  # -- Annotations to add to the HTTPRoute
+  annotations: {}
+  # -- Labels to add to the HTTPRoute
+  labels: {}
+  # -- Parent Gateway references, see values.yaml for an example.
+  parentRefs: []
+  #  - name: my-gateway
+  #    namespace: default
+  #    sectionName: https
+  # -- Hostnames to match for routing, see values.yaml for an example.
+  hostnames: []
+  #  - gotenberg.example.local
 
 # The API module is an HTTP/1 and HTTP/2 (H2C) server. Other modules may add routes, middlewares, and health checks.
 # https://gotenberg.dev/docs/configuration#api
@@ -319,6 +356,8 @@ prometheus:
   collectInterval: ""
   # -- Set the namespace of modules' metrics (default "gotenberg")
   namespace: ""
+  # -- Set the metrics endpoint path (default "/prometheus/metrics")
+  metricsPath: ""
   # -- Disable the collect of metrics
   disableCollect: false
   # -- Disable the route logging

@@ -16,13 +16,13 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: "1.15.1"
+version: "1.16.0"
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "8.25.1"
+appVersion: "8.26.0"
 
 keywords:
   - gotenberg
@@ -51,5 +51,15 @@ annotations:
     - name: Chart's Changelog
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
-    - kind: fixed
-      description: Re-release to fix release assets upload
+    - kind: changed
+      description: Bump gotenberg version 8.25.1 to 8.26.0
+    - kind: added
+      description: Add support for --prometheus-metrics-path flag to set the metrics endpoint path
+    - kind: added
+      description: Add experimental VerticalPodAutoscaler (VPA) support
+    - kind: added
+      description: Add experimental Gateway API support
+    - kind: added
+      description: Add scheduled workflow to check for new Gotenberg releases
+    - kind: changed
+      description: Update Kubernetes test matrix to v1.31-v1.35

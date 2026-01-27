@@ -227,6 +227,9 @@ spec:
           {{- if .Values.prometheus.namespace }}
           - --prometheus-namespace={{ .Values.prometheus.namespace }}
           {{- end }}
+          {{- if .Values.prometheus.metricsPath }}
+          - --prometheus-metrics-path={{ .Values.prometheus.metricsPath }}
+          {{- end }}
           {{- if .Values.prometheus.disableCollect  }}
           - --prometheus-disable-collect
           {{- end }}

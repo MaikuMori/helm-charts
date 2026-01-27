@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.16.0
+
+- Bump `gotenberg` version `8.25.1` -> `8.26.0`.
+- Add support for `--prometheus-metrics-path` flag to set the metrics endpoint path.
+- Add experimental Gateway API `HTTPRoute` support (`gateway.enabled`).
+- Add `VerticalPodAutoscaler` support (`vpa.create`).
+- (CI) Add scheduled workflow to automatically check for new Gotenberg Docker image releases.
+- (CI) Update Kubernetes test matrix to v1.35.0, v1.34.3, v1.33.7, v1.32.11, v1.31.14. Update KinD to v0.31.0.
+
 ## 1.15.1
 
 - Re-release to fix release assets upload.

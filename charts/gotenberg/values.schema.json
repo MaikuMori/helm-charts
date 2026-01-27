@@ -26,6 +26,9 @@
         "fullnameOverride": {
           "$ref": "#/$defs/helm-values.fullnameOverride"
         },
+        "gateway": {
+          "$ref": "#/$defs/helm-values.gateway"
+        },
         "global": {
           "$ref": "#/$defs/helm-values.global"
         },
@@ -124,6 +127,9 @@
         },
         "volumes": {
           "$ref": "#/$defs/helm-values.volumes"
+        },
+        "vpa": {
+          "$ref": "#/$defs/helm-values.vpa"
         },
         "webhook": {
           "$ref": "#/$defs/helm-values.webhook"
@@ -500,6 +506,54 @@
     "helm-values.fullnameOverride": {
       "type": "string",
       "default": ""
+    },
+    "helm-values.gateway": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/helm-values.gateway.annotations"
+        },
+        "enabled": {
+          "$ref": "#/$defs/helm-values.gateway.enabled"
+        },
+        "hostnames": {
+          "$ref": "#/$defs/helm-values.gateway.hostnames"
+        },
+        "labels": {
+          "$ref": "#/$defs/helm-values.gateway.labels"
+        },
+        "parentRefs": {
+          "$ref": "#/$defs/helm-values.gateway.parentRefs"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.gateway.annotations": {
+      "description": "-- Annotations to add to the HTTPRoute",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.gateway.enabled": {
+      "description": "-- Set to true to create an HTTPRoute resource",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.gateway.hostnames": {
+      "description": "- name: my-gateway\nnamespace: default\nsectionName: https\n-- Hostnames to match for routing, see values.yaml for an example.",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.gateway.labels": {
+      "description": "-- Labels to add to the HTTPRoute",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.gateway.parentRefs": {
+      "description": "-- Parent Gateway references, see values.yaml for an example.",
+      "type": "array",
+      "default": [],
+      "items": {}
     },
     "helm-values.global": {
       "description": "Global values shared across all (sub)charts"
@@ -1015,6 +1069,9 @@
         "disableRouterLogging": {
           "$ref": "#/$defs/helm-values.prometheus.disableRouterLogging"
         },
+        "metricsPath": {
+          "$ref": "#/$defs/helm-values.prometheus.metricsPath"
+        },
         "namespace": {
           "$ref": "#/$defs/helm-values.prometheus.namespace"
         }
@@ -1035,6 +1092,11 @@
       "description": "-- Disable the route logging",
       "type": "boolean",
       "default": false
+    },
+    "helm-values.prometheus.metricsPath": {
+      "description": "-- Set the metrics endpoint path (default \"/prometheus/metrics\")",
+      "type": "string",
+      "default": ""
     },
     "helm-values.prometheus.namespace": {
       "description": "-- Set the namespace of modules' metrics (default \"gotenberg\")",
@@ -1163,6 +1225,36 @@
       "type": "array",
       "default": [],
       "items": {}
+    },
+    "helm-values.vpa": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "$ref": "#/$defs/helm-values.vpa.create"
+        },
+        "resourcePolicy": {
+          "$ref": "#/$defs/helm-values.vpa.resourcePolicy"
+        },
+        "updateMode": {
+          "$ref": "#/$defs/helm-values.vpa.updateMode"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.vpa.create": {
+      "description": "-- Create a VerticalPodAutoscaler resource for right-sizing pod resources.\nRequires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.vpa.resourcePolicy": {
+      "description": "-- Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example.",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.vpa.updateMode": {
+      "description": "-- Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only)",
+      "type": "string",
+      "default": "Auto"
     },
     "helm-values.webhook": {
       "type": "object",

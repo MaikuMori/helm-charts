@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.15.0](https://img.shields.io/badge/Version-1.15.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.25.1](https://img.shields.io/badge/AppVersion-8.25.1-informational?style=flat-square)
+![Version: 1.16.0](https://img.shields.io/badge/Version-1.16.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.26.0](https://img.shields.io/badge/AppVersion-8.26.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -111,6 +111,11 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
 | extraEnv | list | `[]` | List of extra environment variables for gotenberg container |
 | fullnameOverride | string | `""` |  |
+| gateway.annotations | object | `{}` | Annotations to add to the HTTPRoute |
+| gateway.enabled | bool | `false` | Set to true to create an HTTPRoute resource |
+| gateway.hostnames | list | `[]` | Hostnames to match for routing, see values.yaml for an example. |
+| gateway.labels | object | `{}` | Labels to add to the HTTPRoute |
+| gateway.parentRefs | list | `[]` | Parent Gateway references, see values.yaml for an example. |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
 | gotenberg.hideBanner | bool | `false` | Hide the Gotenberg banner on startup |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -173,6 +178,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | prometheus.collectInterval | string | `""` | Set the interval for collecting modules' metrics (default 1s) |
 | prometheus.disableCollect | bool | `false` | Disable the collect of metrics |
 | prometheus.disableRouterLogging | bool | `false` | Disable the route logging |
+| prometheus.metricsPath | string | `""` | Set the metrics endpoint path (default "/prometheus/metrics") |
 | prometheus.namespace | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
 | readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. +docs:property readinessProbe: {} |
 | replicaCount | int | `1` |  |
@@ -191,6 +197,9 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | topologySpreadConstraints | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |
+| vpa.create | bool | `false` | Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler |
+| vpa.resourcePolicy | object | `{}` | Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example. |
+| vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only) |
 | webhook.allowList | string | `""` | Set the allowed URLs for the webhook feature using a regular expression |
 | webhook.clientTimeout | string | `""` | Set the time limit for requests to the webhook (default 30s) |
 | webhook.denyList | string | `""` | Set the denied URLs for the webhook feature using a regular expression |

@@ -21,7 +21,7 @@ spec:
     matchLabels:
       {{- include "gotenberg.selectorLabels" . | nindent 6 }}
   endpoints:
-    - path: /prometheus/metrics
+    - path: {{ .Values.prometheus.metricsPath | default "/prometheus/metrics" }}
       port: http
       scheme: http
       {{- with .Values.metrics.serviceMonitor.interval }}
