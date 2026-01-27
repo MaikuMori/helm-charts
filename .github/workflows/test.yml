@@ -85,6 +85,10 @@ jobs:
           version: v0.31.0
           node_image: kindest/node:${{ matrix.k8s }}
 
+      - name: Install Gateway API CRDs
+        if: steps.list-changed.outputs.changed == 'true'
+        run: kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml
+
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
         run: ct install --helm-extra-set-args "--values=ci-values.yaml" --upgrade --target-branch ${{ github.event.repository.default_branch }}
