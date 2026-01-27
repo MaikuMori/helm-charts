@@ -26,7 +26,7 @@ jobs:
 
       - name: Run helm-tools
         run: |
-          pushd charts/gotenberg  
+          pushd charts/gotenberg
           helm-tool lint -e values.linter.exceptions
           helm-tool schema | jq . > generated-schema.json
           CURRENT_SCHEMA=$(cat values.schema.json)

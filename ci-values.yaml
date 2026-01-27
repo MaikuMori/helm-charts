@@ -3,7 +3,7 @@ pdb:
   minAvailable: 1
   maxUnavailable: ""
   # This is a beta feature, so it's not enabled by default.
-  unhealthyPodEvictionPolicy: 
+  unhealthyPodEvictionPolicy:
 
 serviceAccount:
   create: true
