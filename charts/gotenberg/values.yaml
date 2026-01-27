@@ -169,6 +169,25 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+# Gateway API HTTPRoute configuration.
+# WARNING: Gotenberg shouldn't be exposed to the internet.
+# See also: https://gateway-api.sigs.k8s.io/
+gateway:
+  # -- Set to true to create an HTTPRoute resource
+  enabled: false
+  # -- Annotations to add to the HTTPRoute
+  annotations: {}
+  # -- Labels to add to the HTTPRoute
+  labels: {}
+  # -- Parent Gateway references, see values.yaml for an example.
+  parentRefs: []
+  #  - name: my-gateway
+  #    namespace: default
+  #    sectionName: https
+  # -- Hostnames to match for routing, see values.yaml for an example.
+  hostnames: []
+  #  - gotenberg.example.local
+
 # The API module is an HTTP/1 and HTTP/2 (H2C) server. Other modules may add routes, middlewares, and health checks.
 # https://gotenberg.dev/docs/configuration#api
 api:

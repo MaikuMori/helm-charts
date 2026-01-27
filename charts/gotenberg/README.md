@@ -111,6 +111,11 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
 | extraEnv | list | `[]` | List of extra environment variables for gotenberg container |
 | fullnameOverride | string | `""` |  |
+| gateway.annotations | object | `{}` | Annotations to add to the HTTPRoute |
+| gateway.enabled | bool | `false` | Set to true to create an HTTPRoute resource |
+| gateway.hostnames | list | `[]` | Hostnames to match for routing, see values.yaml for an example. |
+| gateway.labels | object | `{}` | Labels to add to the HTTPRoute |
+| gateway.parentRefs | list | `[]` | Parent Gateway references, see values.yaml for an example. |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
 | gotenberg.hideBanner | bool | `false` | Hide the Gotenberg banner on startup |
 | image.pullPolicy | string | `"IfNotPresent"` |  |

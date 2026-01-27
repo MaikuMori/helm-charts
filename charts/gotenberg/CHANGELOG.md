@@ -4,6 +4,7 @@
 
 - Bump `gotenberg` version `8.25.1` -> `8.26.0`.
 - Add support for `--prometheus-metrics-path` flag to set the metrics endpoint path.
+- Add experimental Gateway API `HTTPRoute` support (`gateway.enabled`).
 - (CI) Add scheduled workflow to automatically check for new Gotenberg Docker image releases.
 
 ## 1.15.1

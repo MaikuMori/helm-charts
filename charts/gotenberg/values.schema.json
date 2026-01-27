@@ -26,6 +26,9 @@
         "fullnameOverride": {
           "$ref": "#/$defs/helm-values.fullnameOverride"
         },
+        "gateway": {
+          "$ref": "#/$defs/helm-values.gateway"
+        },
         "global": {
           "$ref": "#/$defs/helm-values.global"
         },
@@ -500,6 +503,54 @@
     "helm-values.fullnameOverride": {
       "type": "string",
       "default": ""
+    },
+    "helm-values.gateway": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "$ref": "#/$defs/helm-values.gateway.annotations"
+        },
+        "enabled": {
+          "$ref": "#/$defs/helm-values.gateway.enabled"
+        },
+        "hostnames": {
+          "$ref": "#/$defs/helm-values.gateway.hostnames"
+        },
+        "labels": {
+          "$ref": "#/$defs/helm-values.gateway.labels"
+        },
+        "parentRefs": {
+          "$ref": "#/$defs/helm-values.gateway.parentRefs"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.gateway.annotations": {
+      "description": "-- Annotations to add to the HTTPRoute",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.gateway.enabled": {
+      "description": "-- Set to true to create an HTTPRoute resource",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.gateway.hostnames": {
+      "description": "- name: my-gateway\nnamespace: default\nsectionName: https\n-- Hostnames to match for routing, see values.yaml for an example.",
+      "type": "array",
+      "default": [],
+      "items": {}
+    },
+    "helm-values.gateway.labels": {
+      "description": "-- Labels to add to the HTTPRoute",
+      "type": "object",
+      "default": {}
+    },
+    "helm-values.gateway.parentRefs": {
+      "description": "-- Parent Gateway references, see values.yaml for an example.",
+      "type": "array",
+      "default": [],
+      "items": {}
     },
     "helm-values.global": {
       "description": "Global values shared across all (sub)charts"

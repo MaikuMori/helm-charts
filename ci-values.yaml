@@ -18,3 +18,11 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
+
+gateway:
+  enabled: true
+  parentRefs:
+    - name: test-gateway
+      namespace: default
+  hostnames:
+    - gotenberg.test.local
