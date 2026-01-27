@@ -1,0 +1,74 @@
+name: Check Gotenberg Version
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check for new Gotenberg release
+        id: check
+        run: |
+          CURRENT=$(grep '^appVersion:' charts/gotenberg/Chart.yaml | sed 's/appVersion: *"\(.*\)"/\1/')
+          LATEST=$(curl -s "https://registry.hub.docker.com/v2/repositories/gotenberg/gotenberg/tags?page_size=50&ordering=last_updated" \
+            | jq -r '[.results[].name | select(test("^[0-9]+\\.[0-9]+\\.[0-9]+$"))] | sort_by(split(".") | map(tonumber)) | last')
+
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+
+          if [ "$CURRENT" != "$LATEST" ] && [ -n "$LATEST" ]; then
+            echo "update=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "update=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create pull request
+        if: steps.check.outputs.update == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURRENT: ${{ steps.check.outputs.current }}
+          LATEST: ${{ steps.check.outputs.latest }}
+        run: |
+          BRANCH="bump-gotenberg-${LATEST}"
+
+          # Check if branch/PR already exists
+          if gh pr list --head "$BRANCH" --json number --jq 'length' | grep -q '^[1-9]'; then
+            echo "PR already exists for $LATEST, skipping."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+
+          sed -i "s/appVersion: \"$CURRENT\"/appVersion: \"$LATEST\"/" charts/gotenberg/Chart.yaml
+
+          git add charts/gotenberg/Chart.yaml
+          git commit -m "Bump Gotenberg to version $LATEST"
+          git push -u origin "$BRANCH"
+
+          gh pr create \
+            --title "Bump Gotenberg to $LATEST" \
+            --body "$(cat <<EOF
+          Automated bump of Gotenberg from \`$CURRENT\` to \`$LATEST\`.
+
+          Release notes: https://github.com/gotenberg/gotenberg/releases/tag/v$LATEST
+
+          **Remaining tasks:**
+          - [ ] Review upstream release notes for breaking changes
+          - [ ] Update \`CHANGELOG.md\`
+          - [ ] Update \`Chart.yaml\` version and \`artifacthub.io/changes\` annotation
+          - [ ] Run \`helm-docs\` and \`helm-tool schema | jq . > values.schema.json\`
+          EOF
+          )"
