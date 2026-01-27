@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.15.0](https://img.shields.io/badge/Version-1.15.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.25.1](https://img.shields.io/badge/AppVersion-8.25.1-informational?style=flat-square)
+![Version: 1.16.0](https://img.shields.io/badge/Version-1.16.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.26.0](https://img.shields.io/badge/AppVersion-8.26.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -173,6 +173,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | prometheus.collectInterval | string | `""` | Set the interval for collecting modules' metrics (default 1s) |
 | prometheus.disableCollect | bool | `false` | Disable the collect of metrics |
 | prometheus.disableRouterLogging | bool | `false` | Disable the route logging |
+| prometheus.metricsPath | string | `""` | Set the metrics endpoint path (default "/prometheus/metrics") |
 | prometheus.namespace | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
 | readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. +docs:property readinessProbe: {} |
 | replicaCount | int | `1` |  |

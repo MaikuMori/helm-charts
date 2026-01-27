@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.16.0
+
+- Bump `gotenberg` version `8.25.1` -> `8.26.0`.
+- Add support for `--prometheus-metrics-path` flag to set the metrics endpoint path.
+
 ## 1.15.1
 
 - Re-release to fix release assets upload.

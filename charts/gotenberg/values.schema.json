@@ -1015,6 +1015,9 @@
         "disableRouterLogging": {
           "$ref": "#/$defs/helm-values.prometheus.disableRouterLogging"
         },
+        "metricsPath": {
+          "$ref": "#/$defs/helm-values.prometheus.metricsPath"
+        },
         "namespace": {
           "$ref": "#/$defs/helm-values.prometheus.namespace"
         }
@@ -1035,6 +1038,11 @@
       "description": "-- Disable the route logging",
       "type": "boolean",
       "default": false
+    },
+    "helm-values.prometheus.metricsPath": {
+      "description": "-- Set the metrics endpoint path (default \"/prometheus/metrics\")",
+      "type": "string",
+      "default": ""
     },
     "helm-values.prometheus.namespace": {
       "description": "-- Set the namespace of modules' metrics (default \"gotenberg\")",
