@@ -7,6 +7,7 @@
 - Add experimental Gateway API `HTTPRoute` support (`gateway.enabled`).
 - Add `VerticalPodAutoscaler` support (`vpa.create`).
 - (CI) Add scheduled workflow to automatically check for new Gotenberg Docker image releases.
+- (CI) Update Kubernetes test matrix to v1.35.0, v1.34.3, v1.33.7, v1.32.11, v1.31.14. Update KinD to v0.31.0.
 
 ## 1.15.1
 

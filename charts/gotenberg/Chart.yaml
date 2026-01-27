@@ -61,3 +61,5 @@ annotations:
       description: Add experimental Gateway API support
     - kind: added
       description: Add scheduled workflow to check for new Gotenberg releases
+    - kind: changed
+      description: Update Kubernetes test matrix to v1.31-v1.35
