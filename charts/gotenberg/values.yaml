@@ -33,6 +33,13 @@ podAnnotations: {}
 # -- Set annotations for the helm test pods (for example to disable certain kube-score checks)
 testPodAnnotations: {}
 
+# -- Image configuration for the helm test pod
+testImage:
+  # -- Repository for the test image
+  repository: busybox
+  # -- Tag for the test image
+  tag: latest
+
 # -- List of additional pod labels
 podLabels: {}
 

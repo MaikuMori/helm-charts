@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.17.0
+
+- Add `testImage` configuration to customize the test pod image ([#81](https://github.com/MaikuMori/helm-charts/issues/81)).
+
 ## 1.16.0
 
 - Bump `gotenberg` version `8.25.1` -> `8.26.0`.
