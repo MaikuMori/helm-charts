@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.16.0](https://img.shields.io/badge/Version-1.16.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.26.0](https://img.shields.io/badge/AppVersion-8.26.0-informational?style=flat-square)
+![Version: 1.17.0](https://img.shields.io/badge/Version-1.17.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.26.0](https://img.shields.io/badge/AppVersion-8.26.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -185,6 +185,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | resources | object | `{}` |  |
 | securityContext | object | `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set. | Define the security context for the container. By default will use upstream recommended values. |
 | service.annotations | object | `{}` | Annotations to add to the service |
+| service.loadBalancerIP | string | `""` | Static IP address for LoadBalancer type service (optional) |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
@@ -192,6 +193,9 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
 | startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. +docs:property startupProbe: {} |
 | strategy | object | `{}` |  |
+| testImage | object | `{"repository":"busybox","tag":"latest"}` | Image configuration for the helm test pod |
+| testImage.repository | string | `"busybox"` | Repository for the test image |
+| testImage.tag | string | `"latest"` | Tag for the test image |
 | testPodAnnotations | object | `{}` | Set annotations for the helm test pods (for example to disable certain kube-score checks) |
 | tolerations | list | `[]` |  |
 | topologySpreadConstraints | list | `[]` |  |

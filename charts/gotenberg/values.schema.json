@@ -113,6 +113,9 @@
         "strategy": {
           "$ref": "#/$defs/helm-values.strategy"
         },
+        "testImage": {
+          "$ref": "#/$defs/helm-values.testImage"
+        },
         "testPodAnnotations": {
           "$ref": "#/$defs/helm-values.testPodAnnotations"
         },
@@ -1132,6 +1135,9 @@
         "annotations": {
           "$ref": "#/$defs/helm-values.service.annotations"
         },
+        "loadBalancerIP": {
+          "$ref": "#/$defs/helm-values.service.loadBalancerIP"
+        },
         "port": {
           "$ref": "#/$defs/helm-values.service.port"
         },
@@ -1145,6 +1151,11 @@
       "description": "-- Annotations to add to the service",
       "type": "object",
       "default": {}
+    },
+    "helm-values.service.loadBalancerIP": {
+      "description": "-- Static IP address for LoadBalancer type service (optional)",
+      "type": "string",
+      "default": ""
     },
     "helm-values.service.port": {
       "type": "number",
@@ -1200,6 +1211,28 @@
       "description": "Strategy is utilized to configure the desired upgrade approach and configuration for the deployment.",
       "type": "object",
       "default": {}
+    },
+    "helm-values.testImage": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "$ref": "#/$defs/helm-values.testImage.repository"
+        },
+        "tag": {
+          "$ref": "#/$defs/helm-values.testImage.tag"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helm-values.testImage.repository": {
+      "description": "-- Repository for the test image",
+      "type": "string",
+      "default": "busybox"
+    },
+    "helm-values.testImage.tag": {
+      "description": "-- Tag for the test image",
+      "type": "string",
+      "default": "latest"
     },
     "helm-values.testPodAnnotations": {
       "description": "-- Set annotations for the helm test pods (for example to disable certain kube-score checks)",
