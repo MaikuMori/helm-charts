@@ -56,6 +56,8 @@ service:
   port: 80
   # -- Annotations to add to the service
   annotations: {}
+  # -- Static IP address for LoadBalancer type service (optional)
+  loadBalancerIP: ""
 
 # Strategy is utilized to configure the desired upgrade approach and
 # configuration for the deployment.

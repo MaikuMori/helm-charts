@@ -1135,6 +1135,9 @@
         "annotations": {
           "$ref": "#/$defs/helm-values.service.annotations"
         },
+        "loadBalancerIP": {
+          "$ref": "#/$defs/helm-values.service.loadBalancerIP"
+        },
         "port": {
           "$ref": "#/$defs/helm-values.service.port"
         },
@@ -1148,6 +1151,11 @@
       "description": "-- Annotations to add to the service",
       "type": "object",
       "default": {}
+    },
+    "helm-values.service.loadBalancerIP": {
+      "description": "-- Static IP address for LoadBalancer type service (optional)",
+      "type": "string",
+      "default": ""
     },
     "helm-values.service.port": {
       "type": "number",

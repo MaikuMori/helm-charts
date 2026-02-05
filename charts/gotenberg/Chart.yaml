@@ -56,3 +56,8 @@ annotations:
       links:
         - name: GitHub Issue
           url: https://github.com/MaikuMori/helm-charts/issues/81
+    - kind: added
+      description: Add service.loadBalancerIP support for LoadBalancer services
+      links:
+        - name: GitHub Issue
+          url: https://github.com/MaikuMori/helm-charts/issues/82

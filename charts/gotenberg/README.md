@@ -185,6 +185,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | resources | object | `{}` |  |
 | securityContext | object | `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set. | Define the security context for the container. By default will use upstream recommended values. |
 | service.annotations | object | `{}` | Annotations to add to the service |
+| service.loadBalancerIP | string | `""` | Static IP address for LoadBalancer type service (optional) |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |

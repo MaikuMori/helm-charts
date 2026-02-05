@@ -3,6 +3,7 @@
 ## 1.17.0
 
 - Add `testImage` configuration to customize the test pod image ([#81](https://github.com/MaikuMori/helm-charts/issues/81)).
+- Add `service.loadBalancerIP` support for LoadBalancer services ([#82](https://github.com/MaikuMori/helm-charts/issues/82)).
 
 ## 1.16.0
 
