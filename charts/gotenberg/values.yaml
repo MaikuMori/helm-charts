@@ -260,8 +260,10 @@ api:
 # The Chromium module interacts with the Chromium browser to convert HTML documents to PDF.
 # https://gotenberg.dev/docs/configuration#chromium
 chromium:
-  # -- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature
+  # -- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100)
   restartAfter: ""
+  # -- Maximum number of concurrent Chromium conversions (default 6)
+  maxConcurrency: 0
   # -- Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion
   autoStart: false
   # -- Maximum duration to wait for Chromium to start or restart

@@ -16,7 +16,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: "1.17.0"
+version: "1.18.0"
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -51,13 +51,7 @@ annotations:
     - name: Chart's Changelog
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
+    - kind: changed
+      description: Bump Gotenberg version 8.26.0 to 8.27.0
     - kind: added
-      description: Add testImage configuration to customize the test pod image
-      links:
-        - name: GitHub Issue
-          url: https://github.com/MaikuMori/helm-charts/issues/81
-    - kind: added
-      description: Add service.loadBalancerIP support for LoadBalancer services
-      links:
-        - name: GitHub Issue
-          url: https://github.com/MaikuMori/helm-charts/issues/82
+      description: Add support for --chromium-max-concurrency flag

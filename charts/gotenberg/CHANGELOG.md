@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.18.0
+
+- Bump `gotenberg` version `8.26.0` -> `8.27.0`.
+- Add support for `--chromium-max-concurrency` flag to set the maximum number of concurrent Chromium conversions.
+- Update `chromium.restartAfter` default documentation (upstream default changed to 100).
+
 ## 1.17.0
 
 - Add `testImage` configuration to customize the test pod image ([#81](https://github.com/MaikuMori/helm-charts/issues/81)).

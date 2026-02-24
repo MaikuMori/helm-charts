@@ -142,6 +142,9 @@ spec:
           {{- if .Values.chromium.maxQueueSize }}
           - --chromium-max-queue-size={{ .Values.chromium.maxQueueSize }}
           {{- end }}
+          {{- if .Values.chromium.maxConcurrency }}
+          - --chromium-max-concurrency={{ .Values.chromium.maxConcurrency }}
+          {{- end }}
 
           {{- if .Values.libreOffice.restartAfter }}
           - --libreoffice-restart-after={{ .Values.libreOffice.restartAfter }}
