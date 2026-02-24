@@ -395,6 +395,9 @@
         "incognito": {
           "$ref": "#/$defs/helm-values.chromium.incognito"
         },
+        "maxConcurrency": {
+          "$ref": "#/$defs/helm-values.chromium.maxConcurrency"
+        },
         "maxQueueSize": {
           "$ref": "#/$defs/helm-values.chromium.maxQueueSize"
         },
@@ -475,6 +478,11 @@
       "type": "boolean",
       "default": false
     },
+    "helm-values.chromium.maxConcurrency": {
+      "description": "-- Maximum number of concurrent Chromium conversions (default 6)",
+      "type": "number",
+      "default": 0
+    },
     "helm-values.chromium.maxQueueSize": {
       "description": "-- Maximum request queue size for Chromium. Set to 0 to disable this feature.",
       "type": "number",
@@ -486,7 +494,7 @@
       "default": ""
     },
     "helm-values.chromium.restartAfter": {
-      "description": "-- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature",
+      "description": "-- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100)",
       "type": "string",
       "default": ""
     },

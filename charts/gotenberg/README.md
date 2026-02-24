@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.17.0](https://img.shields.io/badge/Version-1.17.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.26.0](https://img.shields.io/badge/AppVersion-8.26.0-informational?style=flat-square)
+![Version: 1.18.0](https://img.shields.io/badge/Version-1.18.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.27.0](https://img.shields.io/badge/AppVersion-8.27.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -105,9 +105,10 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.hostResolverRules | string | `""` | Set custom mappings to the host resolver |
 | chromium.ignoreCertificateErrors | bool | `false` | Ignore the certificate errors |
 | chromium.incognito | DEPRECATED | `false` | Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored. |
+| chromium.maxConcurrency | int | `0` | Maximum number of concurrent Chromium conversions (default 6) |
 | chromium.maxQueueSize | int | `0` | Maximum request queue size for Chromium. Set to 0 to disable this feature. |
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
-| chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature |
+| chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100) |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
 | extraEnv | list | `[]` | List of extra environment variables for gotenberg container |
 | fullnameOverride | string | `""` |  |
