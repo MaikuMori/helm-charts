@@ -56,7 +56,7 @@ service:
   port: 80
   # -- Annotations to add to the service
   annotations: {}
-  # -- Static IP address for LoadBalancer type service (optional)
+  # -- (DEPRECATED) Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead.
   loadBalancerIP: ""
 
 # Strategy is utilized to configure the desired upgrade approach and
@@ -136,7 +136,7 @@ pdb:
   create: false
   minAvailable: 1
   maxUnavailable: ""
-  # -- This is a beta feature, so it's not enabled by default.
+  # -- Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow)
   unhealthyPodEvictionPolicy:
 
 nodeSelector: {}
