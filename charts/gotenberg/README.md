@@ -178,8 +178,13 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | pdfEngines.engines | DEPRECATED | `""` | Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines). |
 | pdfEngines.flattenEngines | string | `""` | Set the PDF engines and their order for the flatten feature (default qpdf) |
 | pdfEngines.mergeEngines | string | `""` | Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk) |
+| pdfEngines.readBookmarksEngines | string | `""` | Set the PDF engines and their order for the read bookmarks feature (default pdfcpu) |
 | pdfEngines.readMetadataEngines | string | `""` | Set the PDF engines and their order for the read metadata feature (default exiftool) |
+| pdfEngines.rotateEngines | string | `""` | Set the PDF engines and their order for the rotate feature (default pdfcpu,pdftk) |
 | pdfEngines.splitEngines | string | `""` | Set the PDF engines and their order for the split feature (default pdfcpu,qpdf,pdftk) |
+| pdfEngines.stampEngines | string | `""` | Set the PDF engines and their order for the stamp feature (default pdfcpu,pdftk) |
+| pdfEngines.watermarkEngines | string | `""` | Set the PDF engines and their order for the watermark feature (default pdfcpu,pdftk) |
+| pdfEngines.writeBookmarksEngines | string | `""` | Set the PDF engines and their order for the write bookmarks feature (default pdfcpu,pdftk) |
 | pdfEngines.writeMetadataEngines | string | `""` | Set the PDF engines and their order for the write metadata feature (default exiftool) |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` | List of additional pod labels |

@@ -1061,11 +1061,26 @@
         "mergeEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.mergeEngines"
         },
+        "readBookmarksEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.readBookmarksEngines"
+        },
         "readMetadataEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.readMetadataEngines"
         },
+        "rotateEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.rotateEngines"
+        },
         "splitEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.splitEngines"
+        },
+        "stampEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.stampEngines"
+        },
+        "watermarkEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.watermarkEngines"
+        },
+        "writeBookmarksEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.writeBookmarksEngines"
         },
         "writeMetadataEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.writeMetadataEngines"
@@ -1108,13 +1123,38 @@
       "type": "string",
       "default": ""
     },
+    "helm-values.pdfEngines.readBookmarksEngines": {
+      "description": "-- Set the PDF engines and their order for the read bookmarks feature (default pdfcpu)",
+      "type": "string",
+      "default": ""
+    },
     "helm-values.pdfEngines.readMetadataEngines": {
       "description": "-- Set the PDF engines and their order for the read metadata feature (default exiftool)",
       "type": "string",
       "default": ""
     },
+    "helm-values.pdfEngines.rotateEngines": {
+      "description": "-- Set the PDF engines and their order for the rotate feature (default pdfcpu,pdftk)",
+      "type": "string",
+      "default": ""
+    },
     "helm-values.pdfEngines.splitEngines": {
       "description": "-- Set the PDF engines and their order for the split feature (default pdfcpu,qpdf,pdftk)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.stampEngines": {
+      "description": "-- Set the PDF engines and their order for the stamp feature (default pdfcpu,pdftk)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.watermarkEngines": {
+      "description": "-- Set the PDF engines and their order for the watermark feature (default pdfcpu,pdftk)",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.writeBookmarksEngines": {
+      "description": "-- Set the PDF engines and their order for the write bookmarks feature (default pdfcpu,pdftk)",
       "type": "string",
       "default": ""
     },

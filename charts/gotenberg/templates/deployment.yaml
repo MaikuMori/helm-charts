@@ -205,6 +205,21 @@ spec:
           {{- if .Values.pdfEngines.embedEngines }}
           - --pdfengines-embed-engines={{ .Values.pdfEngines.embedEngines }}
           {{- end }}
+          {{- if .Values.pdfEngines.watermarkEngines }}
+          - --pdfengines-watermark-engines={{ .Values.pdfEngines.watermarkEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.stampEngines }}
+          - --pdfengines-stamp-engines={{ .Values.pdfEngines.stampEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.rotateEngines }}
+          - --pdfengines-rotate-engines={{ .Values.pdfEngines.rotateEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.readBookmarksEngines }}
+          - --pdfengines-read-bookmarks-engines={{ .Values.pdfEngines.readBookmarksEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.writeBookmarksEngines }}
+          - --pdfengines-write-bookmarks-engines={{ .Values.pdfEngines.writeBookmarksEngines }}
+          {{- end }}
           {{- if .Values.pdfEngines.disableRoutes }}
           - --pdfengines-disable-routes
           {{- end }}

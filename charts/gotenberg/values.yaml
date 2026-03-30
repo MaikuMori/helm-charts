@@ -354,6 +354,16 @@ pdfEngines:
   encryptEngines: ""
   # -- Set the PDF engines and their order for the file embedding feature (default pdfcpu)
   embedEngines: ""
+  # -- Set the PDF engines and their order for the watermark feature (default pdfcpu,pdftk)
+  watermarkEngines: ""
+  # -- Set the PDF engines and their order for the stamp feature (default pdfcpu,pdftk)
+  stampEngines: ""
+  # -- Set the PDF engines and their order for the rotate feature (default pdfcpu,pdftk)
+  rotateEngines: ""
+  # -- Set the PDF engines and their order for the read bookmarks feature (default pdfcpu)
+  readBookmarksEngines: ""
+  # -- Set the PDF engines and their order for the write bookmarks feature (default pdfcpu,pdftk)
+  writeBookmarksEngines: ""
   # -- Disable the routes
   disableRoutes: false
 
