@@ -4,6 +4,40 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: changed
+          description: Bump Gotenberg version 8.29.0 to 8.29.1
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.29.1
+    created: "2026-03-30T21:34:00.045045203Z"
+    description: A Helm chart for Gotenberg
+    digest: 1c61ec04f08ac952b5dd8fd5dbd786fc252cf9fce3d2846cf84860bd34b28c9d
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.19.1/gotenberg-1.19.1.tgz
+    version: 1.19.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
           description: Bump Gotenberg version 8.27.0 to 8.29.0
         - kind: added
           description: Add chromium and LibreOffice idle shutdown timeout flags
@@ -1222,4 +1256,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-30T01:52:04.855511478Z"
+generated: "2026-03-30T21:34:00.045493227Z"
