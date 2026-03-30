@@ -1,3 +1,4 @@
 sign: true
 # UID of the GPG key to use
 key: helm@maikumori.com
+release-notes-file: RELEASE_NOTES.md

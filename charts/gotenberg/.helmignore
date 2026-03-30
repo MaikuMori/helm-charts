@@ -21,3 +21,5 @@
 .idea/
 *.tmproj
 .vscode/
+# Release notes (generated during CI)
+RELEASE_NOTES.md

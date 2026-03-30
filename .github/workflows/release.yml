@@ -43,6 +43,22 @@ jobs:
           echo "CR_PASSPHRASE_FILE=$SIGNING_KEY_PASSPHRASE_PATH" >> "$GITHUB_ENV"
           echo "CR_KEYRING=$SIGNING_KEY_PATH" >> "$GITHUB_ENV"
 
+      - name: Extract release notes from changelog
+        run: |
+          for chart_dir in charts/*/; do
+            version=$(grep '^version:' "${chart_dir}Chart.yaml" | awk '{print $2}' | tr -d '"')
+            changelog="${chart_dir}CHANGELOG.md"
+            notes="${chart_dir}RELEASE_NOTES.md"
+            if [ -f "$changelog" ]; then
+              awk -v ver="$version" '
+                $0 ~ "^## " ver "$" { found=1; next }
+                found && /^## / { exit }
+                found && NF { body=1 }
+                body { print }
+              ' "$changelog" > "$notes"
+            fi
+          done
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         env:
