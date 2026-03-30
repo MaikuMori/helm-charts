@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.19.1
+
+- Bump `gotenberg` version `8.29.0` -> `8.29.1`.
+
 ## 1.19.0
 
 - Bump `gotenberg` version `8.27.0` -> `8.29.0`.
