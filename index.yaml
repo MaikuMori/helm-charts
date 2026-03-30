@@ -4,6 +4,58 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: changed
+          description: Bump Gotenberg version 8.27.0 to 8.29.0
+        - kind: added
+          description: Add chromium and LibreOffice idle shutdown timeout flags
+        - kind: added
+          description: Add API telemetry control flags (root, debug, version route)
+        - kind: added
+          description: Add PDF engine flags for watermark, stamp, rotate, and bookmarks features
+        - kind: changed
+          description: Rename api.traceHeader to api.correlationIdHeader (old key still works)
+        - kind: changed
+          description: Rename api.disableHealthCheckLogging to api.disableHealthCheckRouteTelemetry (old key still works)
+        - kind: changed
+          description: Rename logging.format to logging.stdFormat and logging.enableGcpFields to logging.stdEnableGcpFields (old keys still work)
+        - kind: changed
+          description: Rename prometheus.disableRouterLogging to prometheus.disableRouteTelemetry (old key still works)
+        - kind: changed
+          description: "Breaking upstream change: health check route telemetry now disabled by default"
+        - kind: added
+          description: Document OpenTelemetry support via standard OTEL_* environment variables
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.29.0
+    created: "2026-03-30T01:52:04.855113167Z"
+    description: A Helm chart for Gotenberg
+    digest: 6bf3dcabda369649f62b60485cc27b17f11caeb4effe1bffb2bb1ababb741edc
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.19.0/gotenberg-1.19.0.tgz
+    version: 1.19.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
           description: Bump Gotenberg version 8.26.0 to 8.27.0
         - kind: added
           description: Add support for --chromium-max-concurrency flag
@@ -1170,4 +1222,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-24T03:15:03.28332199Z"
+generated: "2026-03-30T01:52:04.855511478Z"
