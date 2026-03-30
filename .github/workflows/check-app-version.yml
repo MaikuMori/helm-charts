@@ -58,17 +58,17 @@ jobs:
           git commit -m "Bump Gotenberg to version $LATEST"
           git push -u origin "$BRANCH"
 
+          BODY=$(printf '%s\n' \
+            "Automated bump of Gotenberg from \`$CURRENT\` to \`$LATEST\`." \
+            "" \
+            "Release notes: https://github.com/gotenberg/gotenberg/releases/tag/v$LATEST" \
+            "" \
+            "**Remaining tasks:**" \
+            "- [ ] Review upstream release notes for breaking changes" \
+            "- [ ] Update \`CHANGELOG.md\`" \
+            "- [ ] Update \`Chart.yaml\` version and \`artifacthub.io/changes\` annotation" \
+            "- [ ] Run \`helm-docs\` and \`helm-tool schema | jq . > values.schema.json\`")
+
           gh pr create \
             --title "Bump Gotenberg to $LATEST" \
-            --body "$(cat <<EOF
-Automated bump of Gotenberg from \`$CURRENT\` to \`$LATEST\`.
-
-Release notes: https://github.com/gotenberg/gotenberg/releases/tag/v$LATEST
-
-**Remaining tasks:**
-- [ ] Review upstream release notes for breaking changes
-- [ ] Update \`CHANGELOG.md\`
-- [ ] Update \`Chart.yaml\` version and \`artifacthub.io/changes\` annotation
-- [ ] Run \`helm-docs\` and \`helm-tool schema | jq . > values.schema.json\`
-EOF
-          )"
+            --body "$BODY"
