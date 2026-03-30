@@ -63,11 +63,12 @@ spec:
           {{- if .Values.api.rootPath }}
           - --api-root-path={{ .Values.api.rootPath }}
           {{- end }}
-          {{- if .Values.api.traceHeader }}
-          - --api-trace-header={{ .Values.api.traceHeader }}
+          {{- $correlationIdHeader := .Values.api.correlationIdHeader | default .Values.api.traceHeader }}
+          {{- if $correlationIdHeader }}
+          - --api-correlation-id-header={{ $correlationIdHeader }}
           {{- end }}
-          {{- if .Values.api.disableHealthCheckLogging }}
-          - --api-disable-health-check-logging
+          {{- if or .Values.api.disableHealthCheckRouteTelemetry .Values.api.disableHealthCheckLogging }}
+          - --api-disable-health-check-route-telemetry
           {{- end }}
           {{- if .Values.api.enableDebugRoute }}
           - --api-enable-debug-route
@@ -89,6 +90,15 @@ spec:
           {{- end }}
           {{- if .Values.api.disableDownloadFrom }}
           - --api-disable-download-from
+          {{- end }}
+          {{- if .Values.api.disableRootRouteTelemetry }}
+          - --api-disable-root-route-telemetry
+          {{- end }}
+          {{- if .Values.api.disableDebugRouteTelemetry }}
+          - --api-disable-debug-route-telemetry
+          {{- end }}
+          {{- if .Values.api.disableVersionRouteTelemetry }}
+          - --api-disable-version-route-telemetry
           {{- end }}
 
           {{- if .Values.chromium.restartAfter }}
@@ -145,6 +155,9 @@ spec:
           {{- if .Values.chromium.maxConcurrency }}
           - --chromium-max-concurrency={{ .Values.chromium.maxConcurrency }}
           {{- end }}
+          {{- if .Values.chromium.idleShutdownTimeout }}
+          - --chromium-idle-shutdown-timeout={{ .Values.chromium.idleShutdownTimeout }}
+          {{- end }}
 
           {{- if .Values.libreOffice.restartAfter }}
           - --libreoffice-restart-after={{ .Values.libreOffice.restartAfter }}
@@ -160,6 +173,9 @@ spec:
           {{- end }}
           {{- if .Values.libreOffice.maxQueueSize }}
           - --libreoffice-max-queue-size={{ .Values.libreOffice.maxQueueSize }}
+          {{- end }}
+          {{- if .Values.libreOffice.idleShutdownTimeout }}
+          - --libreoffice-idle-shutdown-timeout={{ .Values.libreOffice.idleShutdownTimeout }}
           {{- end }}
 
           {{- if .Values.pdfEngines.engines }}
@@ -236,12 +252,13 @@ spec:
           {{- if .Values.prometheus.disableCollect  }}
           - --prometheus-disable-collect
           {{- end }}
-          {{- if .Values.prometheus.disableRouterLogging }}
-          - --prometheus-disable-route-logging
+          {{- if or .Values.prometheus.disableRouteTelemetry .Values.prometheus.disableRouterLogging }}
+          - --prometheus-disable-route-telemetry
           {{- end }}
 
-          {{- if .Values.logging.format }}
-          - --log-format={{ .Values.logging.format }}
+          {{- $logStdFormat := .Values.logging.stdFormat | default .Values.logging.format }}
+          {{- if $logStdFormat }}
+          - --log-std-format={{ $logStdFormat }}
           {{- end }}
           {{- if .Values.logging.level }}
           - --log-level={{ .Values.logging.level }}
@@ -249,8 +266,8 @@ spec:
           {{- if .Values.logging.fieldsPrefix }}
           - --log-fields-prefix={{ .Values.logging.fieldsPrefix }}
           {{- end }}
-          {{- if .Values.logging.enableGcpFields }}
-          - --log-enable-gcp-fields
+          {{- if or .Values.logging.stdEnableGcpFields .Values.logging.enableGcpFields }}
+          - --log-std-enable-gcp-fields
           {{- end }}
           {{- if .Values.logging.enableGcpSeverity }}
           - --log-enable-gcp-severity

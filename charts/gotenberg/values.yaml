@@ -157,10 +157,18 @@ volumeMounts: []
 #  - name: tmp-volume
 #    mountPath: /tmp
 
-# -- List of extra environment variables for gotenberg container
+# -- List of extra environment variables for gotenberg container.
+# Gotenberg 8.29.0+ supports OpenTelemetry via standard OTEL_* environment variables.
+# See https://gotenberg.dev/docs/configuration for details.
 extraEnv: []
-#  - name: FOO
-#    value: bar
+#  - name: OTEL_EXPORTER_OTLP_ENDPOINT
+#    value: "http://otel-collector:4317"
+#  - name: OTEL_TRACES_EXPORTER
+#    value: "otlp"
+#  - name: OTEL_METRICS_EXPORTER
+#    value: "otlp"
+#  - name: OTEL_LOGS_EXPORTER
+#    value: "otlp"
 
 # -- List of init containers for the gotenberg pod
 initContainers: []
@@ -228,10 +236,14 @@ api:
   bodyLimit: ""
   # -- Set the root path of the API - for service discovery via URL paths (default "/")
   rootPath: ""
-  # -- Set the header name to use for identifying requests (default "Gotenberg-Trace")
+  # -- (DEPRECATED) Set the header name to use for identifying requests. Use correlationIdHeader instead.
   traceHeader: ""
-  # -- Disable health check logging
+  # -- Set the header name to use for identifying requests (default "Gotenberg-Trace")
+  correlationIdHeader: ""
+  # -- (DEPRECATED) Disable health check route telemetry. Use disableHealthCheckRouteTelemetry instead.
   disableHealthCheckLogging: false
+  # -- Disable health check route telemetry. Note: upstream default changed to true in Gotenberg 8.29.0 (health check telemetry is disabled by default even without this flag).
+  disableHealthCheckRouteTelemetry: false
   # -- Enable debug route for debugging purposes
   enableDebugRoute: false
   # -- Set the maximum duration to wait for the API to start
@@ -256,6 +268,12 @@ api:
   downloadFromMaxRetry: 4
   # -- Disable the download from feature
   disableDownloadFrom: false
+  # -- Disable telemetry on the root route
+  disableRootRouteTelemetry: false
+  # -- Disable telemetry on the debug route
+  disableDebugRouteTelemetry: false
+  # -- Disable telemetry on the version route
+  disableVersionRouteTelemetry: false
 
 # The Chromium module interacts with the Chromium browser to convert HTML documents to PDF.
 # https://gotenberg.dev/docs/configuration#chromium
@@ -296,6 +314,8 @@ chromium:
   clearCookies: false
   # -- Maximum request queue size for Chromium. Set to 0 to disable this feature.
   maxQueueSize: 0
+  # -- Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
+  idleShutdownTimeout: ""
 
 # The LibreOffice module interacts with LibreOffice to convert documents to PDF, thanks to unoconv.
 # https://gotenberg.dev/docs/configuration#libreoffice
@@ -310,6 +330,8 @@ libreOffice:
   disableRoutes: false
   # -- Maximum request queue size for LibreOffice. Set to 0 to disable this feature.
   maxQueueSize: 0
+  # -- Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
+  idleShutdownTimeout: ""
 
 # The PDF Engines module gathers all engines that can manipulate PDF files.
 # https://gotenberg.dev/docs/configuration#pdf-engines
@@ -371,20 +393,26 @@ prometheus:
   metricsPath: ""
   # -- Disable the collect of metrics
   disableCollect: false
-  # -- Disable the route logging
+  # -- (DEPRECATED) Disable the route logging. Use disableRouteTelemetry instead.
   disableRouterLogging: false
+  # -- Disable route telemetry for the Prometheus metrics endpoint
+  disableRouteTelemetry: false
 
 # The Logging module provides a logger to Gotenberg.
 # https://gotenberg.dev/docs/configuration#logging
 logging:
-  # -- Set log format - auto, json, or text (default "auto")
+  # -- (DEPRECATED) Set log format. Use stdFormat instead.
   format: ""
+  # -- Set log standard output format - auto, json, or text (default "auto")
+  stdFormat: ""
   # -- Set the log level - error, warn, info, or debug (default "info")
   level: ""
   # -- Prepend a specified prefix to each field in the logs
   fieldsPrefix: ""
-  # -- Enable GCP log field mapping for Cloud Run
+  # -- (DEPRECATED) Enable GCP log field mapping for Cloud Run. Use stdEnableGcpFields instead.
   enableGcpFields: false
+  # -- Enable GCP log standard output field mapping for Cloud Run
+  stdEnableGcpFields: false
   # -- Enable GCP severity field mapping
   enableGcpSeverity: false
 
