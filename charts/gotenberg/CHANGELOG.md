@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.19.0
+
+- Bump `gotenberg` version `8.27.0` -> `8.29.0`.
+- Add support for `--chromium-idle-shutdown-timeout` and `--libreoffice-idle-shutdown-timeout` flags to automatically shut down idle browser/office processes.
+- Add support for API telemetry control flags: `--api-disable-root-route-telemetry`, `--api-disable-debug-route-telemetry`, `--api-disable-version-route-telemetry`.
+- Add support for new PDF engine flags: `--pdfengines-watermark-engines`, `--pdfengines-stamp-engines`, `--pdfengines-rotate-engines`, `--pdfengines-read-bookmarks-engines`, `--pdfengines-write-bookmarks-engines`.
+- Rename `api.traceHeader` to `api.correlationIdHeader` (`--api-correlation-id-header`). The old key still works for backward compatibility.
+- Rename `api.disableHealthCheckLogging` to `api.disableHealthCheckRouteTelemetry` (`--api-disable-health-check-route-telemetry`). The old key still works.
+- Rename `logging.format` to `logging.stdFormat` (`--log-std-format`). The old key still works.
+- Rename `logging.enableGcpFields` to `logging.stdEnableGcpFields` (`--log-std-enable-gcp-fields`). The old key still works.
+- Rename `prometheus.disableRouterLogging` to `prometheus.disableRouteTelemetry` (`--prometheus-disable-route-telemetry`). The old key still works.
+- **Breaking upstream change**: Health check route telemetry is now disabled by default in Gotenberg 8.29.0 (previously enabled). This applies even without passing the flag.
+- Document OpenTelemetry support via standard `OTEL_*` environment variables through `extraEnv`.
+
 ## 1.18.0
 
 - Bump `gotenberg` version `8.26.0` -> `8.27.0`.

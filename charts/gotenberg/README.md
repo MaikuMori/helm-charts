@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.18.0](https://img.shields.io/badge/Version-1.18.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.27.0](https://img.shields.io/badge/AppVersion-8.27.0-informational?style=flat-square)
+![Version: 1.19.0](https://img.shields.io/badge/Version-1.19.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.29.0](https://img.shields.io/badge/AppVersion-8.29.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -70,8 +70,13 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | api.basicAuthPassword | string | `nil` | Set the basic authentication password (ignored if existingSecret is set) |
 | api.basicAuthUsername | string | `nil` | Set the basic authentication username (ignored if existingSecret is set) |
 | api.bodyLimit | string | `""` | Set the request body limit for multipart/form-data (e.g., "100MB") |
+| api.correlationIdHeader | string | `""` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
+| api.disableDebugRouteTelemetry | bool | `false` | Disable telemetry on the debug route |
 | api.disableDownloadFrom | bool | `false` | Disable the download from feature |
-| api.disableHealthCheckLogging | bool | `false` | Disable health check logging |
+| api.disableHealthCheckLogging | DEPRECATED | `false` | Disable health check route telemetry. Use disableHealthCheckRouteTelemetry instead. |
+| api.disableHealthCheckRouteTelemetry | bool | `false` | Disable health check route telemetry. Note: upstream default changed to true in Gotenberg 8.29.0 (health check telemetry is disabled by default even without this flag). |
+| api.disableRootRouteTelemetry | bool | `false` | Disable telemetry on the root route |
+| api.disableVersionRouteTelemetry | bool | `false` | Disable telemetry on the version route |
 | api.downloadFromAllowList | string | `""` | Set the allowed URLs for the download from feature using a regular expression |
 | api.downloadFromDenyList | string | `""` | Set the denied URLs for the download from feature using a regular expression |
 | api.downloadFromMaxRetry | int | `4` | Set the maximum number of retries for the download from feature (default 4) |
@@ -85,7 +90,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | api.startTimeout | string | `""` | Set the maximum duration to wait for the API to start |
 | api.timeout | string | `""` | Set the time limit for requests (default 30s) |
 | api.tlsSecretName | string | `""` | Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key) |
-| api.traceHeader | string | `""` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
+| api.traceHeader | DEPRECATED | `""` | Set the header name to use for identifying requests. Use correlationIdHeader instead. |
 | autoscaling.behavior | object | `{}` |  |
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.extraMetrics | list | `[]` |  |
@@ -103,6 +108,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.disableRoutes | bool | `false` | Disable the routes |
 | chromium.disableWebSecurity | bool | `false` | Don't enforce the same-origin policy |
 | chromium.hostResolverRules | string | `""` | Set custom mappings to the host resolver |
+| chromium.idleShutdownTimeout | string | `""` | Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
 | chromium.ignoreCertificateErrors | bool | `false` | Ignore the certificate errors |
 | chromium.incognito | DEPRECATED | `false` | Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored. |
 | chromium.maxConcurrency | int | `0` | Maximum number of concurrent Chromium conversions (default 6) |
@@ -110,7 +116,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
 | chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100) |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
-| extraEnv | list | `[]` | List of extra environment variables for gotenberg container |
+| extraEnv | list | `[]` | List of extra environment variables for gotenberg container. Gotenberg 8.29.0+ supports OpenTelemetry via standard OTEL_* environment variables. See https://gotenberg.dev/docs/configuration for details. |
 | fullnameOverride | string | `""` |  |
 | gateway.annotations | object | `{}` | Annotations to add to the HTTPRoute |
 | gateway.enabled | bool | `false` | Set to true to create an HTTPRoute resource |
@@ -132,15 +138,18 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | initContainers | list | `[]` | List of init containers for the gotenberg pod |
 | libreOffice.autoStart | bool | `false` | Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false) |
 | libreOffice.disableRoutes | bool | `false` | Disable the routes |
+| libreOffice.idleShutdownTimeout | string | `""` | Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
 | libreOffice.maxQueueSize | int | `0` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. |
 | libreOffice.restartAfter | string | `""` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10) |
 | libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 10s) |
 | livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. +docs:property livenessProbe: {} |
-| logging.enableGcpFields | bool | `false` | Enable GCP log field mapping for Cloud Run |
+| logging.enableGcpFields | DEPRECATED | `false` | Enable GCP log field mapping for Cloud Run. Use stdEnableGcpFields instead. |
 | logging.enableGcpSeverity | bool | `false` | Enable GCP severity field mapping |
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
-| logging.format | string | `""` | Set log format - auto, json, or text (default "auto") |
+| logging.format | DEPRECATED | `""` | Set log format. Use stdFormat instead. |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
+| logging.stdEnableGcpFields | bool | `false` | Enable GCP log standard output field mapping for Cloud Run |
+| logging.stdFormat | string | `""` | Set log standard output format - auto, json, or text (default "auto") |
 | metrics.serviceMonitor.annotations | object | `{}` | Additional annotations for the service monitor |
 | metrics.serviceMonitor.enabled | bool | `false` | Enable ServiceMonitor |
 | metrics.serviceMonitor.honorLabels | bool | `false` | HonorLabels chooses the metric’s labels on collisions with target labels |
@@ -161,7 +170,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | pdb.create | bool | `false` |  |
 | pdb.maxUnavailable | string | `""` |  |
 | pdb.minAvailable | int | `1` |  |
-| pdb.unhealthyPodEvictionPolicy | string | `nil` | This is a beta feature, so it's not enabled by default. |
+| pdb.unhealthyPodEvictionPolicy | string | `nil` | Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow) |
 | pdfEngines.convertEngines | string | `""` | Set the PDF engines and their order for the convert feature (default libreoffice-pdfengine) |
 | pdfEngines.disableRoutes | bool | `false` | Disable the routes |
 | pdfEngines.embedEngines | string | `""` | Set the PDF engines and their order for the file embedding feature (default pdfcpu) |
@@ -169,8 +178,13 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | pdfEngines.engines | DEPRECATED | `""` | Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines). |
 | pdfEngines.flattenEngines | string | `""` | Set the PDF engines and their order for the flatten feature (default qpdf) |
 | pdfEngines.mergeEngines | string | `""` | Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk) |
+| pdfEngines.readBookmarksEngines | string | `""` | Set the PDF engines and their order for the read bookmarks feature (default pdfcpu) |
 | pdfEngines.readMetadataEngines | string | `""` | Set the PDF engines and their order for the read metadata feature (default exiftool) |
+| pdfEngines.rotateEngines | string | `""` | Set the PDF engines and their order for the rotate feature (default pdfcpu,pdftk) |
 | pdfEngines.splitEngines | string | `""` | Set the PDF engines and their order for the split feature (default pdfcpu,qpdf,pdftk) |
+| pdfEngines.stampEngines | string | `""` | Set the PDF engines and their order for the stamp feature (default pdfcpu,pdftk) |
+| pdfEngines.watermarkEngines | string | `""` | Set the PDF engines and their order for the watermark feature (default pdfcpu,pdftk) |
+| pdfEngines.writeBookmarksEngines | string | `""` | Set the PDF engines and their order for the write bookmarks feature (default pdfcpu,pdftk) |
 | pdfEngines.writeMetadataEngines | string | `""` | Set the PDF engines and their order for the write metadata feature (default exiftool) |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` | List of additional pod labels |
@@ -178,7 +192,8 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | progressDeadlineSeconds | int | `120` |  |
 | prometheus.collectInterval | string | `""` | Set the interval for collecting modules' metrics (default 1s) |
 | prometheus.disableCollect | bool | `false` | Disable the collect of metrics |
-| prometheus.disableRouterLogging | bool | `false` | Disable the route logging |
+| prometheus.disableRouteTelemetry | bool | `false` | Disable route telemetry for the Prometheus metrics endpoint |
+| prometheus.disableRouterLogging | DEPRECATED | `false` | Disable the route logging. Use disableRouteTelemetry instead. |
 | prometheus.metricsPath | string | `""` | Set the metrics endpoint path (default "/prometheus/metrics") |
 | prometheus.namespace | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
 | readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. +docs:property readinessProbe: {} |
@@ -186,7 +201,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | resources | object | `{}` |  |
 | securityContext | object | `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set. | Define the security context for the container. By default will use upstream recommended values. |
 | service.annotations | object | `{}` | Annotations to add to the service |
-| service.loadBalancerIP | string | `""` | Static IP address for LoadBalancer type service (optional) |
+| service.loadBalancerIP | DEPRECATED | `""` | Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead. |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
