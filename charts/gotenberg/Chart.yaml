@@ -5,7 +5,7 @@ description: A Helm chart for Gotenberg
 
 type: application
 version: "1.19.1"
-appVersion: "8.29.1"
+appVersion: "8.31.0"
 
 keywords:
   - gotenberg
