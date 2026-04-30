@@ -85,6 +85,12 @@ spec:
           {{- if .Values.api.downloadFromDenyList }}
           - --api-download-from-deny-list={{ .Values.api.downloadFromDenyList }}
           {{- end }}
+          {{- if .Values.api.downloadFromDenyPrivateIps }}
+          - --api-download-from-deny-private-ips
+          {{- end }}
+          {{- if .Values.api.downloadFromDenyPublicIps }}
+          - --api-download-from-deny-public-ips
+          {{- end }}
           {{- if .Values.api.downloadFromMaxRetry }}
           - --api-download-from-max-retry={{ .Values.api.downloadFromMaxRetry }}
           {{- end }}
@@ -121,6 +127,12 @@ spec:
           {{- end }}
           {{- if .Values.chromium.denyList }}
           - --chromium-deny-list={{ .Values.chromium.denyList }}
+          {{- end }}
+          {{- if .Values.chromium.denyPrivateIps }}
+          - --chromium-deny-private-ips
+          {{- end }}
+          {{- if .Values.chromium.denyPublicIps }}
+          - --chromium-deny-public-ips
           {{- end }}
           {{- if .Values.chromium.ignoreCertificateErrors }}
           - --chromium-ignore-certificate-errors
@@ -177,6 +189,18 @@ spec:
           {{- if .Values.libreOffice.idleShutdownTimeout }}
           - --libreoffice-idle-shutdown-timeout={{ .Values.libreOffice.idleShutdownTimeout }}
           {{- end }}
+          {{- if .Values.libreOffice.allowList }}
+          - --libreoffice-allow-list={{ .Values.libreOffice.allowList }}
+          {{- end }}
+          {{- if .Values.libreOffice.denyList }}
+          - --libreoffice-deny-list={{ .Values.libreOffice.denyList }}
+          {{- end }}
+          {{- if .Values.libreOffice.denyPrivateIps }}
+          - --libreoffice-deny-private-ips
+          {{- end }}
+          {{- if .Values.libreOffice.denyPublicIps }}
+          - --libreoffice-deny-public-ips
+          {{- end }}
 
           {{- if .Values.pdfEngines.engines }}
           - --pdfengines-engines={{ .Values.pdfEngines.engines }}
@@ -232,6 +256,12 @@ spec:
           {{- end }}
           {{- if .Values.webhook.denyList }}
           - --webhook-deny-list={{ .Values.webhook.denyList }}
+          {{- end }}
+          {{- if .Values.webhook.denyPrivateIps }}
+          - --webhook-deny-private-ips
+          {{- end }}
+          {{- if .Values.webhook.denyPublicIps }}
+          - --webhook-deny-public-ips
           {{- end }}
           {{- if .Values.webhook.errorAllowList }}
           - --webhook-error-allow-list={{ .Values.webhook.errorAllowList }}

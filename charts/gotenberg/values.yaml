@@ -264,6 +264,10 @@ api:
   downloadFromAllowList: ""
   # -- Set the denied URLs for the download from feature using a regular expression
   downloadFromDenyList: ""
+  # -- Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected. Added in Gotenberg 8.32.0.
+  downloadFromDenyPrivateIps: false
+  # -- Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.
+  downloadFromDenyPublicIps: false
   # -- Set the maximum number of retries for the download from feature (default 4)
   downloadFromMaxRetry: 4
   # -- Disable the download from feature
@@ -294,6 +298,10 @@ chromium:
   allowList: ""
   # -- Set the denied URLs for Chromium using a regular expression (default "^file:///[^tmp].*")
   denyList: ""
+  # -- Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. Skipped when `proxyServer` or `hostResolverRules` is set.
+  denyPrivateIps: false
+  # -- Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.
+  denyPublicIps: false
   # -- Ignore the certificate errors
   ignoreCertificateErrors: false
   # -- Don't enforce the same-origin policy
@@ -332,6 +340,14 @@ libreOffice:
   maxQueueSize: 0
   # -- Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
   idleShutdownTimeout: ""
+  # -- Set the allowed URLs for LibreOffice outbound fetches (embedded external content in OOXML/RTF/ODF) using a regular expression. Added in Gotenberg 8.32.0.
+  allowList: ""
+  # -- Set the denied URLs for LibreOffice outbound fetches using a regular expression. Added in Gotenberg 8.32.0.
+  denyList: ""
+  # -- Reject LibreOffice outbound fetches resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0.
+  denyPrivateIps: false
+  # -- Reject LibreOffice outbound fetches resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.
+  denyPublicIps: false
 
 # The PDF Engines module gathers all engines that can manipulate PDF files.
 # https://gotenberg.dev/docs/configuration#pdf-engines
@@ -375,8 +391,12 @@ webhook:
   enableSyncMode: false
   # -- Set the allowed URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks.
   allowList: ""
-  # -- Set the denied URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks, and defaults upstream to a regex blocking loopback, RFC1918, link-local, and IPv6 unique-local ranges (override to call internal hosts).
+  # -- Set the denied URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks. Note: 8.31.0's permissive-by-default revert means this defaults to empty again in 8.32.0+; opt into IP-class filtering via `denyPrivateIps` / `denyPublicIps`.
   denyList: ""
+  # -- Reject webhook URLs (success, error, events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0.
+  denyPrivateIps: false
+  # -- Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.
+  denyPublicIps: false
   # -- (DEPRECATED) Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.
   errorAllowList: ""
   # -- (DEPRECATED) Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.

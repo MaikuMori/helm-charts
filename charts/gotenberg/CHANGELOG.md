@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.21.0
+
+- Bump `gotenberg` version `8.31.0` -> `8.32.0`.
+- **Breaking upstream change**: 8.31.0's strict SSRF defaults are reverted in 8.32.0 — outbound URL filtering (Chromium, webhooks, download-from) now defaults to permissive again. Operators on internet-facing APIs opt into the strict posture via the new per-module `denyPrivateIps` / `denyPublicIps` flags below. The 1.20.0 changelog note about `--webhook-deny-list` defaulting to block private ranges no longer applies.
+- **Breaking upstream change**: `file://` URLs are rejected at `/forms/chromium/convert/url` (route returns HTTP 400). Crafted `file://` sub-resources are scoped to the current request's working directory; `/convert/url` and `/screenshot/url` reject every `file://` sub-resource outright.
+- **Breaking upstream change**: `image` / `pdf` stamp and watermark sources now require an uploaded file. Twelve callsites that previously accepted `stampSource=pdf` / `watermarkSource=pdf` with an expression pointing at any path the Gotenberg process could open now return HTTP 400 unless a matching file is uploaded.
+- Add `api.downloadFromDenyPrivateIps` / `api.downloadFromDenyPublicIps` (`--api-download-from-deny-private-ips`, `--api-download-from-deny-public-ips`) for IP-class filtering on the download-from feature.
+- Add `chromium.denyPrivateIps` / `chromium.denyPublicIps` (`--chromium-deny-private-ips`, `--chromium-deny-public-ips`) for IP-class filtering on Chromium navigations and sub-resources. Skipped when `chromium.proxyServer` or `chromium.hostResolverRules` is set.
+- Add `libreOffice.allowList`, `libreOffice.denyList`, `libreOffice.denyPrivateIps`, `libreOffice.denyPublicIps` (`--libreoffice-allow-list`, `--libreoffice-deny-list`, `--libreoffice-deny-private-ips`, `--libreoffice-deny-public-ips`) to filter LibreOffice outbound fetches. OOXML / RTF / ODF can embed external URLs that LibreOffice's libcurl resolves below the Go-side SSRF filter; LibreOffice now routes outbound fetches through an in-process forward proxy on the same `gotenberg.DecideOutbound` path Chromium and webhook delivery use.
+- Add `webhook.denyPrivateIps` / `webhook.denyPublicIps` (`--webhook-deny-private-ips`, `--webhook-deny-public-ips`) for IP-class filtering on webhook URLs (success, error, events).
+- Upstream bug fix: Chromium chart-rendering regression (charts printed as blank rectangles in print mode) fixed by pinning `chromedp` to `v0.14.2`. Affected 8.29.0 through 8.31.0.
+- Upstream bug fix: LibreOffice no longer caches an unrecoverable first-start error; the lazy-start path retries on failure.
+- Upstream hardening (no chart-level config): Chromium hardened against DNS rebinding via in-process loopback HTTP/CONNECT proxy that pins the dial to the resolved IP. Webhook async goroutines now recover from panics through the existing error path.
+
 ## 1.20.0
 
 - Bump `gotenberg` version `8.29.1` -> `8.31.0`.
