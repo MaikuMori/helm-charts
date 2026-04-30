@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.20.0
+
+- Bump `gotenberg` version `8.29.1` -> `8.31.0`.
+- **Breaking upstream change**: SSRF hardening — Gotenberg now resolves outbound URLs (Chromium asset fetches, webhook delivery, download-from) and rejects non-public addresses (loopback, RFC1918, link-local, multicast, IPv6 unique-local, IPv4-mapped IPv6). The dial is pinned to the validated IP to prevent DNS rebinding.
+- **Breaking upstream change**: `--webhook-deny-list` now defaults to a regex blocking loopback, RFC1918, link-local, and IPv6 unique-local ranges. Override `webhook.denyList` to call internal hosts.
+- **Breaking upstream change**: ExifTool metadata write (`/forms/pdfengines/metadata/write`) now strips control characters and line breaks from payloads and drops `System:`-prefixed tags.
+- Mark `webhook.errorAllowList` (`--webhook-error-allow-list`) as deprecated. In Gotenberg 8.31.0+, `webhook.allowList` covers both regular and error webhooks. The old key still works.
+- Mark `webhook.errorDenyList` (`--webhook-error-deny-list`) as deprecated. In Gotenberg 8.31.0+, `webhook.denyList` covers both regular and error webhooks. The old key still works.
+- Note upstream availability of `chromium` and `libreoffice`-only image variants (`gotenberg/gotenberg:8.31.0-chromium`, `gotenberg/gotenberg:8.31.0-libreoffice`) — set `image.tag` accordingly to use them.
+- Note that upstream stopped publishing `thecodingmachine/gotenberg` images. Pull from `gotenberg/gotenberg` instead (the chart already defaults to this).
+
 ## 1.19.1
 
 - Bump `gotenberg` version `8.29.0` -> `8.29.1`.
