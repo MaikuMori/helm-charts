@@ -4,8 +4,8 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.20.0"
-appVersion: "8.31.0"
+version: "1.21.0"
+appVersion: "8.32.0"
 
 keywords:
   - gotenberg
@@ -35,16 +35,22 @@ annotations:
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
     - kind: changed
-      description: Bump Gotenberg version 8.29.1 to 8.31.0
+      description: Bump Gotenberg version 8.31.0 to 8.32.0
     - kind: changed
-      description: "Breaking upstream change: SSRF hardening rejects outbound URLs resolving to loopback, RFC1918, link-local, and other non-public addresses"
+      description: "Breaking upstream change: 8.31.0's strict SSRF defaults are reverted; outbound URL filtering now defaults to permissive again. Opt into IP-class filtering via the new deny-private-ips / deny-public-ips flags per module."
     - kind: changed
-      description: "Breaking upstream change: --webhook-deny-list now defaults to a regex blocking loopback, RFC1918, link-local, and IPv6 unique-local ranges"
+      description: "Breaking upstream change: file:// rejected at /forms/chromium/convert/url and crafted file:// sub-resources are scoped to the request working directory"
     - kind: changed
-      description: "Breaking upstream change: ExifTool metadata write strips control characters and drops System:-prefixed tags"
-    - kind: deprecated
-      description: webhook.errorAllowList is deprecated upstream (--webhook-error-allow-list), use webhook.allowList instead which now also covers error webhooks
-    - kind: deprecated
-      description: webhook.errorDenyList is deprecated upstream (--webhook-error-deny-list), use webhook.denyList instead which now also covers error webhooks
-    - kind: changed
-      description: thecodingmachine/gotenberg images are no longer published upstream, pull from gotenberg/gotenberg instead
+      description: "Breaking upstream change: image / pdf stamp and watermark sources require an uploaded file (return HTTP 400 otherwise)"
+    - kind: added
+      description: Add api.downloadFromDenyPrivateIps and api.downloadFromDenyPublicIps for IP-class filtering on the download-from feature
+    - kind: added
+      description: Add chromium.denyPrivateIps and chromium.denyPublicIps for IP-class filtering on Chromium navigations and sub-resources (skipped when proxyServer or hostResolverRules is set)
+    - kind: added
+      description: Add libreOffice.allowList, libreOffice.denyList, libreOffice.denyPrivateIps, libreOffice.denyPublicIps to filter LibreOffice outbound fetches for embedded external content
+    - kind: added
+      description: Add webhook.denyPrivateIps and webhook.denyPublicIps for IP-class filtering on webhook URLs
+    - kind: fixed
+      description: "Upstream: Chromium chart-rendering regression (charts printed as blank rectangles in print mode) fixed by pinning chromedp to v0.14.2"
+    - kind: fixed
+      description: "Upstream: LibreOffice no longer caches an unrecoverable first-start error; lazy-start path retries on failure"

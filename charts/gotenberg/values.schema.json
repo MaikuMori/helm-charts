@@ -183,6 +183,12 @@
         "downloadFromDenyList": {
           "$ref": "#/$defs/helm-values.api.downloadFromDenyList"
         },
+        "downloadFromDenyPrivateIps": {
+          "$ref": "#/$defs/helm-values.api.downloadFromDenyPrivateIps"
+        },
+        "downloadFromDenyPublicIps": {
+          "$ref": "#/$defs/helm-values.api.downloadFromDenyPublicIps"
+        },
         "downloadFromMaxRetry": {
           "$ref": "#/$defs/helm-values.api.downloadFromMaxRetry"
         },
@@ -277,6 +283,16 @@
       "description": "-- Set the denied URLs for the download from feature using a regular expression",
       "type": "string",
       "default": ""
+    },
+    "helm-values.api.downloadFromDenyPrivateIps": {
+      "description": "-- Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected. Added in Gotenberg 8.32.0.",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.api.downloadFromDenyPublicIps": {
+      "description": "-- Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
+      "type": "boolean",
+      "default": false
     },
     "helm-values.api.downloadFromMaxRetry": {
       "description": "-- Set the maximum number of retries for the download from feature (default 4)",
@@ -417,6 +433,12 @@
         "denyList": {
           "$ref": "#/$defs/helm-values.chromium.denyList"
         },
+        "denyPrivateIps": {
+          "$ref": "#/$defs/helm-values.chromium.denyPrivateIps"
+        },
+        "denyPublicIps": {
+          "$ref": "#/$defs/helm-values.chromium.denyPublicIps"
+        },
         "disableJavaScript": {
           "$ref": "#/$defs/helm-values.chromium.disableJavaScript"
         },
@@ -490,6 +512,16 @@
       "description": "-- Set the denied URLs for Chromium using a regular expression (default \"^file:///[^tmp].*\")",
       "type": "string",
       "default": ""
+    },
+    "helm-values.chromium.denyPrivateIps": {
+      "description": "-- Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. Skipped when `proxyServer` or `hostResolverRules` is set.",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.chromium.denyPublicIps": {
+      "description": "-- Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
+      "type": "boolean",
+      "default": false
     },
     "helm-values.chromium.disableJavaScript": {
       "description": "-- Disable JavaScript",
@@ -737,8 +769,20 @@
     "helm-values.libreOffice": {
       "type": "object",
       "properties": {
+        "allowList": {
+          "$ref": "#/$defs/helm-values.libreOffice.allowList"
+        },
         "autoStart": {
           "$ref": "#/$defs/helm-values.libreOffice.autoStart"
+        },
+        "denyList": {
+          "$ref": "#/$defs/helm-values.libreOffice.denyList"
+        },
+        "denyPrivateIps": {
+          "$ref": "#/$defs/helm-values.libreOffice.denyPrivateIps"
+        },
+        "denyPublicIps": {
+          "$ref": "#/$defs/helm-values.libreOffice.denyPublicIps"
         },
         "disableRoutes": {
           "$ref": "#/$defs/helm-values.libreOffice.disableRoutes"
@@ -758,8 +802,28 @@
       },
       "additionalProperties": false
     },
+    "helm-values.libreOffice.allowList": {
+      "description": "-- Set the allowed URLs for LibreOffice outbound fetches (embedded external content in OOXML/RTF/ODF) using a regular expression. Added in Gotenberg 8.32.0.",
+      "type": "string",
+      "default": ""
+    },
     "helm-values.libreOffice.autoStart": {
       "description": "-- Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.libreOffice.denyList": {
+      "description": "-- Set the denied URLs for LibreOffice outbound fetches using a regular expression. Added in Gotenberg 8.32.0.",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.libreOffice.denyPrivateIps": {
+      "description": "-- Reject LibreOffice outbound fetches resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0.",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.libreOffice.denyPublicIps": {
+      "description": "-- Reject LibreOffice outbound fetches resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
       "type": "boolean",
       "default": false
     },
@@ -1429,6 +1493,12 @@
         "denyList": {
           "$ref": "#/$defs/helm-values.webhook.denyList"
         },
+        "denyPrivateIps": {
+          "$ref": "#/$defs/helm-values.webhook.denyPrivateIps"
+        },
+        "denyPublicIps": {
+          "$ref": "#/$defs/helm-values.webhook.denyPublicIps"
+        },
         "disable": {
           "$ref": "#/$defs/helm-values.webhook.disable"
         },
@@ -1464,9 +1534,19 @@
       "default": ""
     },
     "helm-values.webhook.denyList": {
-      "description": "-- Set the denied URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks, and defaults upstream to a regex blocking loopback, RFC1918, link-local, and IPv6 unique-local ranges (override to call internal hosts).",
+      "description": "-- Set the denied URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks. Note: 8.31.0's permissive-by-default revert means this defaults to empty again in 8.32.0+; opt into IP-class filtering via `denyPrivateIps` / `denyPublicIps`.",
       "type": "string",
       "default": ""
+    },
+    "helm-values.webhook.denyPrivateIps": {
+      "description": "-- Reject webhook URLs (success, error, events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0.",
+      "type": "boolean",
+      "default": false
+    },
+    "helm-values.webhook.denyPublicIps": {
+      "description": "-- Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
+      "type": "boolean",
+      "default": false
     },
     "helm-values.webhook.disable": {
       "description": "-- Disable the webhook feature",

@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.20.0](https://img.shields.io/badge/Version-1.20.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.31.0](https://img.shields.io/badge/AppVersion-8.31.0-informational?style=flat-square)
+![Version: 1.21.0](https://img.shields.io/badge/Version-1.21.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.32.0](https://img.shields.io/badge/AppVersion-8.32.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -79,6 +79,8 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | api.disableVersionRouteTelemetry | bool | `false` | Disable telemetry on the version route |
 | api.downloadFromAllowList | string | `""` | Set the allowed URLs for the download from feature using a regular expression |
 | api.downloadFromDenyList | string | `""` | Set the denied URLs for the download from feature using a regular expression |
+| api.downloadFromDenyPrivateIps | bool | `false` | Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected. Added in Gotenberg 8.32.0. |
+| api.downloadFromDenyPublicIps | bool | `false` | Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
 | api.downloadFromMaxRetry | int | `4` | Set the maximum number of retries for the download from feature (default 4) |
 | api.enableBasicAuth | bool | `false` | Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values |
 | api.enableDebugRoute | bool | `false` | Enable debug route for debugging purposes |
@@ -104,6 +106,8 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.clearCache | bool | `false` | Clear Chromium cache between each conversion. |
 | chromium.clearCookies | bool | `false` | Clear Chromium cookies between each conversion. |
 | chromium.denyList | string | `""` | Set the denied URLs for Chromium using a regular expression (default "^file:///[^tmp].*") |
+| chromium.denyPrivateIps | bool | `false` | Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. Skipped when `proxyServer` or `hostResolverRules` is set. |
+| chromium.denyPublicIps | bool | `false` | Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
 | chromium.disableJavaScript | bool | `false` | Disable JavaScript |
 | chromium.disableRoutes | bool | `false` | Disable the routes |
 | chromium.disableWebSecurity | bool | `false` | Don't enforce the same-origin policy |
@@ -136,7 +140,11 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | ingress.labels | object | `{}` | Set the labels of the ingress |
 | ingress.tls | list | `[]` | Set the TLS configuration for the ingress, see values.yaml for an example. |
 | initContainers | list | `[]` | List of init containers for the gotenberg pod |
+| libreOffice.allowList | string | `""` | Set the allowed URLs for LibreOffice outbound fetches (embedded external content in OOXML/RTF/ODF) using a regular expression. Added in Gotenberg 8.32.0. |
 | libreOffice.autoStart | bool | `false` | Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false) |
+| libreOffice.denyList | string | `""` | Set the denied URLs for LibreOffice outbound fetches using a regular expression. Added in Gotenberg 8.32.0. |
+| libreOffice.denyPrivateIps | bool | `false` | Reject LibreOffice outbound fetches resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. |
+| libreOffice.denyPublicIps | bool | `false` | Reject LibreOffice outbound fetches resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
 | libreOffice.disableRoutes | bool | `false` | Disable the routes |
 | libreOffice.idleShutdownTimeout | string | `""` | Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
 | libreOffice.maxQueueSize | int | `0` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. |
@@ -222,7 +230,9 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only) |
 | webhook.allowList | string | `""` | Set the allowed URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks. |
 | webhook.clientTimeout | string | `""` | Set the time limit for requests to the webhook (default 30s) |
-| webhook.denyList | string | `""` | Set the denied URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks, and defaults upstream to a regex blocking loopback, RFC1918, link-local, and IPv6 unique-local ranges (override to call internal hosts). |
+| webhook.denyList | string | `""` | Set the denied URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks. Note: 8.31.0's permissive-by-default revert means this defaults to empty again in 8.32.0+; opt into IP-class filtering via `denyPrivateIps` / `denyPublicIps`. |
+| webhook.denyPrivateIps | bool | `false` | Reject webhook URLs (success, error, events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. |
+| webhook.denyPublicIps | bool | `false` | Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
 | webhook.disable | bool | `false` | Disable the webhook feature |
 | webhook.enableSyncMode | bool | `false` | Enable synchronous mode for the webhook feature |
 | webhook.errorAllowList | DEPRECATED | `""` | Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks. |
