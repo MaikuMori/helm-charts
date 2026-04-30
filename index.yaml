@@ -4,6 +4,58 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: changed
+          description: Bump Gotenberg version 8.31.0 to 8.32.0
+        - kind: changed
+          description: "Breaking upstream change: 8.31.0's strict SSRF defaults are reverted; outbound URL filtering now defaults to permissive again. Opt into IP-class filtering via the new deny-private-ips / deny-public-ips flags per module."
+        - kind: changed
+          description: "Breaking upstream change: file:// rejected at /forms/chromium/convert/url and crafted file:// sub-resources are scoped to the request working directory"
+        - kind: changed
+          description: "Breaking upstream change: image / pdf stamp and watermark sources require an uploaded file (return HTTP 400 otherwise)"
+        - kind: added
+          description: Add api.downloadFromDenyPrivateIps and api.downloadFromDenyPublicIps for IP-class filtering on the download-from feature
+        - kind: added
+          description: Add chromium.denyPrivateIps and chromium.denyPublicIps for IP-class filtering on Chromium navigations and sub-resources (skipped when proxyServer or hostResolverRules is set)
+        - kind: added
+          description: Add libreOffice.allowList, libreOffice.denyList, libreOffice.denyPrivateIps, libreOffice.denyPublicIps to filter LibreOffice outbound fetches for embedded external content
+        - kind: added
+          description: Add webhook.denyPrivateIps and webhook.denyPublicIps for IP-class filtering on webhook URLs
+        - kind: fixed
+          description: "Upstream: Chromium chart-rendering regression (charts printed as blank rectangles in print mode) fixed by pinning chromedp to v0.14.2"
+        - kind: fixed
+          description: "Upstream: LibreOffice no longer caches an unrecoverable first-start error; lazy-start path retries on failure"
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.32.0
+    created: "2026-04-30T15:27:59.778027818Z"
+    description: A Helm chart for Gotenberg
+    digest: 13a7f77ac534744a3c11804441d96117eeacafc795c11df9860954d4fc823075
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.21.0/gotenberg-1.21.0.tgz
+    version: 1.21.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
           description: Bump Gotenberg version 8.29.1 to 8.31.0
         - kind: changed
           description: "Breaking upstream change: SSRF hardening rejects outbound URLs resolving to loopback, RFC1918, link-local, and other non-public addresses"
@@ -1302,4 +1354,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-30T06:01:14.823290795Z"
+generated: "2026-04-30T15:27:59.778295787Z"
