@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.19.0](https://img.shields.io/badge/Version-1.19.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.29.0](https://img.shields.io/badge/AppVersion-8.29.0-informational?style=flat-square)
+![Version: 1.20.0](https://img.shields.io/badge/Version-1.20.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.31.0](https://img.shields.io/badge/AppVersion-8.31.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -220,13 +220,13 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | vpa.create | bool | `false` | Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler |
 | vpa.resourcePolicy | object | `{}` | Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example. |
 | vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only) |
-| webhook.allowList | string | `""` | Set the allowed URLs for the webhook feature using a regular expression |
+| webhook.allowList | string | `""` | Set the allowed URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks. |
 | webhook.clientTimeout | string | `""` | Set the time limit for requests to the webhook (default 30s) |
-| webhook.denyList | string | `""` | Set the denied URLs for the webhook feature using a regular expression |
+| webhook.denyList | string | `""` | Set the denied URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks, and defaults upstream to a regex blocking loopback, RFC1918, link-local, and IPv6 unique-local ranges (override to call internal hosts). |
 | webhook.disable | bool | `false` | Disable the webhook feature |
 | webhook.enableSyncMode | bool | `false` | Enable synchronous mode for the webhook feature |
-| webhook.errorAllowList | string | `""` | Set the allowed URLs in case of an error for the webhook feature using a regular expression |
-| webhook.errorDenyList | string | `""` | Set the denied URLs in case of an error for the webhook feature using a regular expression |
+| webhook.errorAllowList | DEPRECATED | `""` | Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks. |
+| webhook.errorDenyList | DEPRECATED | `""` | Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks. |
 | webhook.maxRetry | string | `""` | Set the maximum number of retries for the webhook feature (default 4) |
 | webhook.retryMaxWait | string | `""` | Set the maximum duration to wait before trying to call the webhook again (default 30s) |
 | webhook.retryMinWait | string | `""` | Set the minimum duration to wait before trying to call the webhook again (default 1s) |

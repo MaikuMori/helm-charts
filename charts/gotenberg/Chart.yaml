@@ -4,8 +4,8 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.19.1"
-appVersion: "8.29.1"
+version: "1.20.0"
+appVersion: "8.31.0"
 
 keywords:
   - gotenberg
@@ -35,4 +35,16 @@ annotations:
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
     - kind: changed
-      description: Bump Gotenberg version 8.29.0 to 8.29.1
+      description: Bump Gotenberg version 8.29.1 to 8.31.0
+    - kind: changed
+      description: "Breaking upstream change: SSRF hardening rejects outbound URLs resolving to loopback, RFC1918, link-local, and other non-public addresses"
+    - kind: changed
+      description: "Breaking upstream change: --webhook-deny-list now defaults to a regex blocking loopback, RFC1918, link-local, and IPv6 unique-local ranges"
+    - kind: changed
+      description: "Breaking upstream change: ExifTool metadata write strips control characters and drops System:-prefixed tags"
+    - kind: deprecated
+      description: webhook.errorAllowList is deprecated upstream (--webhook-error-allow-list), use webhook.allowList instead which now also covers error webhooks
+    - kind: deprecated
+      description: webhook.errorDenyList is deprecated upstream (--webhook-error-deny-list), use webhook.denyList instead which now also covers error webhooks
+    - kind: changed
+      description: thecodingmachine/gotenberg images are no longer published upstream, pull from gotenberg/gotenberg instead
