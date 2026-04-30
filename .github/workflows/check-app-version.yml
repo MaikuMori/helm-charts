@@ -10,6 +10,12 @@ permissions:
   contents: write
   pull-requests: write
 
+# Serialize runs so a manual workflow_dispatch can't race the weekly cron and
+# leave a pushed branch with no PR (or duplicate the same bump).
+concurrency:
+  group: check-app-version
+  cancel-in-progress: false
+
 jobs:
   check-version:
     runs-on: ubuntu-latest
@@ -33,42 +39,250 @@ jobs:
             echo "update=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create pull request
+      - name: Create or update pull request
         if: steps.check.outputs.update == 'true'
+        uses: actions/github-script@v8
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CURRENT: ${{ steps.check.outputs.current }}
           LATEST: ${{ steps.check.outputs.latest }}
-        run: |
-          BRANCH="bump-gotenberg-${LATEST}"
+        with:
+          script: |
+            const fs = require('fs');
+            const { promisify } = require('util');
+            const execFile = promisify(require('child_process').execFile);
 
-          # Check if branch/PR already exists
-          if gh pr list --head "$BRANCH" --json number --jq 'length' | grep -q '^[1-9]'; then
-            echo "PR already exists for $LATEST, skipping."
-            exit 0
-          fi
+            const { CURRENT, LATEST } = process.env;
+            const upstream = { owner: 'gotenberg', repo: 'gotenberg' };
+            const here = { owner: context.repo.owner, repo: context.repo.repo };
+            const hereFull = `${here.owner}/${here.repo}`;
+            const branch = `bump-gotenberg-${LATEST}`;
+            const chartPath = 'charts/gotenberg/Chart.yaml';
+            const COMMIT_LIMIT = 100;
+            const BOT_EMAIL = 'github-actions[bot]@users.noreply.github.com';
+            // Total PR-body cap. GitHub's hard limit is 65 536; leave headroom for
+            // the boilerplate sections we always emit.
+            const PR_BODY_MAX = 60000;
+            const RELEASE_BODY_MAX = 8000;
+            // Strip GitHub issue/PR-closing keywords from inlined upstream content
+            // so an upstream "fixes #5" can't accidentally close issue #5 in *this*
+            // repo when the PR merges. See
+            // https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
+            const sanitizeUpstreamMarkdown = (s) => s.replace(
+              /\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+(#\d+|[\w.-]+\/[\w.-]+#\d+|GH-\d+)/gi,
+              '$1 `$2`',
+            );
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
+            const parts = (v) => v.replace(/^v/, '').split('.').map(Number);
+            const cmpVer = (a, b) => {
+              for (let i = 0; i < Math.max(a.length, b.length); i++) {
+                const d = (a[i] ?? 0) - (b[i] ?? 0);
+                if (d !== 0) return d;
+              }
+              return 0;
+            };
 
-          sed -i "s/appVersion: \"$CURRENT\"/appVersion: \"$LATEST\"/" charts/gotenberg/Chart.yaml
+            const sh = async (cmd, args, opts = {}) => {
+              const { stdout, stderr } = await execFile(cmd, args, opts);
+              if (stdout.trim()) core.info(stdout.trim());
+              if (stderr.trim()) core.info(stderr.trim());
+              return stdout;
+            };
 
-          git add charts/gotenberg/Chart.yaml
-          git commit -m "Bump Gotenberg to version $LATEST"
-          git push -u origin "$BRANCH"
+            // --- Gather upstream release notes for (CURRENT, LATEST] -----------
+            const curParts = parts(CURRENT);
+            const latParts = parts(LATEST);
 
-          BODY=$(printf '%s\n' \
-            "Automated bump of Gotenberg from \`$CURRENT\` to \`$LATEST\`." \
-            "" \
-            "Release notes: https://github.com/gotenberg/gotenberg/releases/tag/v$LATEST" \
-            "" \
-            "**Remaining tasks:**" \
-            "- [ ] Review upstream release notes for breaking changes" \
-            "- [ ] Update \`CHANGELOG.md\`" \
-            "- [ ] Update \`Chart.yaml\` version and \`artifacthub.io/changes\` annotation" \
-            "- [ ] Run \`helm-docs\` and \`helm-tool schema | jq . > values.schema.json\`")
+            let releases = [];
+            try {
+              const all = await github.paginate(github.rest.repos.listReleases, {
+                ...upstream, per_page: 100,
+              });
+              releases = all
+                .filter(r => !r.draft && !r.prerelease)
+                .filter(r => /^v\d+\.\d+\.\d+$/.test(r.tag_name))
+                .map(r => ({ tag: r.tag_name, url: r.html_url, body: r.body || '', parts: parts(r.tag_name) }))
+                .filter(r => cmpVer(r.parts, curParts) > 0 && cmpVer(r.parts, latParts) <= 0)
+                .sort((a, b) => cmpVer(a.parts, b.parts));
+            } catch (e) {
+              core.warning(`Failed to list upstream releases: ${e.message}`);
+            }
 
-          gh pr create \
-            --title "Bump Gotenberg to $LATEST" \
-            --body "$BODY"
+            // --- Gather commit list for the same range -------------------------
+            let commits = [];
+            try {
+              const compare = await github.rest.repos.compareCommitsWithBasehead({
+                ...upstream,
+                basehead: `v${CURRENT}...v${LATEST}`,
+              });
+              commits = compare.data.commits.map(c => ({
+                sha: c.sha,
+                url: c.html_url,
+                subject: c.commit.message.split('\n')[0],
+              }));
+            } catch (e) {
+              core.warning(`Failed to fetch upstream compare: ${e.message}`);
+            }
+
+            // --- Bail out if we have no upstream provenance --------------------
+            // Docker Hub can expose a tag before the GitHub release/tag is
+            // published. Opening a PR with no release notes and no commits means
+            // we're trusting Docker Hub alone, which is exactly when this script
+            // produces misleading bump PRs.
+            if (releases.length === 0 && commits.length === 0) {
+              core.warning(
+                `Upstream releases and compare both came back empty for ${CURRENT} -> ${LATEST}. ` +
+                `Skipping PR creation — likely a tag/release timing skew. Will retry on the next run.`,
+              );
+              return;
+            }
+
+            // --- Build the PR body --------------------------------------------
+            const truncate = (s, max) => s.length <= max
+              ? s
+              : `${s.slice(0, max)}\n\n_…release body truncated (${s.length - max} chars omitted)_`;
+
+            const sections = [];
+            sections.push(`Automated bump of Gotenberg from \`${CURRENT}\` to \`${LATEST}\`.`);
+
+            sections.push('## Release notes');
+            if (releases.length > 0) {
+              // Newest first, like Dependabot. Release bodies pass through
+              // sanitizeUpstreamMarkdown so issue-closing keywords from upstream
+              // can't bleed into this repo.
+              for (const r of [...releases].reverse()) {
+                const safe = truncate(sanitizeUpstreamMarkdown(r.body), RELEASE_BODY_MAX);
+                sections.push(
+                  `<details>\n<summary><a href="${r.url}">${r.tag}</a></summary>\n\n${safe}\n\n</details>`
+                );
+              }
+            } else {
+              sections.push(`- https://github.com/${upstream.owner}/${upstream.repo}/releases/tag/v${LATEST}`);
+            }
+
+            if (commits.length > 0) {
+              const lines = commits.slice(0, COMMIT_LIMIT)
+                .map(c => `- [\`${c.sha.slice(0, 7)}\`](${c.url}) ${sanitizeUpstreamMarkdown(c.subject)}`);
+              const overflow = commits.length > COMMIT_LIMIT
+                ? `\n\n_…and ${commits.length - COMMIT_LIMIT} more commits_`
+                : '';
+              sections.push('## Commits');
+              sections.push(
+                `<details>\n<summary>${commits.length} commit(s) between <code>v${CURRENT}</code> and <code>v${LATEST}</code></summary>\n\n${lines.join('\n')}${overflow}\n\n</details>`
+              );
+              sections.push(`[See the full diff](https://github.com/${upstream.owner}/${upstream.repo}/compare/v${CURRENT}...v${LATEST})`);
+            }
+
+            sections.push([
+              '**Remaining tasks:**',
+              '- [ ] Review upstream release notes for breaking changes',
+              '- [ ] Update `CHANGELOG.md`',
+              '- [ ] Update `Chart.yaml` version and `artifacthub.io/changes` annotation',
+              '- [ ] Run `helm-docs` and `helm-tool schema | jq . > values.schema.json`',
+            ].join('\n'));
+
+            // Final hard cap on the assembled body so pulls.create can't fail
+            // *after* we've already pushed the branch. If we land here, per-
+            // release truncation wasn't enough on its own.
+            let body = sections.join('\n\n');
+            if (body.length > PR_BODY_MAX) {
+              const note = `\n\n_…PR body truncated to fit GitHub's size limit. See the full diff link above._`;
+              body = body.slice(0, PR_BODY_MAX - note.length) + note;
+            }
+
+            // --- Manage open bump PRs -----------------------------------------
+            // Restrict to same-repo PRs so a fork PR named bump-gotenberg-X.Y.Z
+            // can't hijack the existing-PR / close-stale flows.
+            const openPRs = await github.paginate(github.rest.pulls.list, {
+              ...here, state: 'open', per_page: 100,
+            });
+            const bumpPRs = openPRs.filter(pr =>
+              pr.head.repo &&
+              pr.head.repo.full_name === hereFull &&
+              /^bump-gotenberg-\d+\.\d+\.\d+$/.test(pr.head.ref)
+            );
+
+            const existing = bumpPRs.find(pr => pr.head.ref === branch);
+            if (existing) {
+              core.info(`PR #${existing.number} already targets ${LATEST}, refreshing body.`);
+              await github.rest.pulls.update({
+                ...here, pull_number: existing.number, body,
+              });
+              return;
+            }
+
+            // --- Create the new branch + bump commit --------------------------
+            await sh('git', ['config', 'user.name', 'github-actions[bot]']);
+            await sh('git', ['config', 'user.email', BOT_EMAIL]);
+            await sh('git', ['checkout', '-b', branch]);
+
+            const chart = fs.readFileSync(chartPath, 'utf8');
+            const escaped = CURRENT.replace(/\./g, '\\.');
+            const updated = chart.replace(
+              new RegExp(`appVersion: "${escaped}"`),
+              `appVersion: "${LATEST}"`,
+            );
+            if (updated === chart) {
+              core.setFailed(`Failed to update appVersion in ${chartPath}`);
+              return;
+            }
+            fs.writeFileSync(chartPath, updated);
+
+            await sh('git', ['add', chartPath]);
+            await sh('git', ['commit', '-m', `Bump Gotenberg to version ${LATEST}`]);
+            await sh('git', ['push', '-u', 'origin', branch]);
+
+            const created = await github.rest.pulls.create({
+              ...here,
+              title: `Bump Gotenberg to ${LATEST}`,
+              head: branch,
+              base: context.payload.repository.default_branch,
+              body,
+            });
+            const newPrUrl = created.data.html_url;
+            core.info(`Opened ${newPrUrl}`);
+
+            // --- Close superseded bump PRs ------------------------------------
+            // Skip ones with maintainer commits so we don't clobber in-progress
+            // work. The new PR's URL goes in the close comment so the trail is
+            // navigable both directions.
+            for (const pr of bumpPRs) {
+              if (pr.head.ref === branch) continue;
+              const ref = pr.head.ref;
+
+              // Explicit refspec because actions/checkout configures
+              // remote.origin.fetch to a single-branch refspec by default —
+              // `git fetch origin <ref>` would only update FETCH_HEAD, leaving
+              // origin/<ref> missing for the rev-list/log lookups below.
+              await sh('git', [
+                'fetch', '--no-tags', 'origin',
+                `+refs/heads/${ref}:refs/remotes/origin/${ref}`,
+              ]);
+              const { stdout: countOut } = await execFile('git', [
+                'rev-list', '--count', `origin/${context.payload.repository.default_branch}..origin/${ref}`,
+              ]);
+              const { stdout: authorOut } = await execFile('git', [
+                'log', '-1', '--pretty=%ae', `origin/${ref}`,
+              ]);
+              const count = parseInt(countOut.trim(), 10);
+              const author = authorOut.trim();
+
+              if (count !== 1 || author !== BOT_EMAIL) {
+                core.info(`PR #${pr.number} (${ref}) has maintainer commits — leaving it alone.`);
+                continue;
+              }
+
+              core.info(`Closing superseded PR #${pr.number} (${ref}) — replaced by ${newPrUrl}.`);
+              await github.rest.issues.createComment({
+                ...here,
+                issue_number: pr.number,
+                body: `Superseded by ${newPrUrl} (bump to \`${LATEST}\`).`,
+              });
+              await github.rest.pulls.update({
+                ...here, pull_number: pr.number, state: 'closed',
+              });
+              try {
+                await github.rest.git.deleteRef({ ...here, ref: `heads/${ref}` });
+              } catch (e) {
+                core.warning(`Failed to delete branch ${ref}: ${e.message}`);
+              }
+            }
