@@ -4,6 +4,52 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: changed
+          description: Bump Gotenberg version 8.29.1 to 8.31.0
+        - kind: changed
+          description: "Breaking upstream change: SSRF hardening rejects outbound URLs resolving to loopback, RFC1918, link-local, and other non-public addresses"
+        - kind: changed
+          description: "Breaking upstream change: --webhook-deny-list now defaults to a regex blocking loopback, RFC1918, link-local, and IPv6 unique-local ranges"
+        - kind: changed
+          description: "Breaking upstream change: ExifTool metadata write strips control characters and drops System:-prefixed tags"
+        - kind: deprecated
+          description: webhook.errorAllowList is deprecated upstream (--webhook-error-allow-list), use webhook.allowList instead which now also covers error webhooks
+        - kind: deprecated
+          description: webhook.errorDenyList is deprecated upstream (--webhook-error-deny-list), use webhook.denyList instead which now also covers error webhooks
+        - kind: changed
+          description: thecodingmachine/gotenberg images are no longer published upstream, pull from gotenberg/gotenberg instead
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.31.0
+    created: "2026-04-30T06:01:14.822727663Z"
+    description: A Helm chart for Gotenberg
+    digest: b7ab165b5ffd6dd7a8e24d6514082f32f637ff40e1dd95b6703e137d18601dcf
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.20.0/gotenberg-1.20.0.tgz
+    version: 1.20.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
           description: Bump Gotenberg version 8.29.0 to 8.29.1
       artifacthub.io/links: |
         - name: Projects Homepage
@@ -1256,4 +1302,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-30T21:34:00.045493227Z"
+generated: "2026-04-30T06:01:14.823290795Z"
