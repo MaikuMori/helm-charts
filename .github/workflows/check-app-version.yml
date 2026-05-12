@@ -41,7 +41,7 @@ jobs:
 
       - name: Create or update pull request
         if: steps.check.outputs.update == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           CURRENT: ${{ steps.check.outputs.current }}
           LATEST: ${{ steps.check.outputs.latest }}
