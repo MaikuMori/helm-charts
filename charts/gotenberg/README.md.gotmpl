@@ -13,10 +13,16 @@ Upstream links:
 - [Documentation](https://gotenberg.dev/docs/about)
 - [GitHub](https://github.com/gotenberg/gotenberg)
 
-## Get Repo Info
+## OCI Repositories
+
+The recommended way to install these charts is via OCI and the `helm search hub maikumori` command should list the available charts.
+
+## Non-OCI Repository
+
+If you don't want to use the OCI repositories you can add the `maikumori` repository as follows.
 
 ```console
-helm repo add maikumori https://maikumori.github.io/helm-charts
+helm repo add maikumori https://maikumori.github.io/helm-charts/
 helm repo update
 ```
 
@@ -25,8 +31,10 @@ helm repo update
 To install the chart with the release name `my-release`:
 
 ```console
-helm install my-release --namespace gotenberg maikumori/gotenberg
+helm install my-release --namespace gotenberg oci://ghcr.io/maikumori/helm-charts/gotenberg
 ```
+
+If you added the non-OCI repository above, you can also use the `maikumori/gotenberg` shorthand in place of the OCI URL in any of the commands below.
 
 ## Uninstalling the Chart
 
@@ -41,7 +49,7 @@ The command removes all the Kubernetes components associated with the chart and 
 ## Upgrading Chart
 
 ```console
-helm upgrade my-release maikumori/gotenberg --install
+helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --install
 ```
 
 ### Using a Newer Gotenberg Version
@@ -51,13 +59,13 @@ Chart releases are typically published when new features or breaking changes are
 To use a specific version of Gotenberg:
 
 ```console
-helm upgrade --install my-release maikumori/gotenberg --set image.tag="8.23.0"
+helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="8.23.0"
 ```
 
 Or with the `--atomic` flag for automatic rollback on failure:
 
 ```console
-helm upgrade --install --atomic my-release maikumori/gotenberg --set image.tag="8.23.0"
+helm upgrade --install --atomic my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="8.23.0"
 ```
 
 This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes between versions.
