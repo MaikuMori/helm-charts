@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.21.1
+
+- Fix incorrect indentation of `extraEnv` vars in `deployment.yaml`
+  (rendered at 10 spaces instead of 12, causing a YAML parse error).
+
 ## 1.21.0
 
 - Bump `gotenberg` version `8.31.0` -> `8.32.0`.
