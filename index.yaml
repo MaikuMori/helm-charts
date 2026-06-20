@@ -4,6 +4,56 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: changed
+          description: Bump Gotenberg version 8.32.0 to 8.34.0
+        - kind: fixed
+          description: "Fix incorrect indentation of extraEnv vars in deployment.yaml that caused a YAML parse error"
+        - kind: changed
+          description: "Breaking upstream change: LibreOffice now blocks content linked from untrusted locations (external http(s):// and local file:/// links no longer resolve during conversion). Unconditional upstream - no flag to disable. Embedded content is unaffected."
+        - kind: added
+          description: Add logging.stdLevelCase (--log-std-level-case) to set the case of the level field in standard-output logs - lower (default) or upper
+        - kind: added
+          description: Add pdfEngines.facturXEngines (--pdfengines-factur-x-engines) for the new Factur-X / ZUGFeRD XMP metadata feature
+        - kind: added
+          description: Add pdfEngines.embedMetadataEngines (--pdfengines-embed-metadata-engines) for the embed-metadata feature (upstream flag that was previously missing from the chart)
+        - kind: fixed
+          description: "Upstream security fix: IsPublicIP now unwraps IPv4-mapped, 6to4, and Teredo IPv6 addresses and rejects embedded non-public IPv4, closing a denyPrivateIps bypass"
+        - kind: fixed
+          description: "Upstream security fix: caller-supplied output filenames now strip both / and \\ path separators"
+        - kind: fixed
+          description: "Upstream: ca-certificates installed in the chromium-only image, fixing outbound TLS failures in that variant"
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.34.0
+    created: "2026-06-20T19:00:56.732090913Z"
+    description: A Helm chart for Gotenberg
+    digest: bf66e1311024acaadb954c658c5e76d3cdb04133cbddba047a7fe17b2b9942bc
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.22.0/gotenberg-1.22.0.tgz
+    version: 1.22.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
           description: Bump Gotenberg version 8.31.0 to 8.32.0
         - kind: changed
           description: "Breaking upstream change: 8.31.0's strict SSRF defaults are reverted; outbound URL filtering now defaults to permissive again. Opt into IP-class filtering via the new deny-private-ips / deny-public-ips flags per module."
@@ -1354,4 +1404,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-30T15:27:59.778295787Z"
+generated: "2026-06-20T19:00:56.732331557Z"
