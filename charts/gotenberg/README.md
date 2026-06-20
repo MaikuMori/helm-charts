@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.21.0](https://img.shields.io/badge/Version-1.21.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.32.0](https://img.shields.io/badge/AppVersion-8.32.0-informational?style=flat-square)
+![Version: 1.22.0](https://img.shields.io/badge/Version-1.22.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.34.0](https://img.shields.io/badge/AppVersion-8.34.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -158,6 +158,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
 | logging.stdEnableGcpFields | bool | `false` | Enable GCP log standard output field mapping for Cloud Run |
 | logging.stdFormat | string | `""` | Set log standard output format - auto, json, or text (default "auto") |
+| logging.stdLevelCase | string | `""` | Set the case of the `level` field in standard output - lower or upper (default "lower"). Added in Gotenberg 8.34.0. |
 | metrics.serviceMonitor.annotations | object | `{}` | Additional annotations for the service monitor |
 | metrics.serviceMonitor.enabled | bool | `false` | Enable ServiceMonitor |
 | metrics.serviceMonitor.honorLabels | bool | `false` | HonorLabels chooses the metric’s labels on collisions with target labels |
@@ -182,8 +183,10 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | pdfEngines.convertEngines | string | `""` | Set the PDF engines and their order for the convert feature (default libreoffice-pdfengine) |
 | pdfEngines.disableRoutes | bool | `false` | Disable the routes |
 | pdfEngines.embedEngines | string | `""` | Set the PDF engines and their order for the file embedding feature (default pdfcpu) |
+| pdfEngines.embedMetadataEngines | string | `""` | Set the PDF engines and their order for the embed metadata feature (default qpdf) |
 | pdfEngines.encryptEngines | string | `""` | Set the PDF engines and their order for the password protection feature (default qpdf,pdftk,pdfcpu) |
 | pdfEngines.engines | DEPRECATED | `""` | Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines). |
+| pdfEngines.facturXEngines | string | `""` | Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0. |
 | pdfEngines.flattenEngines | string | `""` | Set the PDF engines and their order for the flatten feature (default qpdf) |
 | pdfEngines.mergeEngines | string | `""` | Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk) |
 | pdfEngines.readBookmarksEngines | string | `""` | Set the PDF engines and their order for the read bookmarks feature (default pdfcpu) |

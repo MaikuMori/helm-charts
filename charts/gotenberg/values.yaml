@@ -370,6 +370,8 @@ pdfEngines:
   encryptEngines: ""
   # -- Set the PDF engines and their order for the file embedding feature (default pdfcpu)
   embedEngines: ""
+  # -- Set the PDF engines and their order for the embed metadata feature (default qpdf)
+  embedMetadataEngines: ""
   # -- Set the PDF engines and their order for the watermark feature (default pdfcpu,pdftk)
   watermarkEngines: ""
   # -- Set the PDF engines and their order for the stamp feature (default pdfcpu,pdftk)
@@ -380,6 +382,8 @@ pdfEngines:
   readBookmarksEngines: ""
   # -- Set the PDF engines and their order for the write bookmarks feature (default pdfcpu,pdftk)
   writeBookmarksEngines: ""
+  # -- Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0.
+  facturXEngines: ""
   # -- Disable the routes
   disableRoutes: false
 
@@ -435,6 +439,8 @@ logging:
   format: ""
   # -- Set log standard output format - auto, json, or text (default "auto")
   stdFormat: ""
+  # -- Set the case of the `level` field in standard output - lower or upper (default "lower"). Added in Gotenberg 8.34.0.
+  stdLevelCase: ""
   # -- Set the log level - error, warn, info, or debug (default "info")
   level: ""
   # -- Prepend a specified prefix to each field in the logs

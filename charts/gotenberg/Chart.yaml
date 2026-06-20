@@ -4,7 +4,7 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.21.1"
+version: "1.22.0"
 appVersion: "8.34.0"
 
 keywords:
@@ -35,22 +35,20 @@ annotations:
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
     - kind: changed
-      description: Bump Gotenberg version 8.31.0 to 8.32.0
-    - kind: changed
-      description: "Breaking upstream change: 8.31.0's strict SSRF defaults are reverted; outbound URL filtering now defaults to permissive again. Opt into IP-class filtering via the new deny-private-ips / deny-public-ips flags per module."
-    - kind: changed
-      description: "Breaking upstream change: file:// rejected at /forms/chromium/convert/url and crafted file:// sub-resources are scoped to the request working directory"
-    - kind: changed
-      description: "Breaking upstream change: image / pdf stamp and watermark sources require an uploaded file (return HTTP 400 otherwise)"
-    - kind: added
-      description: Add api.downloadFromDenyPrivateIps and api.downloadFromDenyPublicIps for IP-class filtering on the download-from feature
-    - kind: added
-      description: Add chromium.denyPrivateIps and chromium.denyPublicIps for IP-class filtering on Chromium navigations and sub-resources (skipped when proxyServer or hostResolverRules is set)
-    - kind: added
-      description: Add libreOffice.allowList, libreOffice.denyList, libreOffice.denyPrivateIps, libreOffice.denyPublicIps to filter LibreOffice outbound fetches for embedded external content
-    - kind: added
-      description: Add webhook.denyPrivateIps and webhook.denyPublicIps for IP-class filtering on webhook URLs
+      description: Bump Gotenberg version 8.32.0 to 8.34.0
     - kind: fixed
-      description: "Upstream: Chromium chart-rendering regression (charts printed as blank rectangles in print mode) fixed by pinning chromedp to v0.14.2"
+      description: "Fix incorrect indentation of extraEnv vars in deployment.yaml that caused a YAML parse error"
+    - kind: changed
+      description: "Breaking upstream change: LibreOffice now blocks content linked from untrusted locations (external http(s):// and local file:/// links no longer resolve during conversion). Unconditional upstream - no flag to disable. Embedded content is unaffected."
+    - kind: added
+      description: Add logging.stdLevelCase (--log-std-level-case) to set the case of the level field in standard-output logs - lower (default) or upper
+    - kind: added
+      description: Add pdfEngines.facturXEngines (--pdfengines-factur-x-engines) for the new Factur-X / ZUGFeRD XMP metadata feature
+    - kind: added
+      description: Add pdfEngines.embedMetadataEngines (--pdfengines-embed-metadata-engines) for the embed-metadata feature (upstream flag that was previously missing from the chart)
     - kind: fixed
-      description: "Upstream: LibreOffice no longer caches an unrecoverable first-start error; lazy-start path retries on failure"
+      description: "Upstream security fix: IsPublicIP now unwraps IPv4-mapped, 6to4, and Teredo IPv6 addresses and rejects embedded non-public IPv4, closing a denyPrivateIps bypass"
+    - kind: fixed
+      description: "Upstream security fix: caller-supplied output filenames now strip both / and \\ path separators"
+    - kind: fixed
+      description: "Upstream: ca-certificates installed in the chromium-only image, fixing outbound TLS failures in that variant"

@@ -885,6 +885,9 @@
         },
         "stdFormat": {
           "$ref": "#/$defs/helm-values.logging.stdFormat"
+        },
+        "stdLevelCase": {
+          "$ref": "#/$defs/helm-values.logging.stdLevelCase"
         }
       },
       "additionalProperties": false
@@ -921,6 +924,11 @@
     },
     "helm-values.logging.stdFormat": {
       "description": "-- Set log standard output format - auto, json, or text (default \"auto\")",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.logging.stdLevelCase": {
+      "description": "-- Set the case of the `level` field in standard output - lower or upper (default \"lower\"). Added in Gotenberg 8.34.0.",
       "type": "string",
       "default": ""
     },
@@ -1113,11 +1121,17 @@
         "embedEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.embedEngines"
         },
+        "embedMetadataEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.embedMetadataEngines"
+        },
         "encryptEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.encryptEngines"
         },
         "engines": {
           "$ref": "#/$defs/helm-values.pdfEngines.engines"
+        },
+        "facturXEngines": {
+          "$ref": "#/$defs/helm-values.pdfEngines.facturXEngines"
         },
         "flattenEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.flattenEngines"
@@ -1167,6 +1181,11 @@
       "type": "string",
       "default": ""
     },
+    "helm-values.pdfEngines.embedMetadataEngines": {
+      "description": "-- Set the PDF engines and their order for the embed metadata feature (default qpdf)",
+      "type": "string",
+      "default": ""
+    },
     "helm-values.pdfEngines.encryptEngines": {
       "description": "-- Set the PDF engines and their order for the password protection feature (default qpdf,pdftk,pdfcpu)",
       "type": "string",
@@ -1174,6 +1193,11 @@
     },
     "helm-values.pdfEngines.engines": {
       "description": "-- (DEPRECATED) Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines).",
+      "type": "string",
+      "default": ""
+    },
+    "helm-values.pdfEngines.facturXEngines": {
+      "description": "-- Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0.",
       "type": "string",
       "default": ""
     },
