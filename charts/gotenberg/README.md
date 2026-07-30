@@ -158,6 +158,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | libreOffice.maxQueueSize | int | `0` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. |
 | libreOffice.restartAfter | string | `""` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10) |
 | libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 10s) |
+| lifecycle | object | `{}` | Define the container lifecycle hooks. A `preStop` hook keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates. Gotenberg's own graceful shutdown does not cover this: it stops as soon as it is idle, so an idle pod closes its listener within milliseconds of SIGTERM. |
 | livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. +docs:property livenessProbe: {} |
 | logging.enableGcpFields | DEPRECATED | `false` | Enable GCP log field mapping for Cloud Run. Use stdEnableGcpFields instead. |
 | logging.enableGcpSeverity | bool | `false` | Enable GCP severity field mapping |

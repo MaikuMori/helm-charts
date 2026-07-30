@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.23.0
+
+- Add `lifecycle` to set container lifecycle hooks, so a `preStop` hook can be configured. Without one, a pod removed by the HPA or by a rolling update drops connections that arrive in the ~1-2s window between the Service endpoint being removed and kube-proxy catching up. Gotenberg's graceful shutdown does not cover this case: `Api.Stop()` calls `srv.Shutdown()` as soon as there is no in-flight work and cancels the remainder of `--gotenberg-graceful-shutdown-duration`, so an idle pod closes its listener within milliseconds of SIGTERM. A `preStop` hook delays SIGTERM while the server keeps accepting, e.g. `lifecycle.preStop.exec.command: ["sh", "-c", "sleep 5"]`. In-flight requests were never affected — `srv.Shutdown()` drains those.
+
 ## 1.22.0
 
 - Bump `gotenberg` version `8.32.0` -> `8.34.0` (via `8.33.0`).

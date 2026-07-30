@@ -4,7 +4,7 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.22.0"
+version: "1.23.0"
 appVersion: "8.34.0"
 
 keywords:
