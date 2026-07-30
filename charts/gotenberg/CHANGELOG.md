@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.23.0
+
+- Add `lifecycle` to set container lifecycle hooks. A `preStop` hook (e.g. `preStop: {sleep: {seconds: 5}}`) prevents dropped connections during HPA scale-down and rolling updates: an idle Gotenberg closes its listener immediately on SIGTERM, before Service endpoint removal has propagated.
+
 ## 1.22.0
 
 - Bump `gotenberg` version `8.32.0` -> `8.34.0` (via `8.33.0`).

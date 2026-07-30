@@ -388,6 +388,10 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.lifecycle }}
+          lifecycle:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- if or .Values.volumeMounts .Values.api.tlsSecretName }}
           volumeMounts:
             {{- with .Values.volumeMounts }}

@@ -50,6 +50,9 @@
         "libreOffice": {
           "$ref": "#/$defs/helm-values.libreOffice"
         },
+        "lifecycle": {
+          "$ref": "#/$defs/helm-values.lifecycle"
+        },
         "livenessProbe": {
           "$ref": "#/$defs/helm-values.livenessProbe"
         },
@@ -851,6 +854,11 @@
       "description": "-- Maximum duration to wait for LibreOffice to start or restart (default 10s)",
       "type": "string",
       "default": ""
+    },
+    "helm-values.lifecycle": {
+      "description": "-- Define the container lifecycle hooks. A `preStop` hook keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates. Gotenberg's own graceful shutdown does not cover this: it stops as soon as it is idle, so an idle pod closes its listener within milliseconds of SIGTERM.",
+      "type": "object",
+      "default": {}
     },
     "helm-values.livenessProbe": {
       "description": "-- Define the liveness probe object for the container.\nlivenessProbe: {}",
