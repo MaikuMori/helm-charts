@@ -4,8 +4,8 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.23.0"
-appVersion: "8.34.0"
+version: "1.24.0"
+appVersion: "8.36.0"
 
 keywords:
   - gotenberg
@@ -34,5 +34,21 @@ annotations:
     - name: Chart's Changelog
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
+    - kind: changed
+      description: Bump Gotenberg version 8.34.0 -> 8.36.0 (via 8.35.0)
+    - kind: changed
+      description: "Breaking upstream change: outbound HTTP clients no longer inherit HTTP_PROXY and HTTPS_PROXY implicitly; opt in per module via the new enableEnvironmentProxy values"
     - kind: added
-      description: Add lifecycle value to set container lifecycle hooks, e.g. a preStop hook to prevent dropped connections during HPA scale-down and rolling updates
+      description: Add api.enableOidcAuth, api.oidcIssuer, api.oidcAudience and api.oidcJwksUrl for OIDC bearer token authentication (mutually exclusive with basic auth)
+    - kind: added
+      description: Add chromium.enableEnvironmentProxy, libreOffice.enableEnvironmentProxy, webhook.enableEnvironmentProxy and api.downloadFromEnableEnvironmentProxy to route outbound traffic through an authenticated environment proxy
+    - kind: added
+      description: Add chromium.clearStorage to clear Chromium local storage between conversions
+    - kind: added
+      description: Add pdfEngines.optimizeImagesEngines for the new PDF image optimization feature
+    - kind: security
+      description: "Upstream: Gotenberg-Output-Filename header is sanitized against a Windows-side Zip Slip on splitMode conversions"
+    - kind: security
+      description: "Upstream: extraHttpHeaders scope matching is bounded per conversion (max 64 headers, 1024-character scope)"
+    - kind: security
+      description: "Upstream: Chromium WebSocket handshakes are filtered against the outbound SSRF policy"

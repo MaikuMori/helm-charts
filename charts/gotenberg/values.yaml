@@ -266,6 +266,14 @@ api:
   basicAuthUsername:
   # -- Set the basic authentication password (ignored if existingSecret is set)
   basicAuthPassword:
+  # -- Enable OIDC bearer token authentication. Mutually exclusive with `enableBasicAuth`. Added in Gotenberg 8.36.0.
+  enableOidcAuth: false
+  # -- Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match. Added in Gotenberg 8.36.0.
+  oidcIssuer: ""
+  # -- Set the expected OIDC audience - the token `aud` claim must contain it. Added in Gotenberg 8.36.0.
+  oidcAudience: ""
+  # -- Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty. Added in Gotenberg 8.36.0.
+  oidcJwksUrl: ""
   # -- Set the allowed URLs for the download from feature using a regular expression
   downloadFromAllowList: ""
   # -- Set the denied URLs for the download from feature using a regular expression
@@ -276,6 +284,8 @@ api:
   downloadFromDenyPublicIps: false
   # -- Set the maximum number of retries for the download from feature (default 4)
   downloadFromMaxRetry: 4
+  # -- Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.
+  downloadFromEnableEnvironmentProxy: false
   # -- Disable the download from feature
   disableDownloadFrom: false
   # -- Disable telemetry on the root route
@@ -318,6 +328,8 @@ chromium:
   hostResolverRules: ""
   # -- Set the outbound proxy server; this switch only affects HTTP and HTTPS requests
   proxyServer: ""
+  # -- Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset. Added in Gotenberg 8.35.0.
+  enableEnvironmentProxy: false
   # -- Disable JavaScript
   disableJavaScript: false
   # -- Disable the routes
@@ -326,6 +338,8 @@ chromium:
   clearCache: false
   # -- Clear Chromium cookies between each conversion.
   clearCookies: false
+  # -- Clear Chromium local storage between each conversion (session storage is already isolated per conversion). Added in Gotenberg 8.36.0.
+  clearStorage: false
   # -- Maximum request queue size for Chromium. Set to 0 to disable this feature.
   maxQueueSize: 0
   # -- Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
@@ -354,6 +368,8 @@ libreOffice:
   denyPrivateIps: false
   # -- Reject LibreOffice outbound fetches resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.
   denyPublicIps: false
+  # -- Route LibreOffice outbound fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.
+  enableEnvironmentProxy: false
 
 # The PDF Engines module gathers all engines that can manipulate PDF files.
 # https://gotenberg.dev/docs/configuration#pdf-engines
@@ -390,6 +406,8 @@ pdfEngines:
   writeBookmarksEngines: ""
   # -- Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0.
   facturXEngines: ""
+  # -- Set the PDF engines and their order for the image optimization feature; empty means all (default pdfcpu). Added in Gotenberg 8.36.0.
+  optimizeImagesEngines: ""
   # -- Disable the routes
   disableRoutes: false
 
@@ -419,6 +437,8 @@ webhook:
   retryMaxWait: ""
   # -- Set the time limit for requests to the webhook (default 30s)
   clientTimeout: ""
+  # -- Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.
+  enableEnvironmentProxy: false
   # -- Disable the webhook feature
   disable: false
 
