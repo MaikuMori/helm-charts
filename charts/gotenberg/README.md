@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.23.0](https://img.shields.io/badge/Version-1.23.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.34.0](https://img.shields.io/badge/AppVersion-8.34.0-informational?style=flat-square)
+![Version: 1.24.0](https://img.shields.io/badge/Version-1.24.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.36.0](https://img.shields.io/badge/AppVersion-8.36.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -89,12 +89,17 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | api.downloadFromDenyList | string | `""` | Set the denied URLs for the download from feature using a regular expression |
 | api.downloadFromDenyPrivateIps | bool | `false` | Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected. Added in Gotenberg 8.32.0. |
 | api.downloadFromDenyPublicIps | bool | `false` | Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
+| api.downloadFromEnableEnvironmentProxy | bool | `false` | Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0. |
 | api.downloadFromMaxRetry | int | `4` | Set the maximum number of retries for the download from feature (default 4) |
 | api.enableBasicAuth | bool | `false` | Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values |
 | api.enableDebugRoute | bool | `false` | Enable debug route for debugging purposes |
+| api.enableOidcAuth | bool | `false` | Enable OIDC bearer token authentication. Mutually exclusive with `enableBasicAuth`. Added in Gotenberg 8.36.0. |
 | api.existingSecret | string | `""` | Name of an existing secret containing basic auth credentials (keys: username, password) |
 | api.existingSecretPasswordKey | string | `""` | Key in existingSecret for the password (default: password) |
 | api.existingSecretUsernameKey | string | `""` | Key in existingSecret for the username (default: username) |
+| api.oidcAudience | string | `""` | Set the expected OIDC audience - the token `aud` claim must contain it. Added in Gotenberg 8.36.0. |
+| api.oidcIssuer | string | `""` | Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match. Added in Gotenberg 8.36.0. |
+| api.oidcJwksUrl | string | `""` | Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty. Added in Gotenberg 8.36.0. |
 | api.port | int | `3000` | Set the port on which the API should listen (default 3000) |
 | api.rootPath | string | `""` | Set the root path of the API - for service discovery via URL paths (default "/") |
 | api.startTimeout | string | `""` | Set the maximum duration to wait for the API to start |
@@ -113,12 +118,14 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.autoStart | bool | `false` | Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion |
 | chromium.clearCache | bool | `false` | Clear Chromium cache between each conversion. |
 | chromium.clearCookies | bool | `false` | Clear Chromium cookies between each conversion. |
+| chromium.clearStorage | bool | `false` | Clear Chromium local storage between each conversion (session storage is already isolated per conversion). Added in Gotenberg 8.36.0. |
 | chromium.denyList | string | `""` | Set the denied URLs for Chromium using a regular expression (default "^file:///[^tmp].*") |
 | chromium.denyPrivateIps | bool | `false` | Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. Skipped when `proxyServer` or `hostResolverRules` is set. |
 | chromium.denyPublicIps | bool | `false` | Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
 | chromium.disableJavaScript | bool | `false` | Disable JavaScript |
 | chromium.disableRoutes | bool | `false` | Disable the routes |
 | chromium.disableWebSecurity | bool | `false` | Don't enforce the same-origin policy |
+| chromium.enableEnvironmentProxy | bool | `false` | Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset. Added in Gotenberg 8.35.0. |
 | chromium.hostResolverRules | string | `""` | Set custom mappings to the host resolver |
 | chromium.idleShutdownTimeout | string | `""` | Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
 | chromium.ignoreCertificateErrors | bool | `false` | Ignore the certificate errors |
@@ -154,6 +161,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | libreOffice.denyPrivateIps | bool | `false` | Reject LibreOffice outbound fetches resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. |
 | libreOffice.denyPublicIps | bool | `false` | Reject LibreOffice outbound fetches resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
 | libreOffice.disableRoutes | bool | `false` | Disable the routes |
+| libreOffice.enableEnvironmentProxy | bool | `false` | Route LibreOffice outbound fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0. |
 | libreOffice.idleShutdownTimeout | string | `""` | Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
 | libreOffice.maxQueueSize | int | `0` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. |
 | libreOffice.restartAfter | string | `""` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10) |
@@ -198,6 +206,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | pdfEngines.facturXEngines | string | `""` | Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0. |
 | pdfEngines.flattenEngines | string | `""` | Set the PDF engines and their order for the flatten feature (default qpdf) |
 | pdfEngines.mergeEngines | string | `""` | Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk) |
+| pdfEngines.optimizeImagesEngines | string | `""` | Set the PDF engines and their order for the image optimization feature; empty means all (default pdfcpu). Added in Gotenberg 8.36.0. |
 | pdfEngines.readBookmarksEngines | string | `""` | Set the PDF engines and their order for the read bookmarks feature (default pdfcpu) |
 | pdfEngines.readMetadataEngines | string | `""` | Set the PDF engines and their order for the read metadata feature (default exiftool) |
 | pdfEngines.rotateEngines | string | `""` | Set the PDF engines and their order for the rotate feature (default pdfcpu,pdftk) |
@@ -246,6 +255,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | webhook.denyPrivateIps | bool | `false` | Reject webhook URLs (success, error, events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. |
 | webhook.denyPublicIps | bool | `false` | Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
 | webhook.disable | bool | `false` | Disable the webhook feature |
+| webhook.enableEnvironmentProxy | bool | `false` | Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0. |
 | webhook.enableSyncMode | bool | `false` | Enable synchronous mode for the webhook feature |
 | webhook.errorAllowList | DEPRECATED | `""` | Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks. |
 | webhook.errorDenyList | DEPRECATED | `""` | Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks. |

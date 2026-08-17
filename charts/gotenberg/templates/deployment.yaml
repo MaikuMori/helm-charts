@@ -79,6 +79,18 @@ spec:
           {{- if .Values.api.enableBasicAuth }}
           - --api-enable-basic-auth
           {{- end }}
+          {{- if .Values.api.enableOidcAuth }}
+          - --api-enable-oidc-auth
+          {{- end }}
+          {{- if .Values.api.oidcIssuer }}
+          - --api-oidc-issuer={{ .Values.api.oidcIssuer }}
+          {{- end }}
+          {{- if .Values.api.oidcAudience }}
+          - --api-oidc-audience={{ .Values.api.oidcAudience }}
+          {{- end }}
+          {{- if .Values.api.oidcJwksUrl }}
+          - --api-oidc-jwks-url={{ .Values.api.oidcJwksUrl }}
+          {{- end }}
           {{- if .Values.api.downloadFromAllowList }}
           - --api-download-from-allow-list={{ .Values.api.downloadFromAllowList }}
           {{- end }}
@@ -93,6 +105,9 @@ spec:
           {{- end }}
           {{- if .Values.api.downloadFromMaxRetry }}
           - --api-download-from-max-retry={{ .Values.api.downloadFromMaxRetry }}
+          {{- end }}
+          {{- if .Values.api.downloadFromEnableEnvironmentProxy }}
+          - --api-download-from-enable-environment-proxy
           {{- end }}
           {{- if .Values.api.disableDownloadFrom }}
           - --api-disable-download-from
@@ -149,6 +164,9 @@ spec:
           {{- if .Values.chromium.proxyServer }}
           - --chromium-proxy-server={{ .Values.chromium.proxyServer }}
           {{- end }}
+          {{- if .Values.chromium.enableEnvironmentProxy }}
+          - --chromium-enable-environment-proxy
+          {{- end }}
           {{- if .Values.chromium.disableJavaScript }}
           - --chromium-disable-javascript
           {{- end }}
@@ -160,6 +178,9 @@ spec:
           {{- end }}
           {{- if .Values.chromium.clearCookies }}
           - --chromium-clear-cookies
+          {{- end }}
+          {{- if .Values.chromium.clearStorage }}
+          - --chromium-clear-storage
           {{- end }}
           {{- if .Values.chromium.maxQueueSize }}
           - --chromium-max-queue-size={{ .Values.chromium.maxQueueSize }}
@@ -200,6 +221,9 @@ spec:
           {{- end }}
           {{- if .Values.libreOffice.denyPublicIps }}
           - --libreoffice-deny-public-ips
+          {{- end }}
+          {{- if .Values.libreOffice.enableEnvironmentProxy }}
+          - --libreoffice-enable-environment-proxy
           {{- end }}
 
           {{- if .Values.pdfEngines.engines }}
@@ -250,6 +274,9 @@ spec:
           {{- if .Values.pdfEngines.facturXEngines }}
           - --pdfengines-factur-x-engines={{ .Values.pdfEngines.facturXEngines }}
           {{- end }}
+          {{- if .Values.pdfEngines.optimizeImagesEngines }}
+          - --pdfengines-optimize-images-engines={{ .Values.pdfEngines.optimizeImagesEngines }}
+          {{- end }}
           {{- if .Values.pdfEngines.disableRoutes }}
           - --pdfengines-disable-routes
           {{- end }}
@@ -286,6 +313,9 @@ spec:
           {{- end }}
           {{- if .Values.webhook.clientTimeout }}
           - --webhook-client-timeout={{ .Values.webhook.clientTimeout }}
+          {{- end }}
+          {{- if .Values.webhook.enableEnvironmentProxy }}
+          - --webhook-enable-environment-proxy
           {{- end }}
           {{- if .Values.webhook.disable }}
           - --webhook-disable

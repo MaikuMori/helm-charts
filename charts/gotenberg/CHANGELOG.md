@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.24.0
+
+- Bump `gotenberg` version `8.34.0` -> `8.36.0` (via `8.35.0`).
+- **Breaking upstream change**: outbound HTTP clients no longer inherit `HTTP_PROXY` and `HTTPS_PROXY` implicitly. Deployments that relied on those variables reaching Chromium, LibreOffice, `downloadFrom` or webhook delivery must now opt in per module via the new `enableEnvironmentProxy` values below.
+- Add `api.enableOidcAuth`, `api.oidcIssuer`, `api.oidcAudience` and `api.oidcJwksUrl` (`--api-enable-oidc-auth`, `--api-oidc-issuer`, `--api-oidc-audience`, `--api-oidc-jwks-url`) for OIDC bearer token authentication. Mutually exclusive with `api.enableBasicAuth`; `oidcJwksUrl` is discovered from the issuer's well-known configuration when left empty.
+- Add `chromium.enableEnvironmentProxy`, `libreOffice.enableEnvironmentProxy`, `webhook.enableEnvironmentProxy` and `api.downloadFromEnableEnvironmentProxy` to route outbound traffic through the proxy defined by `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` (set via `extraEnv`), credentials included. Use `chromium.enableEnvironmentProxy` instead of `chromium.proxyServer` for authenticated proxies, leaving `proxyServer` and `hostResolverRules` unset.
+- Add `chromium.clearStorage` (`--chromium-clear-storage`) to clear Chromium local storage between conversions; session storage is already isolated per conversion.
+- Add `pdfEngines.optimizeImagesEngines` (`--pdfengines-optimize-images-engines`) for the new image optimization feature (default `pdfcpu`).
+- Upstream security fix: the `Gotenberg-Output-Filename` header is sanitized before reaching archive entry names — `filepath.Base` ignores `\` on Linux, so a crafted header gave a Windows-side Zip Slip on `splitMode` conversions.
+- Upstream security fix: `extraHttpHeaders` scope matching now shares a per-conversion time budget and accepts at most 64 headers with a 1024-character `scope`.
+- Upstream security fix: Chromium WebSocket handshakes are filtered against the outbound policy, closing connections to hosts the SSRF policy otherwise blocks.
+- Upstream features (per-request, no chart config): `/forms/pdfengines/optimize` route and an `optimizeImages` option on the Chromium, LibreOffice, merge and split routes; repeated stamp/watermark fields to apply several in one request; a `selector` field to screenshot a single element; `titleBookmarks` for table-of-contents bookmarks when merging; awaited Promise-returning `waitForExpression`.
+- Upstream bug fixes (no chart-level config): LibreOffice returns `500` rather than `400` for server-side failures; `generateDocumentOutline` now enables `generateTaggedPdf` instead of silently doing nothing; the Chromium pinning proxy no longer latches after a start timeout; LibreOffice releases a document after a failed export; landscape single-page fits the page to its content; `.ppsx` and `.ppsm` are accepted; client-cancelled requests are classified `499`; scrolled workbooks render in full for `singlePageSheets`; an unresolvable outbound host returns `403` rather than `500`.
+- Bundled Chromium updated to `151.0.7922.71`; `pdfcpu` to `v0.15.0`; `unoconverter` to `v0.4.0`.
+
 ## 1.23.0
 
 - Add `lifecycle` to set container lifecycle hooks. A `preStop` hook (e.g. `preStop: {sleep: {seconds: 5}}`) prevents dropped connections during HPA scale-down and rolling updates: an idle Gotenberg closes its listener immediately on SIGTERM, before Service endpoint removal has propagated.
