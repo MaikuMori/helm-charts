@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.24.0](https://img.shields.io/badge/Version-1.24.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.36.0](https://img.shields.io/badge/AppVersion-8.36.0-informational?style=flat-square)
+![Version: 1.25.0](https://img.shields.io/badge/Version-1.25.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.36.0](https://img.shields.io/badge/AppVersion-8.36.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -135,6 +135,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
 | chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100) |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
+| enableServiceLinks | bool | `true` | Set to false to stop Kubernetes injecting service discovery environment variables (`<SVCNAME>_SERVICE_HOST`, `<SVCNAME>_PORT`, ...) into the pod. These can collide with Gotenberg's own configuration variables: a Service named `api` in the same namespace injects `API_PORT=tcp://<clusterIP>:<port>`, which Gotenberg reads as an override for `--api-port` and refuses to start. |
 | extraEnv | list | `[]` | List of extra environment variables for gotenberg container. Gotenberg 8.29.0+ supports OpenTelemetry via standard OTEL_* environment variables. See https://gotenberg.dev/docs/configuration for details. |
 | fullnameOverride | string | `""` |  |
 | gateway.annotations | object | `{}` | Annotations to add to the HTTPRoute |

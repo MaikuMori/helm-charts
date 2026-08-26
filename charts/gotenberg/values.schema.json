@@ -17,6 +17,9 @@
         "chromium": {
           "$ref": "#/$defs/helm-values.chromium"
         },
+        "enableServiceLinks": {
+          "$ref": "#/$defs/helm-values.enableServiceLinks"
+        },
         "enabled": {
           "$ref": "#/$defs/helm-values.enabled"
         },
@@ -641,6 +644,11 @@
       "description": "-- Maximum duration to wait for Chromium to start or restart",
       "type": "string",
       "default": ""
+    },
+    "helm-values.enableServiceLinks": {
+      "description": "-- Set to false to stop Kubernetes injecting service discovery environment variables (`<SVCNAME>_SERVICE_HOST`, `<SVCNAME>_PORT`, ...) into the pod. These can collide with Gotenberg's own configuration variables: a Service named `api` in the same namespace injects `API_PORT=tcp://<clusterIP>:<port>`, which Gotenberg reads as an override for `--api-port` and refuses to start.",
+      "type": "boolean",
+      "default": true
     },
     "helm-values.enabled": {
       "description": "-- Specifies that chart can be used as a condition when it is a dependency.\nSee https://helm.sh/docs/chart_best_practices/dependencies/#conditions-and-tags for more info.\n@ignored",
