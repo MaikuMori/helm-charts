@@ -3,6 +3,40 @@ entries:
   gotenberg:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: Add enableServiceLinks (default true) to disable injection of Kubernetes service discovery environment variables, which collide with Gotenberg's own configuration (a Service named api injects API_PORT and breaks startup)
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.36.0
+    created: "2026-08-27T22:38:23.339745027Z"
+    description: A Helm chart for Gotenberg
+    digest: 738cc38bb9883d5c67685afc5e875f568d673606d2e8e6d18a193c5427b49e2c
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.25.0/gotenberg-1.25.0.tgz
+    version: 1.25.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: Bump Gotenberg version 8.34.0 -> 8.36.0 (via 8.35.0)
         - kind: changed
@@ -1488,4 +1522,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-17T09:04:12.036014461Z"
+generated: "2026-08-27T22:38:23.34013159Z"
