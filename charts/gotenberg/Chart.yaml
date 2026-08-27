@@ -35,4 +35,4 @@ annotations:
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
     - kind: added
-      description: Add enableServiceLinks to stop Kubernetes injecting service discovery environment variables into the pod, which can collide with Gotenberg's own configuration variables (a Service named api injects API_PORT and breaks startup)
+      description: Add enableServiceLinks (default true) to disable injection of Kubernetes service discovery environment variables, which collide with Gotenberg's own configuration (a Service named api injects API_PORT and breaks startup)

@@ -135,7 +135,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
 | chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100) |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
-| enableServiceLinks | bool | `true` | Set to false to stop Kubernetes injecting service discovery environment variables (`<SVCNAME>_SERVICE_HOST`, `<SVCNAME>_PORT`, ...) into the pod. These can collide with Gotenberg's own configuration variables: a Service named `api` in the same namespace injects `API_PORT=tcp://<clusterIP>:<port>`, which Gotenberg reads as an override for `--api-port` and refuses to start. |
+| enableServiceLinks | bool | `true` | Set to false to stop Kubernetes injecting service discovery environment variables (`<SVCNAME>_SERVICE_HOST`, `<SVCNAME>_PORT`, ...) into the pod. These collide with Gotenberg's own configuration: a Service named `api` in the same namespace injects `API_PORT=tcp://<clusterIP>:<port>`, which Gotenberg reads as an override for `--api-port` and refuses to start. |
 | extraEnv | list | `[]` | List of extra environment variables for gotenberg container. Gotenberg 8.29.0+ supports OpenTelemetry via standard OTEL_* environment variables. See https://gotenberg.dev/docs/configuration for details. |
 | fullnameOverride | string | `""` |  |
 | gateway.annotations | object | `{}` | Annotations to add to the HTTPRoute |

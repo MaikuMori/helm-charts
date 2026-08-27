@@ -2,7 +2,7 @@
 
 ## 1.25.0
 
-- Add `enableServiceLinks` (default `true`, matching the Kubernetes default) to stop the kubelet injecting service discovery environment variables into the pod. Gotenberg reads its configuration from environment variables, so a Service named `api` in the same namespace injects `API_PORT=tcp://<clusterIP>:<port>` and the container exits with `invalid overriding value 'tcp://...' from API_PORT`. Other Service names collide with `API_TIMEOUT`, `API_ROOT_PATH` and the rest of the `API_*`, `CHROMIUM_*`, `LIBREOFFICE_*`, `WEBHOOK_*`, `PDFENGINES_*`, `PROMETHEUS_*` and `LOG_*` families the same way. Set it to `false` to close the whole class.
+- Add `enableServiceLinks` (default `true`, matching Kubernetes) to disable injection of service discovery environment variables. These collide with Gotenberg's own configuration: a Service named `api` in the same namespace injects `API_PORT=tcp://...` and the container refuses to start.
 
 ## 1.24.0
 
