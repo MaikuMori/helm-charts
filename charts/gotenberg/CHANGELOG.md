@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.25.0
+
+- Add `enableServiceLinks` (default `true`, matching Kubernetes) to disable injection of service discovery environment variables. These collide with Gotenberg's own configuration: a Service named `api` in the same namespace injects `API_PORT=tcp://...` and the container refuses to start.
+
 ## 1.24.0
 
 - Bump `gotenberg` version `8.34.0` -> `8.36.0` (via `8.35.0`).
