@@ -209,7 +209,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | pdfEngines.engines | DEPRECATED | `""` | Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines). |
 | pdfEngines.facturXEngines | string | `""` | Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0. |
 | pdfEngines.flattenEngines | string | `""` | Set the PDF engines and their order for the flatten feature (default qpdf) |
-| pdfEngines.maxConcurrency | int | `0` | Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0. |
+| pdfEngines.maxConcurrency | int | `0` | Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests; does not apply to LibreOffice. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0. |
 | pdfEngines.mergeEngines | string | `""` | Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk) |
 | pdfEngines.optimizeImagesEngines | string | `""` | Set the PDF engines and their order for the image optimization feature; empty means all (default pdfcpu). Added in Gotenberg 8.36.0. |
 | pdfEngines.readBookmarksEngines | string | `""` | Set the PDF engines and their order for the read bookmarks feature (default pdfcpu) |

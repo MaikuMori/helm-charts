@@ -417,7 +417,7 @@ pdfEngines:
   facturXEngines: ""
   # -- Set the PDF engines and their order for the image optimization feature; empty means all (default pdfcpu). Added in Gotenberg 8.36.0.
   optimizeImagesEngines: ""
-  # -- Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0.
+  # -- Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests; does not apply to LibreOffice. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0.
   maxConcurrency: 0
   # -- Disable the routes
   disableRoutes: false

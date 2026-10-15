@@ -1315,7 +1315,7 @@
       "default": ""
     },
     "helm-values.pdfEngines.maxConcurrency": {
-      "description": "-- Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0.",
+      "description": "-- Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests; does not apply to LibreOffice. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0.",
       "type": "number",
       "default": 0
     },
