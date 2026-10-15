@@ -107,6 +107,12 @@ spec:
           {{- if .Values.api.downloadFromMaxRetry }}
           - --api-download-from-max-retry={{ .Values.api.downloadFromMaxRetry }}
           {{- end }}
+          {{- if not (kindIs "invalid" .Values.api.downloadFromMaxConcurrency) }}
+          - --api-download-from-max-concurrency={{ .Values.api.downloadFromMaxConcurrency }}
+          {{- end }}
+          {{- if .Values.api.downloadFromMaxEntries }}
+          - --api-download-from-max-entries={{ .Values.api.downloadFromMaxEntries }}
+          {{- end }}
           {{- if .Values.api.downloadFromEnableEnvironmentProxy }}
           - --api-download-from-enable-environment-proxy
           {{- end }}
@@ -173,6 +179,9 @@ spec:
           {{- end }}
           {{- if .Values.chromium.disableRoutes }}
           - --chromium-disable-routes
+          {{- end }}
+          {{- if .Values.chromium.sharedBrowserContext }}
+          - --chromium-shared-browser-context
           {{- end }}
           {{- if .Values.chromium.clearCache }}
           - --chromium-clear-cache
@@ -277,6 +286,9 @@ spec:
           {{- end }}
           {{- if .Values.pdfEngines.optimizeImagesEngines }}
           - --pdfengines-optimize-images-engines={{ .Values.pdfEngines.optimizeImagesEngines }}
+          {{- end }}
+          {{- if .Values.pdfEngines.maxConcurrency }}
+          - --pdfengines-max-concurrency={{ .Values.pdfEngines.maxConcurrency }}
           {{- end }}
           {{- if .Values.pdfEngines.disableRoutes }}
           - --pdfengines-disable-routes

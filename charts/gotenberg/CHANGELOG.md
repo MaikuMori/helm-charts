@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.26.0
+
+- Bump `gotenberg` version `8.36.0` -> `8.38.1` (via `8.37.0` and `8.38.0`).
+- **Upstream behavior change**: each Chromium conversion now runs in its own browser context, so cookies, cache and storage no longer carry over between conversions. Set the new `chromium.sharedBrowserContext` (`--chromium-shared-browser-context`) to restore the previous behavior; `chromium.clearCache`, `clearCookies` and `clearStorage` now only apply with it. Isolation adds a few dozen milliseconds per conversion.
+- **Upstream behavior change**: `api.bodyLimit` is enforced on the raw request body before parsing, so multipart boundaries and part headers count toward it and a request just under the limit may now get a `413`.
+- Add `api.downloadFromMaxConcurrency` (`--api-download-from-max-concurrency`) and `api.downloadFromMaxEntries` (`--api-download-from-max-entries`) to bound `downloadFrom` fetches. Upstream now caps concurrent fetches at `10` per request (previously unbounded); set `downloadFromMaxConcurrency: 0` to restore no limit.
+- Add `pdfEngines.maxConcurrency` (`--pdfengines-max-concurrency`, default `1`) to process a request's PDF files concurrently, trading memory for speed.
+- **Upstream behavior change**: `failOnResourceLoadingFailed` now also fails on resources the outbound proxy could not reach, which previously counted as loaded.
+- **Upstream behavior change**: Chromium CONNECT tunnels close after 2 minutes of silence (max 512 in flight), and webhook deliveries, retries included, get a bounded time budget with `Retry-After` capped at `webhook.retryMaxWait`.
+- Upstream security fixes: allow/deny-list matching strips URL userinfo; CGNAT (`100.64.0.0/10`) and benchmarking (`198.18.0.0/15`) ranges count as non-public; IPv6 zone identifiers no longer bypass the private IP checks; Chromium loopback WebSockets are filtered against the lists; metadata keys colliding with ExifTool options return `400`; blocked `downloadFrom` redirects return a generic `403`.
+- Upstream bug fixes (no chart-level config): health checks stay healthy during planned `restartAfter` restarts; DOCX math formulas render again; Chromium renderer crashes fail fast with `503`; about 75 MB less memory per Chromium browser; OpenTelemetry signals stay off until their `OTEL_*_EXPORTER` variable is set; duplicate upload filenames are kept as `name (2).ext`; intermittent deny-list match timeouts under CPU throttling no longer fail requests with `500`.
+- Upstream feature (per-request, no chart config): `generateTaggedPdf` for LibreOffice conversions.
+- Bundled Chromium updated to `155.0.8059.39` (fixes CVE-2026-87654); LibreOffice to `26.8.1`.
+
 ## 1.25.0
 
 - Add `enableServiceLinks` (default `true`, matching Kubernetes) to disable injection of service discovery environment variables. These collide with Gotenberg's own configuration: a Service named `api` in the same namespace injects `API_PORT=tcp://...` and the container refuses to start.
