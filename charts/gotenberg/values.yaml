@@ -287,6 +287,10 @@ api:
   downloadFromDenyPublicIps: false
   # -- Set the maximum number of retries for the download from feature (default 4)
   downloadFromMaxRetry: 4
+  # -- Set the maximum number of concurrent fetches per request for the download from feature. Set to 0 to use the upstream default (default 10). Added in Gotenberg 8.37.0.
+  downloadFromMaxConcurrency: 0
+  # -- Set the maximum number of entries in the `downloadFrom` array. Set to 0 for no limit (default 0). Added in Gotenberg 8.37.0.
+  downloadFromMaxEntries: 0
   # -- Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.
   downloadFromEnableEnvironmentProxy: false
   # -- Disable the download from feature
@@ -337,11 +341,13 @@ chromium:
   disableJavaScript: false
   # -- Disable the routes
   disableRoutes: false
-  # -- Clear Chromium cache between each conversion.
+  # -- Share one browser context, with its cookies, cache and storage, across all conversions. Since Gotenberg 8.38.0 each conversion gets its own isolated context by default; enable this only when all callers trust each other. Added in Gotenberg 8.38.0.
+  sharedBrowserContext: false
+  # -- Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0.
   clearCache: false
-  # -- Clear Chromium cookies between each conversion.
+  # -- Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0.
   clearCookies: false
-  # -- Clear Chromium local storage between each conversion (session storage is already isolated per conversion). Added in Gotenberg 8.36.0.
+  # -- Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0. Added in Gotenberg 8.36.0.
   clearStorage: false
   # -- Maximum request queue size for Chromium. Set to 0 to disable this feature.
   maxQueueSize: 0
@@ -411,6 +417,8 @@ pdfEngines:
   facturXEngines: ""
   # -- Set the PDF engines and their order for the image optimization feature; empty means all (default pdfcpu). Added in Gotenberg 8.36.0.
   optimizeImagesEngines: ""
+  # -- Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0.
+  maxConcurrency: 0
   # -- Disable the routes
   disableRoutes: false
 

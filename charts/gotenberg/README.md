@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.25.0](https://img.shields.io/badge/Version-1.25.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.36.0](https://img.shields.io/badge/AppVersion-8.36.0-informational?style=flat-square)
+![Version: 1.26.0](https://img.shields.io/badge/Version-1.26.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.38.1](https://img.shields.io/badge/AppVersion-8.38.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -90,6 +90,8 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | api.downloadFromDenyPrivateIps | bool | `false` | Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected. Added in Gotenberg 8.32.0. |
 | api.downloadFromDenyPublicIps | bool | `false` | Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
 | api.downloadFromEnableEnvironmentProxy | bool | `false` | Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0. |
+| api.downloadFromMaxConcurrency | int | `0` | Set the maximum number of concurrent fetches per request for the download from feature. Set to 0 to use the upstream default (default 10). Added in Gotenberg 8.37.0. |
+| api.downloadFromMaxEntries | int | `0` | Set the maximum number of entries in the `downloadFrom` array. Set to 0 for no limit (default 0). Added in Gotenberg 8.37.0. |
 | api.downloadFromMaxRetry | int | `4` | Set the maximum number of retries for the download from feature (default 4) |
 | api.enableBasicAuth | bool | `false` | Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values |
 | api.enableDebugRoute | bool | `false` | Enable debug route for debugging purposes |
@@ -116,9 +118,9 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.allowInsecureLocalhost | bool | `false` | Ignore TLS/SSL errors on localhost |
 | chromium.allowList | string | `""` | Set the allowed URLs for Chromium using a regular expression |
 | chromium.autoStart | bool | `false` | Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion |
-| chromium.clearCache | bool | `false` | Clear Chromium cache between each conversion. |
-| chromium.clearCookies | bool | `false` | Clear Chromium cookies between each conversion. |
-| chromium.clearStorage | bool | `false` | Clear Chromium local storage between each conversion (session storage is already isolated per conversion). Added in Gotenberg 8.36.0. |
+| chromium.clearCache | bool | `false` | Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0. |
+| chromium.clearCookies | bool | `false` | Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0. |
+| chromium.clearStorage | bool | `false` | Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0. Added in Gotenberg 8.36.0. |
 | chromium.denyList | string | `""` | Set the denied URLs for Chromium using a regular expression (default "^file:///[^tmp].*") |
 | chromium.denyPrivateIps | bool | `false` | Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. Skipped when `proxyServer` or `hostResolverRules` is set. |
 | chromium.denyPublicIps | bool | `false` | Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0. |
@@ -134,6 +136,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.maxQueueSize | int | `0` | Maximum request queue size for Chromium. Set to 0 to disable this feature. |
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
 | chromium.restartAfter | string | `""` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100) |
+| chromium.sharedBrowserContext | bool | `false` | Share one browser context, with its cookies, cache and storage, across all conversions. Since Gotenberg 8.38.0 each conversion gets its own isolated context by default; enable this only when all callers trust each other. Added in Gotenberg 8.38.0. |
 | chromium.startTimeout | string | `""` | Maximum duration to wait for Chromium to start or restart |
 | enableServiceLinks | bool | `true` | Set to false to stop Kubernetes injecting service discovery environment variables (`<SVCNAME>_SERVICE_HOST`, `<SVCNAME>_PORT`, ...) into the pod. These collide with Gotenberg's own configuration: a Service named `api` in the same namespace injects `API_PORT=tcp://<clusterIP>:<port>`, which Gotenberg reads as an override for `--api-port` and refuses to start. |
 | extraEnv | list | `[]` | List of extra environment variables for gotenberg container. Gotenberg 8.29.0+ supports OpenTelemetry via standard OTEL_* environment variables. See https://gotenberg.dev/docs/configuration for details. |
@@ -206,6 +209,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | pdfEngines.engines | DEPRECATED | `""` | Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines). |
 | pdfEngines.facturXEngines | string | `""` | Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0. |
 | pdfEngines.flattenEngines | string | `""` | Set the PDF engines and their order for the flatten feature (default qpdf) |
+| pdfEngines.maxConcurrency | int | `0` | Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0. |
 | pdfEngines.mergeEngines | string | `""` | Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk) |
 | pdfEngines.optimizeImagesEngines | string | `""` | Set the PDF engines and their order for the image optimization feature; empty means all (default pdfcpu). Added in Gotenberg 8.36.0. |
 | pdfEngines.readBookmarksEngines | string | `""` | Set the PDF engines and their order for the read bookmarks feature (default pdfcpu) |

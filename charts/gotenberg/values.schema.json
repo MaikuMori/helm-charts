@@ -198,6 +198,12 @@
         "downloadFromEnableEnvironmentProxy": {
           "$ref": "#/$defs/helm-values.api.downloadFromEnableEnvironmentProxy"
         },
+        "downloadFromMaxConcurrency": {
+          "$ref": "#/$defs/helm-values.api.downloadFromMaxConcurrency"
+        },
+        "downloadFromMaxEntries": {
+          "$ref": "#/$defs/helm-values.api.downloadFromMaxEntries"
+        },
         "downloadFromMaxRetry": {
           "$ref": "#/$defs/helm-values.api.downloadFromMaxRetry"
         },
@@ -319,6 +325,16 @@
       "description": "-- Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.",
       "type": "boolean",
       "default": false
+    },
+    "helm-values.api.downloadFromMaxConcurrency": {
+      "description": "-- Set the maximum number of concurrent fetches per request for the download from feature. Set to 0 to use the upstream default (default 10). Added in Gotenberg 8.37.0.",
+      "type": "number",
+      "default": 0
+    },
+    "helm-values.api.downloadFromMaxEntries": {
+      "description": "-- Set the maximum number of entries in the `downloadFrom` array. Set to 0 for no limit (default 0). Added in Gotenberg 8.37.0.",
+      "type": "number",
+      "default": 0
     },
     "helm-values.api.downloadFromMaxRetry": {
       "description": "-- Set the maximum number of retries for the download from feature (default 4)",
@@ -524,6 +540,9 @@
         "restartAfter": {
           "$ref": "#/$defs/helm-values.chromium.restartAfter"
         },
+        "sharedBrowserContext": {
+          "$ref": "#/$defs/helm-values.chromium.sharedBrowserContext"
+        },
         "startTimeout": {
           "$ref": "#/$defs/helm-values.chromium.startTimeout"
         }
@@ -551,17 +570,17 @@
       "default": false
     },
     "helm-values.chromium.clearCache": {
-      "description": "-- Clear Chromium cache between each conversion.",
+      "description": "-- Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0.",
       "type": "boolean",
       "default": false
     },
     "helm-values.chromium.clearCookies": {
-      "description": "-- Clear Chromium cookies between each conversion.",
+      "description": "-- Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0.",
       "type": "boolean",
       "default": false
     },
     "helm-values.chromium.clearStorage": {
-      "description": "-- Clear Chromium local storage between each conversion (session storage is already isolated per conversion). Added in Gotenberg 8.36.0.",
+      "description": "-- Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0. Added in Gotenberg 8.36.0.",
       "type": "boolean",
       "default": false
     },
@@ -639,6 +658,11 @@
       "description": "-- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100)",
       "type": "string",
       "default": ""
+    },
+    "helm-values.chromium.sharedBrowserContext": {
+      "description": "-- Share one browser context, with its cookies, cache and storage, across all conversions. Since Gotenberg 8.38.0 each conversion gets its own isolated context by default; enable this only when all callers trust each other. Added in Gotenberg 8.38.0.",
+      "type": "boolean",
+      "default": false
     },
     "helm-values.chromium.startTimeout": {
       "description": "-- Maximum duration to wait for Chromium to start or restart",
@@ -1216,6 +1240,9 @@
         "flattenEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.flattenEngines"
         },
+        "maxConcurrency": {
+          "$ref": "#/$defs/helm-values.pdfEngines.maxConcurrency"
+        },
         "mergeEngines": {
           "$ref": "#/$defs/helm-values.pdfEngines.mergeEngines"
         },
@@ -1288,6 +1315,11 @@
       "description": "-- Set the PDF engines and their order for the flatten feature (default qpdf)",
       "type": "string",
       "default": ""
+    },
+    "helm-values.pdfEngines.maxConcurrency": {
+      "description": "-- Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0.",
+      "type": "number",
+      "default": 0
     },
     "helm-values.pdfEngines.mergeEngines": {
       "description": "-- Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk)",
