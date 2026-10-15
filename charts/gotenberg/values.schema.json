@@ -327,9 +327,7 @@
       "default": false
     },
     "helm-values.api.downloadFromMaxConcurrency": {
-      "description": "-- Set the maximum number of concurrent fetches per request for the download from feature. Set to 0 to use the upstream default (default 10). Added in Gotenberg 8.37.0.",
-      "type": "number",
-      "default": 0
+      "description": "-- (int) Set the maximum number of concurrent fetches per request for the download from feature. Leave unset for the upstream default (10); set to 0 for no limit. Added in Gotenberg 8.37.0."
     },
     "helm-values.api.downloadFromMaxEntries": {
       "description": "-- Set the maximum number of entries in the `downloadFrom` array. Set to 0 for no limit (default 0). Added in Gotenberg 8.37.0.",

@@ -287,8 +287,8 @@ api:
   downloadFromDenyPublicIps: false
   # -- Set the maximum number of retries for the download from feature (default 4)
   downloadFromMaxRetry: 4
-  # -- Set the maximum number of concurrent fetches per request for the download from feature. Set to 0 to use the upstream default (default 10). Added in Gotenberg 8.37.0.
-  downloadFromMaxConcurrency: 0
+  # -- (int) Set the maximum number of concurrent fetches per request for the download from feature. Leave unset for the upstream default (10); set to 0 for no limit. Added in Gotenberg 8.37.0.
+  downloadFromMaxConcurrency:
   # -- Set the maximum number of entries in the `downloadFrom` array. Set to 0 for no limit (default 0). Added in Gotenberg 8.37.0.
   downloadFromMaxEntries: 0
   # -- Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.
