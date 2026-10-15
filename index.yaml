@@ -3,6 +3,56 @@ entries:
   gotenberg:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: Bump Gotenberg version 8.36.0 -> 8.38.1 (via 8.37.0 and 8.38.0)
+        - kind: changed
+          description: "Upstream behavior change: each Chromium conversion runs in its own browser context, so cookies, cache and storage no longer carry over; set chromium.sharedBrowserContext to restore sharing"
+        - kind: changed
+          description: "Upstream behavior change: api.bodyLimit is enforced on the raw request body before parsing, so multipart overhead now counts toward it"
+        - kind: added
+          description: Add chromium.sharedBrowserContext; clearCache, clearCookies and clearStorage now only apply with it
+        - kind: added
+          description: Add api.downloadFromMaxConcurrency and api.downloadFromMaxEntries to bound downloadFrom fetches
+        - kind: added
+          description: Add pdfEngines.maxConcurrency to process a request's PDF files concurrently
+        - kind: security
+          description: "Upstream: allow/deny-list matching strips URL userinfo, CGNAT and benchmarking ranges count as non-public, and IPv6 zone identifiers no longer bypass the private IP checks"
+        - kind: security
+          description: "Upstream: Chromium loopback WebSockets are filtered against the allow-list and deny-list"
+        - kind: security
+          description: "Upstream: Chromium updated to 155.0.8059.39, fixing CVE-2026-87654"
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.38.1
+    created: "2026-10-15T21:56:11.581531007Z"
+    description: A Helm chart for Gotenberg
+    digest: 71d05d8574c28f77192b8cc32e85e5b793e991862ba09aa2c5bb9d188df3b4ff
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.26.0/gotenberg-1.26.0.tgz
+    version: 1.26.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: Add enableServiceLinks (default true) to disable injection of Kubernetes service discovery environment variables, which collide with Gotenberg's own configuration (a Service named api injects API_PORT and breaks startup)
       artifacthub.io/links: |
@@ -1522,4 +1572,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-27T22:38:23.34013159Z"
+generated: "2026-10-15T21:56:11.582017731Z"
