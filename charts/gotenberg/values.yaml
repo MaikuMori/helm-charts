@@ -22,6 +22,8 @@ fullnameOverride: ""
 serviceAccount:
   # -- Specifies whether a service account should be created
   create: false
+  # -- Automatically mount the service account's API token in the pods. Only applies when `create` is true.
+  automount: true
   # -- Annotations to add to the service account
   annotations: {}
   # -- The name of the service account to use.

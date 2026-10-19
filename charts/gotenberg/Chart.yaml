@@ -4,7 +4,7 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.26.0"
+version: "1.27.0"
 appVersion: "8.38.1"
 
 keywords:
@@ -34,21 +34,5 @@ annotations:
     - name: Chart's Changelog
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
-    - kind: changed
-      description: Bump Gotenberg version 8.36.0 -> 8.38.1 (via 8.37.0 and 8.38.0)
-    - kind: changed
-      description: "Upstream behavior change: each Chromium conversion runs in its own browser context, so cookies, cache and storage no longer carry over; set chromium.sharedBrowserContext to restore sharing"
-    - kind: changed
-      description: "Upstream behavior change: api.bodyLimit is enforced on the raw request body before parsing, so multipart overhead now counts toward it"
     - kind: added
-      description: Add chromium.sharedBrowserContext; clearCache, clearCookies and clearStorage now only apply with it
-    - kind: added
-      description: Add api.downloadFromMaxConcurrency and api.downloadFromMaxEntries to bound downloadFrom fetches
-    - kind: added
-      description: Add pdfEngines.maxConcurrency to process a request's PDF files concurrently
-    - kind: security
-      description: "Upstream: allow/deny-list matching strips URL userinfo, CGNAT and benchmarking ranges count as non-public, and IPv6 zone identifiers no longer bypass the private IP checks"
-    - kind: security
-      description: "Upstream: Chromium loopback WebSockets are filtered against the allow-list and deny-list"
-    - kind: security
-      description: "Upstream: Chromium updated to 155.0.8059.39, fixing CVE-2026-87654"
+      description: Add serviceAccount.automount (default true) to stop mounting the API token in the pods; requires serviceAccount.create

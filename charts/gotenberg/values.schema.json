@@ -1505,6 +1505,9 @@
         "annotations": {
           "$ref": "#/$defs/helm-values.serviceAccount.annotations"
         },
+        "automount": {
+          "$ref": "#/$defs/helm-values.serviceAccount.automount"
+        },
         "create": {
           "$ref": "#/$defs/helm-values.serviceAccount.create"
         },
@@ -1518,6 +1521,11 @@
       "description": "-- Annotations to add to the service account",
       "type": "object",
       "default": {}
+    },
+    "helm-values.serviceAccount.automount": {
+      "description": "-- Automatically mount the service account's API token in the pods. Only applies when `create` is true.",
+      "type": "boolean",
+      "default": true
     },
     "helm-values.serviceAccount.create": {
       "description": "-- Specifies whether a service account should be created",

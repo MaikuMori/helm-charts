@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.27.0
+
+- Add `serviceAccount.automount` (default `true`) to set `automountServiceAccountToken` on the created service account, so the pods can run without a Kubernetes API token. Requires `serviceAccount.create: true`.
+
 ## 1.26.0
 
 - Bump `gotenberg` version `8.36.0` -> `8.38.1` (via `8.37.0` and `8.38.0`).
