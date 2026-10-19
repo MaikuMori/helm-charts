@@ -1,0 +1,65 @@
+suite: deployment
+templates:
+  - templates/deployment.yaml
+tests:
+  - it: runs the chart's app version by default
+    chart:
+      appVersion: 1.2.3
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: gotenberg/gotenberg:1.2.3
+
+  - it: sets replicas unless autoscaling is enabled
+    set:
+      replicaCount: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: leaves replicas to the HPA when autoscaling is enabled
+    set:
+      autoscaling.enabled: true
+    asserts:
+      - notExists:
+          path: spec.replicas
+
+  - it: passes enableServiceLinks through
+    set:
+      enableServiceLinks: false
+    asserts:
+      - equal:
+          path: spec.template.spec.enableServiceLinks
+          value: false
+
+  - it: falls back to the deprecated traceHeader for the correlation ID header
+    set:
+      api.traceHeader: X-Trace
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-correlation-id-header=X-Trace
+
+  - it: prefers correlationIdHeader over traceHeader
+    set:
+      api.traceHeader: X-Trace
+      api.correlationIdHeader: X-Correlation
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-correlation-id-header=X-Correlation
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --api-correlation-id-header=X-Trace
+
+  - it: configures TLS from a secret
+    set:
+      api.tlsSecretName: gotenberg-tls
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-tls-cert-file=/tls/tls.crt
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-tls-key-file=/tls/tls.key
