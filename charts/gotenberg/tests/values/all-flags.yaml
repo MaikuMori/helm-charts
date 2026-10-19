@@ -14,7 +14,7 @@ api:
   downloadFromDenyPrivateIps: true
   downloadFromDenyPublicIps: true
   downloadFromEnableEnvironmentProxy: true
-  downloadFromMaxConcurrency: downloadFromMaxConcurrency-value
+  downloadFromMaxConcurrency: 7
   downloadFromMaxEntries: 7
   downloadFromMaxRetry: 11
   enableBasicAuth: true

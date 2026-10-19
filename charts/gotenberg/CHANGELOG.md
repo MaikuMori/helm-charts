@@ -2,7 +2,11 @@
 
 ## 1.27.1
 
-- No changes to rendered manifests. Add unit and snapshot tests for the chart's templates, and install it with default values in CI ([#71](https://github.com/MaikuMori/helm-charts/issues/71)).
+- No changes to rendered manifests.
+- Generate `values.schema.json` with [helm-values-schema-json](https://github.com/losisin/helm-values-schema-json) instead of `helm-tool`. Descriptions no longer contain `helm-docs` markup, and deprecated values are marked `deprecated` ([#64](https://github.com/MaikuMori/helm-charts/issues/64)).
+- The schema now checks values that default to empty: `api.downloadFromMaxConcurrency` and `autoscaling.targetMemoryUtilizationPercentage` must be integers, and `pdb.unhealthyPodEvictionPolicy` must be `IfHealthyBudget` or `AlwaysAllow`.
+- Fix the README listing deprecated values with type `DEPRECATED`.
+- Add unit and snapshot tests for the chart's templates, and install it with default values in CI ([#71](https://github.com/MaikuMori/helm-charts/issues/71)).
 
 ## 1.27.0
 

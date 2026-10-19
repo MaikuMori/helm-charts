@@ -195,7 +195,7 @@ jobs:
               '- [ ] Review upstream release notes for breaking changes',
               '- [ ] Update `CHANGELOG.md`',
               '- [ ] Update `Chart.yaml` version and `artifacthub.io/changes` annotation',
-              '- [ ] Run `helm-docs` and `helm-tool schema | jq . > values.schema.json`',
+              '- [ ] Run `helm-docs` and `helm schema` (in `charts/gotenberg`)',
             ].join('\n'));
 
             // Final hard cap on the assembled body so pulls.create can't fail

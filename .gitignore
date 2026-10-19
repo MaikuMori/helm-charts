@@ -2,8 +2,5 @@
 *.tgz
 .cr-release-packages/
 
-# CI-generated schema (helm-tool)
-charts/*/generated-schema.json
-
 # Release signing material (CI)
 .gpg-dir/

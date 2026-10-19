@@ -81,7 +81,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | api.correlationIdHeader | string | `""` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
 | api.disableDebugRouteTelemetry | bool | `false` | Disable telemetry on the debug route |
 | api.disableDownloadFrom | bool | `false` | Disable the download from feature |
-| api.disableHealthCheckLogging | DEPRECATED | `false` | Disable health check route telemetry. Use disableHealthCheckRouteTelemetry instead. |
+| api.disableHealthCheckLogging | bool | `false` | Deprecated: Disable health check route telemetry. Use disableHealthCheckRouteTelemetry instead. |
 | api.disableHealthCheckRouteTelemetry | bool | `false` | Disable health check route telemetry. Note: upstream default changed to true in Gotenberg 8.29.0 (health check telemetry is disabled by default even without this flag). |
 | api.disableRootRouteTelemetry | bool | `false` | Disable telemetry on the root route |
 | api.disableVersionRouteTelemetry | bool | `false` | Disable telemetry on the version route |
@@ -107,13 +107,14 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | api.startTimeout | string | `""` | Set the maximum duration to wait for the API to start |
 | api.timeout | string | `""` | Set the time limit for requests (default 30s) |
 | api.tlsSecretName | string | `""` | Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key) |
-| api.traceHeader | DEPRECATED | `""` | Set the header name to use for identifying requests. Use correlationIdHeader instead. |
+| api.traceHeader | string | `""` | Deprecated: Set the header name to use for identifying requests. Use correlationIdHeader instead. |
 | autoscaling.behavior | object | `{}` |  |
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.extraMetrics | list | `[]` |  |
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| autoscaling.targetMemoryUtilizationPercentage | int | `nil` | Target average memory utilization percentage. Leave unset to not scale on memory. |
 | chromium.allowFileAccessFromFiles | bool | `false` | Allow file:// URIs to read other file:// URIs |
 | chromium.allowInsecureLocalhost | bool | `false` | Ignore TLS/SSL errors on localhost |
 | chromium.allowList | string | `""` | Set the allowed URLs for Chromium using a regular expression |
@@ -131,7 +132,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | chromium.hostResolverRules | string | `""` | Set custom mappings to the host resolver |
 | chromium.idleShutdownTimeout | string | `""` | Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
 | chromium.ignoreCertificateErrors | bool | `false` | Ignore the certificate errors |
-| chromium.incognito | DEPRECATED | `false` | Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored. |
+| chromium.incognito | bool | `false` | Deprecated: Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored. |
 | chromium.maxConcurrency | int | `0` | Maximum number of concurrent Chromium conversions (default 6) |
 | chromium.maxQueueSize | int | `0` | Maximum request queue size for Chromium. Set to 0 to disable this feature. |
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
@@ -171,11 +172,11 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | libreOffice.restartAfter | string | `""` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10) |
 | libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 10s) |
 | lifecycle | object | `{}` | Define the container lifecycle hooks. A `preStop` hook keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates. Gotenberg's own graceful shutdown does not cover this: it stops as soon as it is idle, so an idle pod closes its listener within milliseconds of SIGTERM. |
-| livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. +docs:property livenessProbe: {} |
-| logging.enableGcpFields | DEPRECATED | `false` | Enable GCP log field mapping for Cloud Run. Use stdEnableGcpFields instead. |
+| livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. |
+| logging.enableGcpFields | bool | `false` | Deprecated: Enable GCP log field mapping for Cloud Run. Use stdEnableGcpFields instead. |
 | logging.enableGcpSeverity | bool | `false` | Enable GCP severity field mapping |
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
-| logging.format | DEPRECATED | `""` | Set log format. Use stdFormat instead. |
+| logging.format | string | `""` | Deprecated: Set log format. Use stdFormat instead. |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
 | logging.stdEnableGcpFields | bool | `false` | Enable GCP log standard output field mapping for Cloud Run |
 | logging.stdFormat | string | `""` | Set log standard output format - auto, json, or text (default "auto") |
@@ -206,7 +207,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | pdfEngines.embedEngines | string | `""` | Set the PDF engines and their order for the file embedding feature (default pdfcpu) |
 | pdfEngines.embedMetadataEngines | string | `""` | Set the PDF engines and their order for the embed metadata feature (default qpdf) |
 | pdfEngines.encryptEngines | string | `""` | Set the PDF engines and their order for the password protection feature (default qpdf,pdftk,pdfcpu) |
-| pdfEngines.engines | DEPRECATED | `""` | Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines). |
+| pdfEngines.engines | string | `""` | Deprecated: Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines). |
 | pdfEngines.facturXEngines | string | `""` | Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0. |
 | pdfEngines.flattenEngines | string | `""` | Set the PDF engines and their order for the flatten feature (default qpdf) |
 | pdfEngines.maxConcurrency | int | `0` | Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests; does not apply to LibreOffice. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0. |
@@ -227,22 +228,22 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | prometheus.collectInterval | string | `""` | Set the interval for collecting modules' metrics (default 1s) |
 | prometheus.disableCollect | bool | `false` | Disable the collect of metrics |
 | prometheus.disableRouteTelemetry | bool | `false` | Disable route telemetry for the Prometheus metrics endpoint |
-| prometheus.disableRouterLogging | DEPRECATED | `false` | Disable the route logging. Use disableRouteTelemetry instead. |
+| prometheus.disableRouterLogging | bool | `false` | Deprecated: Disable the route logging. Use disableRouteTelemetry instead. |
 | prometheus.metricsPath | string | `""` | Set the metrics endpoint path (default "/prometheus/metrics") |
 | prometheus.namespace | string | `""` | Set the namespace of modules' metrics (default "gotenberg") |
-| readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. +docs:property readinessProbe: {} |
+| readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set. | Define the security context for the container. By default will use upstream recommended values. |
 | service.annotations | object | `{}` | Annotations to add to the service |
-| service.loadBalancerIP | DEPRECATED | `""` | Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead. |
+| service.loadBalancerIP | string | `""` | Deprecated: Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead. |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.automount | bool | `false` | Mount the service account's API token in the pods. Gotenberg doesn't use the Kubernetes API. |
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
-| startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. +docs:property startupProbe: {} |
+| startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. |
 | strategy | object | `{}` |  |
 | testImage | object | `{"repository":"busybox","tag":"latest"}` | Image configuration for the helm test pod |
 | testImage.repository | string | `"busybox"` | Repository for the test image |
@@ -263,8 +264,8 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | webhook.disable | bool | `false` | Disable the webhook feature |
 | webhook.enableEnvironmentProxy | bool | `false` | Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0. |
 | webhook.enableSyncMode | bool | `false` | Enable synchronous mode for the webhook feature |
-| webhook.errorAllowList | DEPRECATED | `""` | Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks. |
-| webhook.errorDenyList | DEPRECATED | `""` | Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks. |
+| webhook.errorAllowList | string | `""` | Deprecated: Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks. |
+| webhook.errorDenyList | string | `""` | Deprecated: Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks. |
 | webhook.maxRetry | string | `""` | Set the maximum number of retries for the webhook feature (default 4) |
 | webhook.retryMaxWait | string | `""` | Set the maximum duration to wait before trying to call the webhook again (default 30s) |
 | webhook.retryMinWait | string | `""` | Set the minimum duration to wait before trying to call the webhook again (default 1s) |

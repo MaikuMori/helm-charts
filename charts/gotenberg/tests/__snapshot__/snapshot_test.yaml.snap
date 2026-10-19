@@ -152,7 +152,7 @@ matches with every flag set:
                 - --api-download-from-deny-private-ips
                 - --api-download-from-deny-public-ips
                 - --api-download-from-max-retry=11
-                - --api-download-from-max-concurrency=downloadFromMaxConcurrency-value
+                - --api-download-from-max-concurrency=7
                 - --api-download-from-max-entries=7
                 - --api-download-from-enable-environment-proxy
                 - --api-disable-download-from

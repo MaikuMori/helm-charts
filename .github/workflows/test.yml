@@ -46,22 +46,32 @@ jobs:
           cache-dependency-path: .github/workflows/test.yml
 
       - name: Install helm-tools
+        env:
+          SCHEMA_VERSION: 2.6.0
+          SCHEMA_SHA256: c3447c1be91b987678e70996451b6cf2169b9f44fea8fe670dc0f340281f11e8
         run: |
-          go install github.com/cert-manager/helm-tool@v0.5.3
+          go install github.com/cert-manager/helm-tool@v0.6.0
           go install github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2
+          archive="helm-values-schema-json_${SCHEMA_VERSION}_linux_amd64.tgz"
+          curl -sSfLO "https://github.com/losisin/helm-values-schema-json/releases/download/v${SCHEMA_VERSION}/${archive}"
+          echo "${SCHEMA_SHA256}  ${archive}" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/bin" schema
+          rm "$archive"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
 
-      - name: Run helm-tools
+      - name: Lint values
+        run: helm-tool lint -e values.linter.exceptions
+        working-directory: charts/gotenberg
+
+      - name: Check schema is up to date
+        working-directory: charts/gotenberg
         run: |
-          pushd charts/gotenberg
-          helm-tool lint -e values.linter.exceptions
-          helm-tool schema | jq . > generated-schema.json
-          CURRENT_SCHEMA=$(cat values.schema.json)
-          GENERATED_SCHEMA=$(cat generated-schema.json)
-          if [ "$CURRENT_SCHEMA" != "$GENERATED_SCHEMA" ]; then
-            echo "Outdated schema, regenerate it with 'helm-tool schema > values.schema.json'"
+          schema
+          if ! git diff --exit-code -- values.schema.json; then
+            echo "Outdated schema, regenerate it with 'helm schema' in charts/gotenberg"
             exit 1
           fi
-          popd
 
       - name: Check README is up to date
         run: |

@@ -21,6 +21,7 @@
 .idea/
 *.tmproj
 .vscode/
-# CI values and unit tests
+# CI values, unit tests and schema generator config
 /ci/
 /tests/
+/.schema.yaml

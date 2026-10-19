@@ -35,4 +35,10 @@ annotations:
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
     - kind: changed
-      description: No changes to rendered manifests; the chart now has unit and snapshot tests
+      description: Generate the values schema with helm-values-schema-json; descriptions are clean and deprecated values are marked deprecated
+    - kind: changed
+      description: The schema checks api.downloadFromMaxConcurrency and autoscaling.targetMemoryUtilizationPercentage are integers and pdb.unhealthyPodEvictionPolicy is IfHealthyBudget or AlwaysAllow
+    - kind: fixed
+      description: README no longer lists deprecated values with type DEPRECATED
+    - kind: added
+      description: Unit and snapshot tests for the chart's templates; no changes to rendered manifests
