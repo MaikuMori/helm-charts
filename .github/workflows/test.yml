@@ -18,10 +18,15 @@ jobs:
         with:
           persist-credentials: false
 
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "stable"
+          cache-dependency-path: tools/*/go.sum
+
       - name: Run actionlint
         run: |
-          bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12
-          ./actionlint -color
+          go -C tools/actionlint install github.com/rhysd/actionlint/cmd/actionlint
+          actionlint -color
 
       - name: Run zizmor
         uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
@@ -42,23 +47,14 @@ jobs:
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: "stable"
-          # We don't have go.sum file, but if this file changes we might as well download new dependencies.
-          cache-dependency-path: .github/workflows/test.yml
+          cache-dependency-path: tools/*/go.sum
 
+      # Versions are pinned in tools/*/go.mod.
       - name: Install helm-tools
-        env:
-          SCHEMA_VERSION: 2.6.0
-          SCHEMA_SHA256: c3447c1be91b987678e70996451b6cf2169b9f44fea8fe670dc0f340281f11e8
         run: |
-          go install github.com/cert-manager/helm-tool@v0.6.0
-          go install github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2
-          archive="helm-values-schema-json_${SCHEMA_VERSION}_linux_amd64.tgz"
-          curl -sSfLO "https://github.com/losisin/helm-values-schema-json/releases/download/v${SCHEMA_VERSION}/${archive}"
-          echo "${SCHEMA_SHA256}  ${archive}" | sha256sum -c -
-          mkdir -p "$RUNNER_TEMP/bin"
-          tar -xzf "$archive" -C "$RUNNER_TEMP/bin" schema
-          rm "$archive"
-          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          go -C tools/helm-tool install github.com/cert-manager/helm-tool
+          go -C tools/helm-docs install github.com/norwoodj/helm-docs/cmd/helm-docs
+          go -C tools/helm-schema install github.com/losisin/helm-values-schema-json/v2
 
       - name: Lint values
         run: helm-tool lint -e values.linter.exceptions
@@ -67,7 +63,7 @@ jobs:
       - name: Check schema is up to date
         working-directory: charts/gotenberg
         run: |
-          schema
+          helm-values-schema-json
           if ! git diff --exit-code -- values.schema.json; then
             echo "Outdated schema, regenerate it with 'helm schema' in charts/gotenberg"
             exit 1

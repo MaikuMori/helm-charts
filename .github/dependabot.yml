@@ -10,3 +10,14 @@ updates:
           - "*"
     cooldown:
       default-days: 7
+  - package-ecosystem: "gomod"
+    directories:
+      - "/tools/*"
+    schedule:
+      interval: "weekly"
+    groups:
+      tools:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 7

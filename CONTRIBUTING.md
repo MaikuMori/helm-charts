@@ -13,6 +13,8 @@ Ideally here's the flow:
 - Run [`helm schema`](https://github.com/losisin/helm-values-schema-json) in `charts/gotenberg` to regenerate `values.schema.json`
 - Run [`helm unittest charts/gotenberg`](https://github.com/helm-unittest/helm-unittest)
 
+CI pins `helm-docs`, `helm schema`, `helm-tool` and `actionlint` in `tools/*/go.mod`. To use the same versions locally, install them with e.g. `go -C tools/helm-docs install github.com/norwoodj/helm-docs/cmd/helm-docs`.
+
 ## Tests
 
 `charts/gotenberg/tests/` holds [helm-unittest](https://github.com/helm-unittest/helm-unittest) suites:
