@@ -22,6 +22,8 @@ fullnameOverride: ""
 serviceAccount:
   # -- Specifies whether a service account should be created
   create: false
+  # -- Mount the service account's API token in the pods. Gotenberg doesn't use the Kubernetes API.
+  automount: false
   # -- Annotations to add to the service account
   annotations: {}
   # -- The name of the service account to use.

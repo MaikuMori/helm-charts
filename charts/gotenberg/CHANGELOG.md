@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.27.0
+
+- Add `serviceAccount.automount` to control `automountServiceAccountToken` on the pods and the created service account ([@Jean-Beru](https://github.com/Jean-Beru)).
+- The Kubernetes API token is no longer mounted in the pods by default. Set `serviceAccount.automount: true` if an init container needs it.
+
 ## 1.26.0
 
 - Bump `gotenberg` version `8.36.0` -> `8.38.1` (via `8.37.0` and `8.38.0`).
