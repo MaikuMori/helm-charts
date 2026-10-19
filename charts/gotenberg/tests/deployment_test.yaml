@@ -2,37 +2,6 @@ suite: deployment
 templates:
   - templates/deployment.yaml
 tests:
-  - it: runs the chart's app version by default
-    chart:
-      appVersion: 1.2.3
-    asserts:
-      - equal:
-          path: spec.template.spec.containers[0].image
-          value: gotenberg/gotenberg:1.2.3
-
-  - it: sets replicas unless autoscaling is enabled
-    set:
-      replicaCount: 3
-    asserts:
-      - equal:
-          path: spec.replicas
-          value: 3
-
-  - it: leaves replicas to the HPA when autoscaling is enabled
-    set:
-      autoscaling.enabled: true
-    asserts:
-      - notExists:
-          path: spec.replicas
-
-  - it: passes enableServiceLinks through
-    set:
-      enableServiceLinks: false
-    asserts:
-      - equal:
-          path: spec.template.spec.enableServiceLinks
-          value: false
-
   - it: falls back to the deprecated traceHeader for the correlation ID header
     set:
       api.traceHeader: X-Trace
@@ -53,9 +22,23 @@ tests:
           path: spec.template.spec.containers[0].args
           content: --api-correlation-id-header=X-Trace
 
-  - it: configures TLS from a secret
+  - it: falls back to the deprecated logging.format for the log format
+    set:
+      logging.format: json
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --log-std-format=json
+
+  - it: mounts the TLS secret and points the API at it
     set:
       api.tlsSecretName: gotenberg-tls
+      volumes:
+        - name: scratch
+          emptyDir: {}
+      volumeMounts:
+        - name: scratch
+          mountPath: /scratch
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
@@ -63,3 +46,138 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].args
           content: --api-tls-key-file=/tls/tls.key
+      - equal:
+          path: spec.template.spec.volumes
+          value:
+            - name: scratch
+              emptyDir: {}
+            - name: tls
+              secret:
+                secretName: gotenberg-tls
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts
+          value:
+            - name: scratch
+              mountPath: /scratch
+            - name: tls
+              mountPath: /tls
+              readOnly: true
+
+  - it: reads basic auth credentials from an existing secret with default keys
+    set:
+      api.enableBasicAuth: true
+      api.existingSecret: creds
+      api.basicAuthUsername: ignored
+      api.basicAuthPassword: ignored
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env
+          value:
+            - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: creds
+                  key: username
+            - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: creds
+                  key: password
+
+  - it: uses custom secret keys for basic auth
+    set:
+      api.enableBasicAuth: true
+      api.existingSecret: creds
+      api.existingSecretUsernameKey: user
+      api.existingSecretPasswordKey: pass
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.key
+          value: user
+      - equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.key
+          value: pass
+
+  - it: sets inline basic auth credentials only when both are given
+    set:
+      api.enableBasicAuth: true
+      api.basicAuthUsername: admin
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-enable-basic-auth
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].env
+
+  - it: ignores basic auth credentials when basic auth is disabled
+    set:
+      api.basicAuthUsername: admin
+      api.basicAuthPassword: secret
+    asserts:
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].env
+
+  - it: runs as the image's gotenberg user by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            privileged: false
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].env
+
+  - it: leaves the user to OpenShift and sets HOME there
+    capabilities:
+      apiVersions:
+        - security.openshift.io/v1
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: HOME
+            value: /home/gotenberg
+
+  - it: uses a custom securityContext as is and sets HOME for another user
+    set:
+      securityContext:
+        runAsUser: 2000
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            runAsUser: 2000
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: HOME
+            value: /home/gotenberg
+
+  - it: sets HOME when the pod securityContext picks another user
+    set:
+      podSecurityContext:
+        runAsUser: 2000
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: HOME
+            value: /home/gotenberg
+
+  - it: keeps a HOME set in extraEnv
+    set:
+      securityContext:
+        runAsUser: 2000
+      extraEnv:
+        - name: HOME
+          value: /tmp
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env
+          value:
+            - name: HOME
+              value: /tmp

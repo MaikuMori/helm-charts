@@ -88,7 +88,11 @@ jobs:
         run: helm plugin install https://github.com/helm-unittest/helm-unittest/releases/download/v1.2.1/unittest-1.2.1.tgz --verify=false
 
       - name: Run helm-unittest
-        run: helm unittest --strict charts/*
+        run: |
+          if ! helm unittest --strict charts/*; then
+            echo "::error::If the rendered output changed on purpose, update the snapshots with 'helm unittest -u charts/gotenberg' and commit them."
+            exit 1
+          fi
 
   lint:
     runs-on: ubuntu-latest

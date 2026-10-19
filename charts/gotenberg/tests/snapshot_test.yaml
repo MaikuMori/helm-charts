@@ -1,0 +1,33 @@
+suite: rendered output
+chart:
+  version: 0.0.0
+  appVersion: 0.0.0
+templates:
+  - templates/*.yaml
+  - templates/tests/*.yaml
+tests:
+  - it: matches with default values
+    values:
+      - ../ci/default-values.yaml
+    asserts:
+      - matchSnapshot: {}
+
+  - it: matches with every optional resource enabled
+    values:
+      - ../ci/full-values.yaml
+    asserts:
+      - matchSnapshot: {}
+
+  - it: matches with every flag set
+    values:
+      - values/all-flags.yaml
+    asserts:
+      - matchSnapshot: {}
+
+  - it: matches with the CRD-backed and policy resources enabled
+    set:
+      networkPolicy.enabled: true
+      metrics.serviceMonitor.enabled: true
+      vpa.create: true
+    asserts:
+      - matchSnapshot: {}
