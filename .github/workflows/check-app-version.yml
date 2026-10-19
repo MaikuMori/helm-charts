@@ -1,4 +1,4 @@
-name: Check Gotenberg Version
+name: Check for Updates
 
 on:
   schedule:
@@ -6,9 +6,7 @@ on:
     - cron: "0 9 * * 1"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 # Serialize runs so a manual workflow_dispatch can't race the weekly cron and
 # leave a pushed branch with no PR (or duplicate the same bump).
@@ -19,9 +17,12 @@ concurrency:
 jobs:
   check-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 # zizmor: ignore[artipacked] later steps push with git
 
       - name: Check for new Gotenberg release
         id: check
@@ -59,7 +60,7 @@ jobs:
 
       - name: Create or update pull request
         if: steps.check.outputs.update == 'true'
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           CURRENT: ${{ steps.check.outputs.current }}
           LATEST: ${{ steps.check.outputs.latest }}
@@ -195,7 +196,7 @@ jobs:
               '- [ ] Review upstream release notes for breaking changes',
               '- [ ] Update `CHANGELOG.md`',
               '- [ ] Update `Chart.yaml` version and `artifacthub.io/changes` annotation',
-              '- [ ] Run `helm-docs` and `helm-tool schema | jq . > values.schema.json`',
+              '- [ ] Run `helm-docs` and `helm schema` (in `charts/gotenberg`)',
             ].join('\n'));
 
             // Final hard cap on the assembled body so pulls.create can't fail
@@ -304,3 +305,41 @@ jobs:
                 core.warning(`Failed to delete branch ${ref}: ${e.message}`);
               }
             }
+
+  # Test tools that Dependabot can't track; tools/*/go.mod and actions are covered by it.
+  check-test-tools:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Open, update or close the tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: Update pinned test tools
+        run: |
+          set -euo pipefail
+          updates=$(.github/scripts/check-pinned-tools.sh)
+          issue=$(gh issue list --state open --label dependencies --search "in:title \"$TITLE\"" \
+            --json number,title --jq "map(select(.title == env.TITLE)) | .[0].number // empty")
+
+          if [ -z "$updates" ]; then
+            if [ -n "$issue" ]; then
+              gh issue close "$issue" --comment "All pinned test tools are current."
+            fi
+            exit 0
+          fi
+
+          body=$(printf '%s\n\n%s\n' \
+            "Newer releases of tools pinned in \`.github/workflows/test.yml\` (at least a week old):" \
+            "$updates")
+          if [ -n "$issue" ]; then
+            gh issue edit "$issue" --body "$body"
+          else
+            gh issue create --title "$TITLE" --label dependencies --body "$body"
+          fi

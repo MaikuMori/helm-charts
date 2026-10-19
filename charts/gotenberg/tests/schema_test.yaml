@@ -1,0 +1,94 @@
+suite: values schema
+templates:
+  - templates/deployment.yaml
+tests:
+  - it: accepts any Kubernetes probe
+    set:
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 3000
+          scheme: HTTPS
+        initialDelaySeconds: 5
+      readinessProbe:
+        exec:
+          command: [cat, /tmp/ready]
+      startupProbe:
+        tcpSocket:
+          port: http
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: accepts free-form Kubernetes objects and maps
+    set:
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+      securityContext:
+        runAsUser: 2000
+        runAsNonRoot: true
+      podSecurityContext:
+        fsGroup: 2000
+      podAnnotations:
+        example.com/key: value
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+        - key: dedicated
+          operator: Exists
+      affinity:
+        nodeAffinity: {}
+      lifecycle:
+        preStop:
+          sleep:
+            seconds: 5
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+      autoscaling.behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 60
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: accepts values that default to null
+    set:
+      api.basicAuthUsername: user
+      api.basicAuthPassword: pass
+      api.downloadFromMaxConcurrency: 3
+      autoscaling.targetMemoryUtilizationPercentage: 70
+      pdb.unhealthyPodEvictionPolicy: AlwaysAllow
+      metrics.serviceMonitor.namespace: monitoring
+      metrics.serviceMonitor.interval: 30s
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: rejects unknown top-level values
+    set:
+      replicaCont: 2
+    asserts:
+      - failedTemplate:
+          errorPattern: "additional properties 'replicaCont' not allowed"
+
+  - it: rejects unknown values in chart-defined sections
+    set:
+      metrics.serviceMonitor.enabledd: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "additional properties 'enabledd' not allowed"
+
+  - it: rejects wrong types
+    set:
+      api.downloadFromMaxConcurrency: lots
+    asserts:
+      - failedTemplate:
+          errorPattern: "/api/downloadFromMaxConcurrency"
+
+  - it: rejects unknown PDB eviction policies
+    set:
+      pdb.unhealthyPodEvictionPolicy: Sometimes
+    asserts:
+      - failedTemplate:
+          errorPattern: "/pdb/unhealthyPodEvictionPolicy"

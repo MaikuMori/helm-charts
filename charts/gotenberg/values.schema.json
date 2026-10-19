@@ -1,1745 +1,971 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/$defs/helm-values",
-  "$defs": {
-    "helm-values": {
-      "type": "object",
-      "properties": {
-        "affinity": {
-          "$ref": "#/$defs/helm-values.affinity"
-        },
-        "api": {
-          "$ref": "#/$defs/helm-values.api"
-        },
-        "autoscaling": {
-          "$ref": "#/$defs/helm-values.autoscaling"
-        },
-        "chromium": {
-          "$ref": "#/$defs/helm-values.chromium"
-        },
-        "enableServiceLinks": {
-          "$ref": "#/$defs/helm-values.enableServiceLinks"
-        },
-        "enabled": {
-          "$ref": "#/$defs/helm-values.enabled"
-        },
-        "extraEnv": {
-          "$ref": "#/$defs/helm-values.extraEnv"
-        },
-        "fullnameOverride": {
-          "$ref": "#/$defs/helm-values.fullnameOverride"
-        },
-        "gateway": {
-          "$ref": "#/$defs/helm-values.gateway"
-        },
-        "global": {
-          "$ref": "#/$defs/helm-values.global"
-        },
-        "gotenberg": {
-          "$ref": "#/$defs/helm-values.gotenberg"
-        },
-        "image": {
-          "$ref": "#/$defs/helm-values.image"
-        },
-        "imagePullSecrets": {
-          "$ref": "#/$defs/helm-values.imagePullSecrets"
-        },
-        "ingress": {
-          "$ref": "#/$defs/helm-values.ingress"
-        },
-        "initContainers": {
-          "$ref": "#/$defs/helm-values.initContainers"
-        },
-        "libreOffice": {
-          "$ref": "#/$defs/helm-values.libreOffice"
-        },
-        "lifecycle": {
-          "$ref": "#/$defs/helm-values.lifecycle"
-        },
-        "livenessProbe": {
-          "$ref": "#/$defs/helm-values.livenessProbe"
-        },
-        "logging": {
-          "$ref": "#/$defs/helm-values.logging"
-        },
-        "metrics": {
-          "$ref": "#/$defs/helm-values.metrics"
-        },
-        "nameOverride": {
-          "$ref": "#/$defs/helm-values.nameOverride"
-        },
-        "networkPolicy": {
-          "$ref": "#/$defs/helm-values.networkPolicy"
-        },
-        "nodeSelector": {
-          "$ref": "#/$defs/helm-values.nodeSelector"
-        },
-        "pdb": {
-          "$ref": "#/$defs/helm-values.pdb"
-        },
-        "pdfEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines"
-        },
-        "podAnnotations": {
-          "$ref": "#/$defs/helm-values.podAnnotations"
-        },
-        "podLabels": {
-          "$ref": "#/$defs/helm-values.podLabels"
-        },
-        "podSecurityContext": {
-          "$ref": "#/$defs/helm-values.podSecurityContext"
-        },
-        "progressDeadlineSeconds": {
-          "$ref": "#/$defs/helm-values.progressDeadlineSeconds"
-        },
-        "prometheus": {
-          "$ref": "#/$defs/helm-values.prometheus"
-        },
-        "readinessProbe": {
-          "$ref": "#/$defs/helm-values.readinessProbe"
-        },
-        "replicaCount": {
-          "$ref": "#/$defs/helm-values.replicaCount"
-        },
-        "resources": {
-          "$ref": "#/$defs/helm-values.resources"
-        },
-        "securityContext": {
-          "$ref": "#/$defs/helm-values.securityContext"
-        },
-        "service": {
-          "$ref": "#/$defs/helm-values.service"
-        },
-        "serviceAccount": {
-          "$ref": "#/$defs/helm-values.serviceAccount"
-        },
-        "startupProbe": {
-          "$ref": "#/$defs/helm-values.startupProbe"
-        },
-        "strategy": {
-          "$ref": "#/$defs/helm-values.strategy"
-        },
-        "testImage": {
-          "$ref": "#/$defs/helm-values.testImage"
-        },
-        "testPodAnnotations": {
-          "$ref": "#/$defs/helm-values.testPodAnnotations"
-        },
-        "tolerations": {
-          "$ref": "#/$defs/helm-values.tolerations"
-        },
-        "topologySpreadConstraints": {
-          "$ref": "#/$defs/helm-values.topologySpreadConstraints"
-        },
-        "volumeMounts": {
-          "$ref": "#/$defs/helm-values.volumeMounts"
-        },
-        "volumes": {
-          "$ref": "#/$defs/helm-values.volumes"
-        },
-        "vpa": {
-          "$ref": "#/$defs/helm-values.vpa"
-        },
-        "webhook": {
-          "$ref": "#/$defs/helm-values.webhook"
-        }
-      },
-      "additionalProperties": false
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "affinity": {
+      "type": "object"
     },
-    "helm-values.affinity": {
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.api": {
+    "api": {
       "type": "object",
       "properties": {
         "basicAuthPassword": {
-          "$ref": "#/$defs/helm-values.api.basicAuthPassword"
+          "description": "Set the basic authentication password (ignored if existingSecret is set)",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "basicAuthUsername": {
-          "$ref": "#/$defs/helm-values.api.basicAuthUsername"
+          "description": "Set the basic authentication username (ignored if existingSecret is set)",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "bodyLimit": {
-          "$ref": "#/$defs/helm-values.api.bodyLimit"
+          "description": "Set the request body limit for multipart/form-data (e.g., \"100MB\")",
+          "type": "string"
         },
         "correlationIdHeader": {
-          "$ref": "#/$defs/helm-values.api.correlationIdHeader"
+          "description": "Set the header name to use for identifying requests (default \"Gotenberg-Trace\")",
+          "type": "string"
         },
         "disableDebugRouteTelemetry": {
-          "$ref": "#/$defs/helm-values.api.disableDebugRouteTelemetry"
+          "description": "Disable telemetry on the debug route",
+          "type": "boolean"
         },
         "disableDownloadFrom": {
-          "$ref": "#/$defs/helm-values.api.disableDownloadFrom"
+          "description": "Disable the download from feature",
+          "type": "boolean"
         },
         "disableHealthCheckLogging": {
-          "$ref": "#/$defs/helm-values.api.disableHealthCheckLogging"
+          "description": "Deprecated: Disable health check route telemetry. Use disableHealthCheckRouteTelemetry instead.",
+          "deprecated": true,
+          "type": "boolean"
         },
         "disableHealthCheckRouteTelemetry": {
-          "$ref": "#/$defs/helm-values.api.disableHealthCheckRouteTelemetry"
+          "description": "Disable health check route telemetry. Note: upstream default changed to true in Gotenberg 8.29.0 (health check telemetry is disabled by default even without this flag).",
+          "type": "boolean"
         },
         "disableRootRouteTelemetry": {
-          "$ref": "#/$defs/helm-values.api.disableRootRouteTelemetry"
+          "description": "Disable telemetry on the root route",
+          "type": "boolean"
         },
         "disableVersionRouteTelemetry": {
-          "$ref": "#/$defs/helm-values.api.disableVersionRouteTelemetry"
+          "description": "Disable telemetry on the version route",
+          "type": "boolean"
         },
         "downloadFromAllowList": {
-          "$ref": "#/$defs/helm-values.api.downloadFromAllowList"
+          "description": "Set the allowed URLs for the download from feature using a regular expression",
+          "type": "string"
         },
         "downloadFromDenyList": {
-          "$ref": "#/$defs/helm-values.api.downloadFromDenyList"
+          "description": "Set the denied URLs for the download from feature using a regular expression",
+          "type": "string"
         },
         "downloadFromDenyPrivateIps": {
-          "$ref": "#/$defs/helm-values.api.downloadFromDenyPrivateIps"
+          "description": "Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected. Added in Gotenberg 8.32.0.",
+          "type": "boolean"
         },
         "downloadFromDenyPublicIps": {
-          "$ref": "#/$defs/helm-values.api.downloadFromDenyPublicIps"
+          "description": "Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
+          "type": "boolean"
         },
         "downloadFromEnableEnvironmentProxy": {
-          "$ref": "#/$defs/helm-values.api.downloadFromEnableEnvironmentProxy"
+          "description": "Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.",
+          "type": "boolean"
         },
         "downloadFromMaxConcurrency": {
-          "$ref": "#/$defs/helm-values.api.downloadFromMaxConcurrency"
+          "description": "Set the maximum number of concurrent fetches per request for the download from feature. Leave unset for the upstream default (10); set to 0 for no limit. Added in Gotenberg 8.37.0.",
+          "type": [
+            "integer",
+            "null"
+          ]
         },
         "downloadFromMaxEntries": {
-          "$ref": "#/$defs/helm-values.api.downloadFromMaxEntries"
+          "description": "Set the maximum number of entries in the `downloadFrom` array. Set to 0 for no limit (default 0). Added in Gotenberg 8.37.0.",
+          "type": "integer"
         },
         "downloadFromMaxRetry": {
-          "$ref": "#/$defs/helm-values.api.downloadFromMaxRetry"
+          "description": "Set the maximum number of retries for the download from feature (default 4)",
+          "type": "integer"
         },
         "enableBasicAuth": {
-          "$ref": "#/$defs/helm-values.api.enableBasicAuth"
+          "description": "Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values",
+          "type": "boolean"
         },
         "enableDebugRoute": {
-          "$ref": "#/$defs/helm-values.api.enableDebugRoute"
+          "description": "Enable debug route for debugging purposes",
+          "type": "boolean"
         },
         "enableOidcAuth": {
-          "$ref": "#/$defs/helm-values.api.enableOidcAuth"
+          "description": "Enable OIDC bearer token authentication. Mutually exclusive with `enableBasicAuth`. Added in Gotenberg 8.36.0.",
+          "type": "boolean"
         },
         "existingSecret": {
-          "$ref": "#/$defs/helm-values.api.existingSecret"
+          "description": "Name of an existing secret containing basic auth credentials (keys: username, password)",
+          "type": "string"
         },
         "existingSecretPasswordKey": {
-          "$ref": "#/$defs/helm-values.api.existingSecretPasswordKey"
+          "description": "Key in existingSecret for the password (default: password)",
+          "type": "string"
         },
         "existingSecretUsernameKey": {
-          "$ref": "#/$defs/helm-values.api.existingSecretUsernameKey"
+          "description": "Key in existingSecret for the username (default: username)",
+          "type": "string"
         },
         "oidcAudience": {
-          "$ref": "#/$defs/helm-values.api.oidcAudience"
+          "description": "Set the expected OIDC audience - the token `aud` claim must contain it. Added in Gotenberg 8.36.0.",
+          "type": "string"
         },
         "oidcIssuer": {
-          "$ref": "#/$defs/helm-values.api.oidcIssuer"
+          "description": "Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match. Added in Gotenberg 8.36.0.",
+          "type": "string"
         },
         "oidcJwksUrl": {
-          "$ref": "#/$defs/helm-values.api.oidcJwksUrl"
+          "description": "Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty. Added in Gotenberg 8.36.0.",
+          "type": "string"
         },
         "port": {
-          "$ref": "#/$defs/helm-values.api.port"
+          "description": "Set the port on which the API should listen (default 3000)",
+          "type": "integer"
         },
         "rootPath": {
-          "$ref": "#/$defs/helm-values.api.rootPath"
+          "description": "Set the root path of the API - for service discovery via URL paths (default \"/\")",
+          "type": "string"
         },
         "startTimeout": {
-          "$ref": "#/$defs/helm-values.api.startTimeout"
+          "description": "Set the maximum duration to wait for the API to start",
+          "type": "string"
         },
         "timeout": {
-          "$ref": "#/$defs/helm-values.api.timeout"
+          "description": "Set the time limit for requests (default 30s)",
+          "type": "string"
         },
         "tlsSecretName": {
-          "$ref": "#/$defs/helm-values.api.tlsSecretName"
+          "description": "Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key)",
+          "type": "string"
         },
         "traceHeader": {
-          "$ref": "#/$defs/helm-values.api.traceHeader"
+          "description": "Deprecated: Set the header name to use for identifying requests. Use correlationIdHeader instead.",
+          "deprecated": true,
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.api.basicAuthPassword": {
-      "description": "-- Set the basic authentication password (ignored if existingSecret is set)"
-    },
-    "helm-values.api.basicAuthUsername": {
-      "description": "-- Set the basic authentication username (ignored if existingSecret is set)"
-    },
-    "helm-values.api.bodyLimit": {
-      "description": "-- Set the request body limit for multipart/form-data (e.g., \"100MB\")",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.correlationIdHeader": {
-      "description": "-- Set the header name to use for identifying requests (default \"Gotenberg-Trace\")",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.disableDebugRouteTelemetry": {
-      "description": "-- Disable telemetry on the debug route",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.disableDownloadFrom": {
-      "description": "-- Disable the download from feature",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.disableHealthCheckLogging": {
-      "description": "-- (DEPRECATED) Disable health check route telemetry. Use disableHealthCheckRouteTelemetry instead.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.disableHealthCheckRouteTelemetry": {
-      "description": "-- Disable health check route telemetry. Note: upstream default changed to true in Gotenberg 8.29.0 (health check telemetry is disabled by default even without this flag).",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.disableRootRouteTelemetry": {
-      "description": "-- Disable telemetry on the root route",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.disableVersionRouteTelemetry": {
-      "description": "-- Disable telemetry on the version route",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.downloadFromAllowList": {
-      "description": "-- Set the allowed URLs for the download from feature using a regular expression",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.downloadFromDenyList": {
-      "description": "-- Set the denied URLs for the download from feature using a regular expression",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.downloadFromDenyPrivateIps": {
-      "description": "-- Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected. Added in Gotenberg 8.32.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.downloadFromDenyPublicIps": {
-      "description": "-- Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.downloadFromEnableEnvironmentProxy": {
-      "description": "-- Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.downloadFromMaxConcurrency": {
-      "description": "-- (int) Set the maximum number of concurrent fetches per request for the download from feature. Leave unset for the upstream default (10); set to 0 for no limit. Added in Gotenberg 8.37.0."
-    },
-    "helm-values.api.downloadFromMaxEntries": {
-      "description": "-- Set the maximum number of entries in the `downloadFrom` array. Set to 0 for no limit (default 0). Added in Gotenberg 8.37.0.",
-      "type": "number",
-      "default": 0
-    },
-    "helm-values.api.downloadFromMaxRetry": {
-      "description": "-- Set the maximum number of retries for the download from feature (default 4)",
-      "type": "number",
-      "default": 4
-    },
-    "helm-values.api.enableBasicAuth": {
-      "description": "-- Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.enableDebugRoute": {
-      "description": "-- Enable debug route for debugging purposes",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.enableOidcAuth": {
-      "description": "-- Enable OIDC bearer token authentication. Mutually exclusive with `enableBasicAuth`. Added in Gotenberg 8.36.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.api.existingSecret": {
-      "description": "-- Name of an existing secret containing basic auth credentials (keys: username, password)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.existingSecretPasswordKey": {
-      "description": "-- Key in existingSecret for the password (default: password)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.existingSecretUsernameKey": {
-      "description": "-- Key in existingSecret for the username (default: username)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.oidcAudience": {
-      "description": "-- Set the expected OIDC audience - the token `aud` claim must contain it. Added in Gotenberg 8.36.0.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.oidcIssuer": {
-      "description": "-- Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match. Added in Gotenberg 8.36.0.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.oidcJwksUrl": {
-      "description": "-- Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty. Added in Gotenberg 8.36.0.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.port": {
-      "description": "-- Set the port on which the API should listen (default 3000)",
-      "type": "number",
-      "default": 3000
-    },
-    "helm-values.api.rootPath": {
-      "description": "-- Set the root path of the API - for service discovery via URL paths (default \"/\")",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.startTimeout": {
-      "description": "-- Set the maximum duration to wait for the API to start",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.timeout": {
-      "description": "-- Set the time limit for requests (default 30s)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.tlsSecretName": {
-      "description": "-- Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.api.traceHeader": {
-      "description": "-- (DEPRECATED) Set the header name to use for identifying requests. Use correlationIdHeader instead.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.autoscaling": {
+    "autoscaling": {
       "type": "object",
       "properties": {
         "behavior": {
-          "$ref": "#/$defs/helm-values.autoscaling.behavior"
+          "type": "object"
         },
         "enabled": {
-          "$ref": "#/$defs/helm-values.autoscaling.enabled"
+          "type": "boolean"
         },
         "extraMetrics": {
-          "$ref": "#/$defs/helm-values.autoscaling.extraMetrics"
+          "type": "array"
         },
         "maxReplicas": {
-          "$ref": "#/$defs/helm-values.autoscaling.maxReplicas"
+          "type": "integer"
         },
         "minReplicas": {
-          "$ref": "#/$defs/helm-values.autoscaling.minReplicas"
+          "type": "integer"
         },
         "targetCPUUtilizationPercentage": {
-          "$ref": "#/$defs/helm-values.autoscaling.targetCPUUtilizationPercentage"
+          "type": "integer"
         },
         "targetMemoryUtilizationPercentage": {
-          "$ref": "#/$defs/helm-values.autoscaling.targetMemoryUtilizationPercentage"
+          "description": "Target average memory utilization percentage. Leave unset to not scale on memory.",
+          "type": [
+            "integer",
+            "null"
+          ]
         }
       },
       "additionalProperties": false
     },
-    "helm-values.autoscaling.behavior": {
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.autoscaling.enabled": {
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.autoscaling.extraMetrics": {
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.autoscaling.maxReplicas": {
-      "type": "number",
-      "default": 100
-    },
-    "helm-values.autoscaling.minReplicas": {
-      "type": "number",
-      "default": 1
-    },
-    "helm-values.autoscaling.targetCPUUtilizationPercentage": {
-      "type": "number",
-      "default": 80
-    },
-    "helm-values.autoscaling.targetMemoryUtilizationPercentage": {
-      "type": "number"
-    },
-    "helm-values.chromium": {
+    "chromium": {
       "type": "object",
       "properties": {
         "allowFileAccessFromFiles": {
-          "$ref": "#/$defs/helm-values.chromium.allowFileAccessFromFiles"
+          "description": "Allow file:// URIs to read other file:// URIs",
+          "type": "boolean"
         },
         "allowInsecureLocalhost": {
-          "$ref": "#/$defs/helm-values.chromium.allowInsecureLocalhost"
+          "description": "Ignore TLS/SSL errors on localhost",
+          "type": "boolean"
         },
         "allowList": {
-          "$ref": "#/$defs/helm-values.chromium.allowList"
+          "description": "Set the allowed URLs for Chromium using a regular expression",
+          "type": "string"
         },
         "autoStart": {
-          "$ref": "#/$defs/helm-values.chromium.autoStart"
+          "description": "Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion",
+          "type": "boolean"
         },
         "clearCache": {
-          "$ref": "#/$defs/helm-values.chromium.clearCache"
+          "description": "Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0.",
+          "type": "boolean"
         },
         "clearCookies": {
-          "$ref": "#/$defs/helm-values.chromium.clearCookies"
+          "description": "Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0.",
+          "type": "boolean"
         },
         "clearStorage": {
-          "$ref": "#/$defs/helm-values.chromium.clearStorage"
+          "description": "Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0. Added in Gotenberg 8.36.0.",
+          "type": "boolean"
         },
         "denyList": {
-          "$ref": "#/$defs/helm-values.chromium.denyList"
+          "description": "Set the denied URLs for Chromium using a regular expression (default \"^file:///[^tmp].*\")",
+          "type": "string"
         },
         "denyPrivateIps": {
-          "$ref": "#/$defs/helm-values.chromium.denyPrivateIps"
+          "description": "Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. Skipped when `proxyServer` or `hostResolverRules` is set.",
+          "type": "boolean"
         },
         "denyPublicIps": {
-          "$ref": "#/$defs/helm-values.chromium.denyPublicIps"
+          "description": "Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
+          "type": "boolean"
         },
         "disableJavaScript": {
-          "$ref": "#/$defs/helm-values.chromium.disableJavaScript"
+          "description": "Disable JavaScript",
+          "type": "boolean"
         },
         "disableRoutes": {
-          "$ref": "#/$defs/helm-values.chromium.disableRoutes"
+          "description": "Disable the routes",
+          "type": "boolean"
         },
         "disableWebSecurity": {
-          "$ref": "#/$defs/helm-values.chromium.disableWebSecurity"
+          "description": "Don't enforce the same-origin policy",
+          "type": "boolean"
         },
         "enableEnvironmentProxy": {
-          "$ref": "#/$defs/helm-values.chromium.enableEnvironmentProxy"
+          "description": "Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset. Added in Gotenberg 8.35.0.",
+          "type": "boolean"
         },
         "hostResolverRules": {
-          "$ref": "#/$defs/helm-values.chromium.hostResolverRules"
+          "description": "Set custom mappings to the host resolver",
+          "type": "string"
         },
         "idleShutdownTimeout": {
-          "$ref": "#/$defs/helm-values.chromium.idleShutdownTimeout"
+          "description": "Duration after which idle Chromium browser processes are shut down (e.g., \"30s\"). Set to 0s or leave empty to disable (default 0s, disabled).",
+          "type": "string"
         },
         "ignoreCertificateErrors": {
-          "$ref": "#/$defs/helm-values.chromium.ignoreCertificateErrors"
+          "description": "Ignore the certificate errors",
+          "type": "boolean"
         },
         "incognito": {
-          "$ref": "#/$defs/helm-values.chromium.incognito"
+          "description": "Deprecated: Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored.",
+          "deprecated": true,
+          "type": "boolean"
         },
         "maxConcurrency": {
-          "$ref": "#/$defs/helm-values.chromium.maxConcurrency"
+          "description": "Maximum number of concurrent Chromium conversions (default 6)",
+          "type": "integer"
         },
         "maxQueueSize": {
-          "$ref": "#/$defs/helm-values.chromium.maxQueueSize"
+          "description": "Maximum request queue size for Chromium. Set to 0 to disable this feature.",
+          "type": "integer"
         },
         "proxyServer": {
-          "$ref": "#/$defs/helm-values.chromium.proxyServer"
+          "description": "Set the outbound proxy server; this switch only affects HTTP and HTTPS requests",
+          "type": "string"
         },
         "restartAfter": {
-          "$ref": "#/$defs/helm-values.chromium.restartAfter"
+          "description": "Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100)",
+          "type": "string"
         },
         "sharedBrowserContext": {
-          "$ref": "#/$defs/helm-values.chromium.sharedBrowserContext"
+          "description": "Share one browser context, with its cookies, cache and storage, across all conversions. Since Gotenberg 8.38.0 each conversion gets its own isolated context by default; enable this only when all callers trust each other. Added in Gotenberg 8.38.0.",
+          "type": "boolean"
         },
         "startTimeout": {
-          "$ref": "#/$defs/helm-values.chromium.startTimeout"
+          "description": "Maximum duration to wait for Chromium to start or restart",
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.chromium.allowFileAccessFromFiles": {
-      "description": "-- Allow file:// URIs to read other file:// URIs",
-      "type": "boolean",
-      "default": false
+    "enableServiceLinks": {
+      "description": "Set to false to stop Kubernetes injecting service discovery environment variables (`\u003cSVCNAME\u003e_SERVICE_HOST`, `\u003cSVCNAME\u003e_PORT`, ...) into the pod. These collide with Gotenberg's own configuration: a Service named `api` in the same namespace injects `API_PORT=tcp://\u003cclusterIP\u003e:\u003cport\u003e`, which Gotenberg reads as an override for `--api-port` and refuses to start.",
+      "type": "boolean"
     },
-    "helm-values.chromium.allowInsecureLocalhost": {
-      "description": "-- Ignore TLS/SSL errors on localhost",
-      "type": "boolean",
-      "default": false
+    "enabled": {
+      "description": "Specifies that chart can be used as a condition when it is a dependency. See https://helm.sh/docs/chart_best_practices/dependencies/#conditions-and-tags for more info. @ignored",
+      "type": "boolean"
     },
-    "helm-values.chromium.allowList": {
-      "description": "-- Set the allowed URLs for Chromium using a regular expression",
-      "type": "string",
-      "default": ""
+    "extraEnv": {
+      "description": "List of extra environment variables for gotenberg container. Gotenberg 8.29.0+ supports OpenTelemetry via standard OTEL_* environment variables. See https://gotenberg.dev/docs/configuration for details.",
+      "type": "array"
     },
-    "helm-values.chromium.autoStart": {
-      "description": "-- Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion",
-      "type": "boolean",
-      "default": false
+    "fullnameOverride": {
+      "type": "string"
     },
-    "helm-values.chromium.clearCache": {
-      "description": "-- Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.clearCookies": {
-      "description": "-- Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.clearStorage": {
-      "description": "-- Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext` since Gotenberg 8.38.0. Added in Gotenberg 8.36.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.denyList": {
-      "description": "-- Set the denied URLs for Chromium using a regular expression (default \"^file:///[^tmp].*\")",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.chromium.denyPrivateIps": {
-      "description": "-- Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0. Skipped when `proxyServer` or `hostResolverRules` is set.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.denyPublicIps": {
-      "description": "-- Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.disableJavaScript": {
-      "description": "-- Disable JavaScript",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.disableRoutes": {
-      "description": "-- Disable the routes",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.disableWebSecurity": {
-      "description": "-- Don't enforce the same-origin policy",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.enableEnvironmentProxy": {
-      "description": "-- Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset. Added in Gotenberg 8.35.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.hostResolverRules": {
-      "description": "-- Set custom mappings to the host resolver",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.chromium.idleShutdownTimeout": {
-      "description": "-- Duration after which idle Chromium browser processes are shut down (e.g., \"30s\"). Set to 0s or leave empty to disable (default 0s, disabled).",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.chromium.ignoreCertificateErrors": {
-      "description": "-- Ignore the certificate errors",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.incognito": {
-      "description": "-- (DEPRECATED) Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.maxConcurrency": {
-      "description": "-- Maximum number of concurrent Chromium conversions (default 6)",
-      "type": "number",
-      "default": 0
-    },
-    "helm-values.chromium.maxQueueSize": {
-      "description": "-- Maximum request queue size for Chromium. Set to 0 to disable this feature.",
-      "type": "number",
-      "default": 0
-    },
-    "helm-values.chromium.proxyServer": {
-      "description": "-- Set the outbound proxy server; this switch only affects HTTP and HTTPS requests",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.chromium.restartAfter": {
-      "description": "-- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.chromium.sharedBrowserContext": {
-      "description": "-- Share one browser context, with its cookies, cache and storage, across all conversions. Since Gotenberg 8.38.0 each conversion gets its own isolated context by default; enable this only when all callers trust each other. Added in Gotenberg 8.38.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.chromium.startTimeout": {
-      "description": "-- Maximum duration to wait for Chromium to start or restart",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.enableServiceLinks": {
-      "description": "-- Set to false to stop Kubernetes injecting service discovery environment variables (`<SVCNAME>_SERVICE_HOST`, `<SVCNAME>_PORT`, ...) into the pod. These collide with Gotenberg's own configuration: a Service named `api` in the same namespace injects `API_PORT=tcp://<clusterIP>:<port>`, which Gotenberg reads as an override for `--api-port` and refuses to start.",
-      "type": "boolean",
-      "default": true
-    },
-    "helm-values.enabled": {
-      "description": "-- Specifies that chart can be used as a condition when it is a dependency.\nSee https://helm.sh/docs/chart_best_practices/dependencies/#conditions-and-tags for more info.\n@ignored",
-      "type": "boolean",
-      "default": true
-    },
-    "helm-values.extraEnv": {
-      "description": "-- List of extra environment variables for gotenberg container.\nGotenberg 8.29.0+ supports OpenTelemetry via standard OTEL_* environment variables. See https://gotenberg.dev/docs/configuration for details.",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.fullnameOverride": {
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.gateway": {
+    "gateway": {
       "type": "object",
       "properties": {
         "annotations": {
-          "$ref": "#/$defs/helm-values.gateway.annotations"
+          "description": "Annotations to add to the HTTPRoute",
+          "type": "object"
         },
         "enabled": {
-          "$ref": "#/$defs/helm-values.gateway.enabled"
+          "description": "Set to true to create an HTTPRoute resource",
+          "type": "boolean"
         },
         "hostnames": {
-          "$ref": "#/$defs/helm-values.gateway.hostnames"
+          "description": "Hostnames to match for routing, see values.yaml for an example.",
+          "type": "array"
         },
         "labels": {
-          "$ref": "#/$defs/helm-values.gateway.labels"
+          "description": "Labels to add to the HTTPRoute",
+          "type": "object"
         },
         "parentRefs": {
-          "$ref": "#/$defs/helm-values.gateway.parentRefs"
+          "description": "Parent Gateway references, see values.yaml for an example.",
+          "type": "array"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.gateway.annotations": {
-      "description": "-- Annotations to add to the HTTPRoute",
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.gateway.enabled": {
-      "description": "-- Set to true to create an HTTPRoute resource",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.gateway.hostnames": {
-      "description": "- name: my-gateway\nnamespace: default\nsectionName: https\n-- Hostnames to match for routing, see values.yaml for an example.",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.gateway.labels": {
-      "description": "-- Labels to add to the HTTPRoute",
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.gateway.parentRefs": {
-      "description": "-- Parent Gateway references, see values.yaml for an example.",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.global": {
-      "description": "Global values shared across all (sub)charts"
-    },
-    "helm-values.gotenberg": {
+    "gotenberg": {
       "type": "object",
       "properties": {
         "gracefulShutdownDurationSec": {
-          "$ref": "#/$defs/helm-values.gotenberg.gracefulShutdownDurationSec"
+          "description": "Set the graceful shutdown duration (default 30s)",
+          "type": "integer"
         },
         "hideBanner": {
-          "$ref": "#/$defs/helm-values.gotenberg.hideBanner"
+          "description": "Hide the Gotenberg banner on startup",
+          "type": "boolean"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.gotenberg.gracefulShutdownDurationSec": {
-      "description": "-- Set the graceful shutdown duration (default 30s)",
-      "type": "number",
-      "default": 30
-    },
-    "helm-values.gotenberg.hideBanner": {
-      "description": "-- Hide the Gotenberg banner on startup",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.image": {
+    "image": {
       "type": "object",
       "properties": {
         "pullPolicy": {
-          "$ref": "#/$defs/helm-values.image.pullPolicy"
+          "type": "string"
         },
         "repository": {
-          "$ref": "#/$defs/helm-values.image.repository"
+          "type": "string"
         },
         "tag": {
-          "$ref": "#/$defs/helm-values.image.tag"
+          "description": "Overrides the image tag whose default is the chart appVersion.",
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.image.pullPolicy": {
-      "type": "string",
-      "default": "IfNotPresent"
+    "imagePullSecrets": {
+      "type": "array"
     },
-    "helm-values.image.repository": {
-      "type": "string",
-      "default": "gotenberg/gotenberg"
-    },
-    "helm-values.image.tag": {
-      "description": "-- Overrides the image tag whose default is the chart appVersion.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.imagePullSecrets": {
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.ingress": {
+    "ingress": {
       "type": "object",
       "properties": {
         "annotations": {
-          "$ref": "#/$defs/helm-values.ingress.annotations"
+          "description": "Set the annotations of the ingress",
+          "type": "object"
         },
         "className": {
-          "$ref": "#/$defs/helm-values.ingress.className"
+          "description": "Set the class name of the ingress",
+          "type": "string"
         },
         "enabled": {
-          "$ref": "#/$defs/helm-values.ingress.enabled"
+          "description": "Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet.",
+          "type": "boolean"
         },
         "hosts": {
-          "$ref": "#/$defs/helm-values.ingress.hosts"
+          "description": "Set the hostnames of the ingress, see values.yaml for an example.",
+          "type": "array"
         },
         "labels": {
-          "$ref": "#/$defs/helm-values.ingress.labels"
+          "description": "Set the labels of the ingress",
+          "type": "object"
         },
         "tls": {
-          "$ref": "#/$defs/helm-values.ingress.tls"
+          "description": "Set the TLS configuration for the ingress, see values.yaml for an example.",
+          "type": "array"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.ingress.annotations": {
-      "description": "-- Set the annotations of the ingress",
-      "type": "object",
-      "default": {}
+    "initContainers": {
+      "description": "List of init containers for the gotenberg pod",
+      "type": "array"
     },
-    "helm-values.ingress.className": {
-      "description": "-- Set the class name of the ingress",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.ingress.enabled": {
-      "description": "-- Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.ingress.hosts": {
-      "description": "-- Set the hostnames of the ingress, see values.yaml for an example.",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.ingress.labels": {
-      "description": "-- Set the labels of the ingress",
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.ingress.tls": {
-      "description": "-- Set the TLS configuration for the ingress, see values.yaml for an example.",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.initContainers": {
-      "description": "-- List of init containers for the gotenberg pod",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.libreOffice": {
+    "libreOffice": {
       "type": "object",
       "properties": {
         "allowList": {
-          "$ref": "#/$defs/helm-values.libreOffice.allowList"
+          "description": "Set the allowed URLs for LibreOffice outbound fetches (embedded external content in OOXML/RTF/ODF) using a regular expression. Added in Gotenberg 8.32.0.",
+          "type": "string"
         },
         "autoStart": {
-          "$ref": "#/$defs/helm-values.libreOffice.autoStart"
+          "description": "Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)",
+          "type": "boolean"
         },
         "denyList": {
-          "$ref": "#/$defs/helm-values.libreOffice.denyList"
+          "description": "Set the denied URLs for LibreOffice outbound fetches using a regular expression. Added in Gotenberg 8.32.0.",
+          "type": "string"
         },
         "denyPrivateIps": {
-          "$ref": "#/$defs/helm-values.libreOffice.denyPrivateIps"
+          "description": "Reject LibreOffice outbound fetches resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0.",
+          "type": "boolean"
         },
         "denyPublicIps": {
-          "$ref": "#/$defs/helm-values.libreOffice.denyPublicIps"
+          "description": "Reject LibreOffice outbound fetches resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
+          "type": "boolean"
         },
         "disableRoutes": {
-          "$ref": "#/$defs/helm-values.libreOffice.disableRoutes"
+          "description": "Disable the routes",
+          "type": "boolean"
         },
         "enableEnvironmentProxy": {
-          "$ref": "#/$defs/helm-values.libreOffice.enableEnvironmentProxy"
+          "description": "Route LibreOffice outbound fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.",
+          "type": "boolean"
         },
         "idleShutdownTimeout": {
-          "$ref": "#/$defs/helm-values.libreOffice.idleShutdownTimeout"
+          "description": "Duration after which idle LibreOffice processes are shut down (e.g., \"30s\"). Set to 0s or leave empty to disable (default 0s, disabled).",
+          "type": "string"
         },
         "maxQueueSize": {
-          "$ref": "#/$defs/helm-values.libreOffice.maxQueueSize"
+          "description": "Maximum request queue size for LibreOffice. Set to 0 to disable this feature.",
+          "type": "integer"
         },
         "restartAfter": {
-          "$ref": "#/$defs/helm-values.libreOffice.restartAfter"
+          "description": "Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)",
+          "type": "string"
         },
         "startTimeout": {
-          "$ref": "#/$defs/helm-values.libreOffice.startTimeout"
+          "description": "Maximum duration to wait for LibreOffice to start or restart (default 10s)",
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.libreOffice.allowList": {
-      "description": "-- Set the allowed URLs for LibreOffice outbound fetches (embedded external content in OOXML/RTF/ODF) using a regular expression. Added in Gotenberg 8.32.0.",
-      "type": "string",
-      "default": ""
+    "lifecycle": {
+      "description": "Define the container lifecycle hooks. A `preStop` hook keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates. Gotenberg's own graceful shutdown does not cover this: it stops as soon as it is idle, so an idle pod closes its listener within milliseconds of SIGTERM.",
+      "type": "object"
     },
-    "helm-values.libreOffice.autoStart": {
-      "description": "-- Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.libreOffice.denyList": {
-      "description": "-- Set the denied URLs for LibreOffice outbound fetches using a regular expression. Added in Gotenberg 8.32.0.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.libreOffice.denyPrivateIps": {
-      "description": "-- Reject LibreOffice outbound fetches resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.libreOffice.denyPublicIps": {
-      "description": "-- Reject LibreOffice outbound fetches resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.libreOffice.disableRoutes": {
-      "description": "-- Disable the routes",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.libreOffice.enableEnvironmentProxy": {
-      "description": "-- Route LibreOffice outbound fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.libreOffice.idleShutdownTimeout": {
-      "description": "-- Duration after which idle LibreOffice processes are shut down (e.g., \"30s\"). Set to 0s or leave empty to disable (default 0s, disabled).",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.libreOffice.maxQueueSize": {
-      "description": "-- Maximum request queue size for LibreOffice. Set to 0 to disable this feature.",
-      "type": "number",
-      "default": 0
-    },
-    "helm-values.libreOffice.restartAfter": {
-      "description": "-- Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.libreOffice.startTimeout": {
-      "description": "-- Maximum duration to wait for LibreOffice to start or restart (default 10s)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.lifecycle": {
-      "description": "-- Define the container lifecycle hooks. A `preStop` hook keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates. Gotenberg's own graceful shutdown does not cover this: it stops as soon as it is idle, so an idle pod closes its listener within milliseconds of SIGTERM.",
+    "livenessProbe": {
+      "description": "Define the liveness probe object for the container.",
       "type": "object",
-      "default": {}
-    },
-    "helm-values.livenessProbe": {
-      "description": "-- Define the liveness probe object for the container.\nlivenessProbe: {}",
-      "type": "object",
-      "default": {
+      "properties": {
         "httpGet": {
-          "path": "/health",
-          "port": "http"
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          }
         }
       }
     },
-    "helm-values.logging": {
+    "logging": {
       "type": "object",
       "properties": {
         "enableGcpFields": {
-          "$ref": "#/$defs/helm-values.logging.enableGcpFields"
+          "description": "Deprecated: Enable GCP log field mapping for Cloud Run. Use stdEnableGcpFields instead.",
+          "deprecated": true,
+          "type": "boolean"
         },
         "enableGcpSeverity": {
-          "$ref": "#/$defs/helm-values.logging.enableGcpSeverity"
+          "description": "Enable GCP severity field mapping",
+          "type": "boolean"
         },
         "fieldsPrefix": {
-          "$ref": "#/$defs/helm-values.logging.fieldsPrefix"
+          "description": "Prepend a specified prefix to each field in the logs",
+          "type": "string"
         },
         "format": {
-          "$ref": "#/$defs/helm-values.logging.format"
+          "description": "Deprecated: Set log format. Use stdFormat instead.",
+          "deprecated": true,
+          "type": "string"
         },
         "level": {
-          "$ref": "#/$defs/helm-values.logging.level"
+          "description": "Set the log level - error, warn, info, or debug (default \"info\")",
+          "type": "string"
         },
         "stdEnableGcpFields": {
-          "$ref": "#/$defs/helm-values.logging.stdEnableGcpFields"
+          "description": "Enable GCP log standard output field mapping for Cloud Run",
+          "type": "boolean"
         },
         "stdFormat": {
-          "$ref": "#/$defs/helm-values.logging.stdFormat"
+          "description": "Set log standard output format - auto, json, or text (default \"auto\")",
+          "type": "string"
         },
         "stdLevelCase": {
-          "$ref": "#/$defs/helm-values.logging.stdLevelCase"
+          "description": "Set the case of the `level` field in standard output - lower or upper (default \"lower\"). Added in Gotenberg 8.34.0.",
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.logging.enableGcpFields": {
-      "description": "-- (DEPRECATED) Enable GCP log field mapping for Cloud Run. Use stdEnableGcpFields instead.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.logging.enableGcpSeverity": {
-      "description": "-- Enable GCP severity field mapping",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.logging.fieldsPrefix": {
-      "description": "-- Prepend a specified prefix to each field in the logs",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.logging.format": {
-      "description": "-- (DEPRECATED) Set log format. Use stdFormat instead.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.logging.level": {
-      "description": "-- Set the log level - error, warn, info, or debug (default \"info\")",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.logging.stdEnableGcpFields": {
-      "description": "-- Enable GCP log standard output field mapping for Cloud Run",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.logging.stdFormat": {
-      "description": "-- Set log standard output format - auto, json, or text (default \"auto\")",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.logging.stdLevelCase": {
-      "description": "-- Set the case of the `level` field in standard output - lower or upper (default \"lower\"). Added in Gotenberg 8.34.0.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.metrics": {
+    "metrics": {
       "type": "object",
       "properties": {
         "serviceMonitor": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor"
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "description": "Additional annotations for the service monitor",
+              "type": "object"
+            },
+            "enabled": {
+              "description": "Enable ServiceMonitor",
+              "type": "boolean"
+            },
+            "honorLabels": {
+              "description": "HonorLabels chooses the metric’s labels on collisions with target labels",
+              "type": "boolean"
+            },
+            "interval": {
+              "description": "Interval at which metrics should be scraped",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "jobLabel": {
+              "description": "Optional job label for the target service in Prometheus",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "labels": {
+              "description": "Additional labels for the service monitor",
+              "type": "object"
+            },
+            "metricRelabelings": {
+              "description": "List of metric relabel configs to apply to samples before ingestion",
+              "type": "array"
+            },
+            "namespace": {
+              "description": "Namespace for ServiceMonitor, defaults to release namespace",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "relabelings": {
+              "description": "List of relabel configs to apply to samples before scraping",
+              "type": "array"
+            },
+            "scrapeTimeout": {
+              "description": "Timeout after which the scrape is ended",
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
     },
-    "helm-values.metrics.serviceMonitor": {
-      "type": "object",
-      "properties": {
-        "annotations": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.annotations"
-        },
-        "enabled": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.enabled"
-        },
-        "honorLabels": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.honorLabels"
-        },
-        "interval": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.interval"
-        },
-        "jobLabel": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.jobLabel"
-        },
-        "labels": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.labels"
-        },
-        "metricRelabelings": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.metricRelabelings"
-        },
-        "namespace": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.namespace"
-        },
-        "relabelings": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.relabelings"
-        },
-        "scrapeTimeout": {
-          "$ref": "#/$defs/helm-values.metrics.serviceMonitor.scrapeTimeout"
-        }
-      },
-      "additionalProperties": false
+    "nameOverride": {
+      "type": "string"
     },
-    "helm-values.metrics.serviceMonitor.annotations": {
-      "description": "-- Additional annotations for the service monitor",
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.metrics.serviceMonitor.enabled": {
-      "description": "-- Enable ServiceMonitor",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.metrics.serviceMonitor.honorLabels": {
-      "description": "-- HonorLabels chooses the metric’s labels on collisions with target labels",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.metrics.serviceMonitor.interval": {
-      "description": "-- (string) Interval at which metrics should be scraped"
-    },
-    "helm-values.metrics.serviceMonitor.jobLabel": {
-      "description": "-- (string) Optional job label for the target service in Prometheus"
-    },
-    "helm-values.metrics.serviceMonitor.labels": {
-      "description": "-- Additional labels for the service monitor",
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.metrics.serviceMonitor.metricRelabelings": {
-      "description": "-- List of metric relabel configs to apply to samples before ingestion",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.metrics.serviceMonitor.namespace": {
-      "description": "-- (string) Namespace for ServiceMonitor, defaults to release namespace"
-    },
-    "helm-values.metrics.serviceMonitor.relabelings": {
-      "description": "-- List of relabel configs to apply to samples before scraping",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.metrics.serviceMonitor.scrapeTimeout": {
-      "description": "-- (string) Timeout after which the scrape is ended"
-    },
-    "helm-values.nameOverride": {
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.networkPolicy": {
+    "networkPolicy": {
       "type": "object",
       "properties": {
         "allowEgress": {
-          "$ref": "#/$defs/helm-values.networkPolicy.allowEgress"
+          "type": "boolean"
         },
         "allowIngress": {
-          "$ref": "#/$defs/helm-values.networkPolicy.allowIngress"
+          "type": "boolean"
         },
         "enabled": {
-          "$ref": "#/$defs/helm-values.networkPolicy.enabled"
+          "type": "boolean"
         },
         "extraEgress": {
-          "$ref": "#/$defs/helm-values.networkPolicy.extraEgress"
+          "type": "array"
         },
         "extraIngress": {
-          "$ref": "#/$defs/helm-values.networkPolicy.extraIngress"
+          "type": "array"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.networkPolicy.allowEgress": {
-      "description": "Allow all connections to any destinations. To be set to false if extraEgress is used.",
-      "type": "boolean",
-      "default": true
+    "nodeSelector": {
+      "type": "object"
     },
-    "helm-values.networkPolicy.allowIngress": {
-      "description": "Allow all connections from any source. To be set to false if extraIngress is used.",
-      "type": "boolean",
-      "default": true
-    },
-    "helm-values.networkPolicy.enabled": {
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.networkPolicy.extraEgress": {
-      "description": "extraIngress:\n  - from:\n    - podSelector:\n        matchLabels:\n          component: apache\n    ports:\n    - port: 8080\n      protocol: TCP\nConfig custom egress rules to the NetworkPolicy.",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.networkPolicy.extraIngress": {
-      "description": "Config custom ingress rules to the NetworkPolicy.",
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.nodeSelector": {
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.pdb": {
+    "pdb": {
       "type": "object",
       "properties": {
         "create": {
-          "$ref": "#/$defs/helm-values.pdb.create"
+          "type": "boolean"
         },
         "maxUnavailable": {
-          "$ref": "#/$defs/helm-values.pdb.maxUnavailable"
+          "type": "string"
         },
         "minAvailable": {
-          "$ref": "#/$defs/helm-values.pdb.minAvailable"
+          "type": "integer"
         },
         "unhealthyPodEvictionPolicy": {
-          "$ref": "#/$defs/helm-values.pdb.unhealthyPodEvictionPolicy"
+          "description": "Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow)",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "IfHealthyBudget",
+            "AlwaysAllow",
+            null
+          ]
         }
       },
       "additionalProperties": false
     },
-    "helm-values.pdb.create": {
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.pdb.maxUnavailable": {
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdb.minAvailable": {
-      "type": "number",
-      "default": 1
-    },
-    "helm-values.pdb.unhealthyPodEvictionPolicy": {
-      "description": "-- Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow)"
-    },
-    "helm-values.pdfEngines": {
+    "pdfEngines": {
       "type": "object",
       "properties": {
         "convertEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.convertEngines"
+          "description": "Set the PDF engines and their order for the convert feature (default libreoffice-pdfengine)",
+          "type": "string"
         },
         "disableRoutes": {
-          "$ref": "#/$defs/helm-values.pdfEngines.disableRoutes"
+          "description": "Disable the routes",
+          "type": "boolean"
         },
         "embedEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.embedEngines"
+          "description": "Set the PDF engines and their order for the file embedding feature (default pdfcpu)",
+          "type": "string"
         },
         "embedMetadataEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.embedMetadataEngines"
+          "description": "Set the PDF engines and their order for the embed metadata feature (default qpdf)",
+          "type": "string"
         },
         "encryptEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.encryptEngines"
+          "description": "Set the PDF engines and their order for the password protection feature (default qpdf,pdftk,pdfcpu)",
+          "type": "string"
         },
         "engines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.engines"
+          "description": "Deprecated: Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines).",
+          "deprecated": true,
+          "type": "string"
         },
         "facturXEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.facturXEngines"
+          "description": "Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0.",
+          "type": "string"
         },
         "flattenEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.flattenEngines"
+          "description": "Set the PDF engines and their order for the flatten feature (default qpdf)",
+          "type": "string"
         },
         "maxConcurrency": {
-          "$ref": "#/$defs/helm-values.pdfEngines.maxConcurrency"
+          "description": "Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests; does not apply to LibreOffice. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0.",
+          "type": "integer"
         },
         "mergeEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.mergeEngines"
+          "description": "Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk)",
+          "type": "string"
         },
         "optimizeImagesEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.optimizeImagesEngines"
+          "description": "Set the PDF engines and their order for the image optimization feature; empty means all (default pdfcpu). Added in Gotenberg 8.36.0.",
+          "type": "string"
         },
         "readBookmarksEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.readBookmarksEngines"
+          "description": "Set the PDF engines and their order for the read bookmarks feature (default pdfcpu)",
+          "type": "string"
         },
         "readMetadataEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.readMetadataEngines"
+          "description": "Set the PDF engines and their order for the read metadata feature (default exiftool)",
+          "type": "string"
         },
         "rotateEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.rotateEngines"
+          "description": "Set the PDF engines and their order for the rotate feature (default pdfcpu,pdftk)",
+          "type": "string"
         },
         "splitEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.splitEngines"
+          "description": "Set the PDF engines and their order for the split feature (default pdfcpu,qpdf,pdftk)",
+          "type": "string"
         },
         "stampEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.stampEngines"
+          "description": "Set the PDF engines and their order for the stamp feature (default pdfcpu,pdftk)",
+          "type": "string"
         },
         "watermarkEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.watermarkEngines"
+          "description": "Set the PDF engines and their order for the watermark feature (default pdfcpu,pdftk)",
+          "type": "string"
         },
         "writeBookmarksEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.writeBookmarksEngines"
+          "description": "Set the PDF engines and their order for the write bookmarks feature (default pdfcpu,pdftk)",
+          "type": "string"
         },
         "writeMetadataEngines": {
-          "$ref": "#/$defs/helm-values.pdfEngines.writeMetadataEngines"
+          "description": "Set the PDF engines and their order for the write metadata feature (default exiftool)",
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.pdfEngines.convertEngines": {
-      "description": "-- Set the PDF engines and their order for the convert feature (default libreoffice-pdfengine)",
-      "type": "string",
-      "default": ""
+    "podAnnotations": {
+      "type": "object"
     },
-    "helm-values.pdfEngines.disableRoutes": {
-      "description": "-- Disable the routes",
-      "type": "boolean",
-      "default": false
+    "podLabels": {
+      "description": "List of additional pod labels",
+      "type": "object"
     },
-    "helm-values.pdfEngines.embedEngines": {
-      "description": "-- Set the PDF engines and their order for the file embedding feature (default pdfcpu)",
-      "type": "string",
-      "default": ""
+    "podSecurityContext": {
+      "type": "object"
     },
-    "helm-values.pdfEngines.embedMetadataEngines": {
-      "description": "-- Set the PDF engines and their order for the embed metadata feature (default qpdf)",
-      "type": "string",
-      "default": ""
+    "progressDeadlineSeconds": {
+      "type": "integer"
     },
-    "helm-values.pdfEngines.encryptEngines": {
-      "description": "-- Set the PDF engines and their order for the password protection feature (default qpdf,pdftk,pdfcpu)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.engines": {
-      "description": "-- (DEPRECATED) Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines).",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.facturXEngines": {
-      "description": "-- Set the PDF engines and their order for the Factur-X XMP metadata feature (default qpdf). Added in Gotenberg 8.34.0.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.flattenEngines": {
-      "description": "-- Set the PDF engines and their order for the flatten feature (default qpdf)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.maxConcurrency": {
-      "description": "-- Maximum number of PDF files the per-file features (metadata, encryption, stamps, watermarks, flattening, ...) process at once, across all requests; does not apply to LibreOffice. Set to 0 to use the upstream default (default 1). Added in Gotenberg 8.37.0.",
-      "type": "number",
-      "default": 0
-    },
-    "helm-values.pdfEngines.mergeEngines": {
-      "description": "-- Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.optimizeImagesEngines": {
-      "description": "-- Set the PDF engines and their order for the image optimization feature; empty means all (default pdfcpu). Added in Gotenberg 8.36.0.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.readBookmarksEngines": {
-      "description": "-- Set the PDF engines and their order for the read bookmarks feature (default pdfcpu)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.readMetadataEngines": {
-      "description": "-- Set the PDF engines and their order for the read metadata feature (default exiftool)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.rotateEngines": {
-      "description": "-- Set the PDF engines and their order for the rotate feature (default pdfcpu,pdftk)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.splitEngines": {
-      "description": "-- Set the PDF engines and their order for the split feature (default pdfcpu,qpdf,pdftk)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.stampEngines": {
-      "description": "-- Set the PDF engines and their order for the stamp feature (default pdfcpu,pdftk)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.watermarkEngines": {
-      "description": "-- Set the PDF engines and their order for the watermark feature (default pdfcpu,pdftk)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.writeBookmarksEngines": {
-      "description": "-- Set the PDF engines and their order for the write bookmarks feature (default pdfcpu,pdftk)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.pdfEngines.writeMetadataEngines": {
-      "description": "-- Set the PDF engines and their order for the write metadata feature (default exiftool)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.podAnnotations": {
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.podLabels": {
-      "description": "-- List of additional pod labels",
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.podSecurityContext": {
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.progressDeadlineSeconds": {
-      "type": "number",
-      "default": 120
-    },
-    "helm-values.prometheus": {
+    "prometheus": {
       "type": "object",
       "properties": {
         "collectInterval": {
-          "$ref": "#/$defs/helm-values.prometheus.collectInterval"
+          "description": "Set the interval for collecting modules' metrics (default 1s)",
+          "type": "string"
         },
         "disableCollect": {
-          "$ref": "#/$defs/helm-values.prometheus.disableCollect"
+          "description": "Disable the collect of metrics",
+          "type": "boolean"
         },
         "disableRouteTelemetry": {
-          "$ref": "#/$defs/helm-values.prometheus.disableRouteTelemetry"
+          "description": "Disable route telemetry for the Prometheus metrics endpoint",
+          "type": "boolean"
         },
         "disableRouterLogging": {
-          "$ref": "#/$defs/helm-values.prometheus.disableRouterLogging"
+          "description": "Deprecated: Disable the route logging. Use disableRouteTelemetry instead.",
+          "deprecated": true,
+          "type": "boolean"
         },
         "metricsPath": {
-          "$ref": "#/$defs/helm-values.prometheus.metricsPath"
+          "description": "Set the metrics endpoint path (default \"/prometheus/metrics\")",
+          "type": "string"
         },
         "namespace": {
-          "$ref": "#/$defs/helm-values.prometheus.namespace"
+          "description": "Set the namespace of modules' metrics (default \"gotenberg\")",
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.prometheus.collectInterval": {
-      "description": "-- Set the interval for collecting modules' metrics (default 1s)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.prometheus.disableCollect": {
-      "description": "-- Disable the collect of metrics",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.prometheus.disableRouteTelemetry": {
-      "description": "-- Disable route telemetry for the Prometheus metrics endpoint",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.prometheus.disableRouterLogging": {
-      "description": "-- (DEPRECATED) Disable the route logging. Use disableRouteTelemetry instead.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.prometheus.metricsPath": {
-      "description": "-- Set the metrics endpoint path (default \"/prometheus/metrics\")",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.prometheus.namespace": {
-      "description": "-- Set the namespace of modules' metrics (default \"gotenberg\")",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.readinessProbe": {
-      "description": "-- Define the readiness probe object for the container.\nreadinessProbe: {}",
+    "readinessProbe": {
+      "description": "Define the readiness probe object for the container.",
       "type": "object",
-      "default": {
+      "properties": {
         "httpGet": {
-          "path": "/health",
-          "port": "http"
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          }
         }
       }
     },
-    "helm-values.replicaCount": {
-      "type": "number",
-      "default": 1
+    "replicaCount": {
+      "type": "integer"
     },
-    "helm-values.resources": {
-      "type": "object",
-      "default": {}
+    "resources": {
+      "type": "object"
     },
-    "helm-values.securityContext": {
-      "description": "-- Define the security context for the container. By default will use upstream recommended values.\n@default -- `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set.",
-      "type": "object",
-      "default": {}
+    "securityContext": {
+      "description": "Define the security context for the container. By default will use upstream recommended values.",
+      "type": "object"
     },
-    "helm-values.service": {
+    "service": {
       "type": "object",
       "properties": {
         "annotations": {
-          "$ref": "#/$defs/helm-values.service.annotations"
+          "description": "Annotations to add to the service",
+          "type": "object"
         },
         "loadBalancerIP": {
-          "$ref": "#/$defs/helm-values.service.loadBalancerIP"
+          "description": "Deprecated: Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead.",
+          "deprecated": true,
+          "type": "string"
         },
         "port": {
-          "$ref": "#/$defs/helm-values.service.port"
+          "type": "integer"
         },
         "type": {
-          "$ref": "#/$defs/helm-values.service.type"
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.service.annotations": {
-      "description": "-- Annotations to add to the service",
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.service.loadBalancerIP": {
-      "description": "-- (DEPRECATED) Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.service.port": {
-      "type": "number",
-      "default": 80
-    },
-    "helm-values.service.type": {
-      "type": "string",
-      "default": "ClusterIP"
-    },
-    "helm-values.serviceAccount": {
+    "serviceAccount": {
       "type": "object",
       "properties": {
         "annotations": {
-          "$ref": "#/$defs/helm-values.serviceAccount.annotations"
+          "description": "Annotations to add to the service account",
+          "type": "object"
         },
         "automount": {
-          "$ref": "#/$defs/helm-values.serviceAccount.automount"
+          "description": "Mount the service account's API token in the pods. Gotenberg doesn't use the Kubernetes API.",
+          "type": "boolean"
         },
         "create": {
-          "$ref": "#/$defs/helm-values.serviceAccount.create"
+          "description": "Specifies whether a service account should be created",
+          "type": "boolean"
         },
         "name": {
-          "$ref": "#/$defs/helm-values.serviceAccount.name"
+          "description": "The name of the service account to use. # If not set and create is true, a name is generated using the fullname template",
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.serviceAccount.annotations": {
-      "description": "-- Annotations to add to the service account",
+    "startupProbe": {
+      "description": "Define the startup probe object for the container.",
       "type": "object",
-      "default": {}
-    },
-    "helm-values.serviceAccount.automount": {
-      "description": "-- Mount the service account's API token in the pods. Gotenberg doesn't use the Kubernetes API.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.serviceAccount.create": {
-      "description": "-- Specifies whether a service account should be created",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.serviceAccount.name": {
-      "description": "-- The name of the service account to use.\nIf not set and create is true, a name is generated using the fullname template",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.startupProbe": {
-      "description": "-- Define the startup probe object for the container.\nstartupProbe: {}",
-      "type": "object",
-      "default": {
-        "failureThreshold": 30,
-        "httpGet": {
-          "path": "/health",
-          "port": "http"
+      "properties": {
+        "failureThreshold": {
+          "type": "integer"
         },
-        "periodSeconds": 10
+        "httpGet": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "port": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          }
+        },
+        "periodSeconds": {
+          "type": "integer"
+        }
       }
     },
-    "helm-values.strategy": {
-      "description": "Strategy is utilized to configure the desired upgrade approach and configuration for the deployment.",
-      "type": "object",
-      "default": {}
+    "strategy": {
+      "type": "object"
     },
-    "helm-values.testImage": {
+    "testImage": {
+      "description": "Image configuration for the helm test pod",
       "type": "object",
       "properties": {
         "repository": {
-          "$ref": "#/$defs/helm-values.testImage.repository"
+          "description": "Repository for the test image",
+          "type": "string"
         },
         "tag": {
-          "$ref": "#/$defs/helm-values.testImage.tag"
+          "description": "Tag for the test image",
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.testImage.repository": {
-      "description": "-- Repository for the test image",
-      "type": "string",
-      "default": "busybox"
+    "testPodAnnotations": {
+      "description": "Set annotations for the helm test pods (for example to disable certain kube-score checks)",
+      "type": "object"
     },
-    "helm-values.testImage.tag": {
-      "description": "-- Tag for the test image",
-      "type": "string",
-      "default": "latest"
+    "tolerations": {
+      "type": "array"
     },
-    "helm-values.testPodAnnotations": {
-      "description": "-- Set annotations for the helm test pods (for example to disable certain kube-score checks)",
-      "type": "object",
-      "default": {}
+    "topologySpreadConstraints": {
+      "type": "array"
     },
-    "helm-values.tolerations": {
-      "type": "array",
-      "default": [],
-      "items": {}
+    "volumeMounts": {
+      "type": "array"
     },
-    "helm-values.topologySpreadConstraints": {
-      "type": "array",
-      "default": [],
-      "items": {}
+    "volumes": {
+      "type": "array"
     },
-    "helm-values.volumeMounts": {
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.volumes": {
-      "type": "array",
-      "default": [],
-      "items": {}
-    },
-    "helm-values.vpa": {
+    "vpa": {
       "type": "object",
       "properties": {
         "create": {
-          "$ref": "#/$defs/helm-values.vpa.create"
+          "description": "Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler",
+          "type": "boolean"
         },
         "resourcePolicy": {
-          "$ref": "#/$defs/helm-values.vpa.resourcePolicy"
+          "description": "Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example.",
+          "type": "object"
         },
         "updateMode": {
-          "$ref": "#/$defs/helm-values.vpa.updateMode"
+          "description": "Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only)",
+          "type": "string"
         }
       },
       "additionalProperties": false
     },
-    "helm-values.vpa.create": {
-      "description": "-- Create a VerticalPodAutoscaler resource for right-sizing pod resources.\nRequires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.vpa.resourcePolicy": {
-      "description": "-- Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example.",
-      "type": "object",
-      "default": {}
-    },
-    "helm-values.vpa.updateMode": {
-      "description": "-- Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only)",
-      "type": "string",
-      "default": "Auto"
-    },
-    "helm-values.webhook": {
+    "webhook": {
       "type": "object",
       "properties": {
         "allowList": {
-          "$ref": "#/$defs/helm-values.webhook.allowList"
+          "description": "Set the allowed URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks.",
+          "type": "string"
         },
         "clientTimeout": {
-          "$ref": "#/$defs/helm-values.webhook.clientTimeout"
+          "description": "Set the time limit for requests to the webhook (default 30s)",
+          "type": "string"
         },
         "denyList": {
-          "$ref": "#/$defs/helm-values.webhook.denyList"
+          "description": "Set the denied URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks. Note: 8.31.0's permissive-by-default revert means this defaults to empty again in 8.32.0+; opt into IP-class filtering via `denyPrivateIps` / `denyPublicIps`.",
+          "type": "string"
         },
         "denyPrivateIps": {
-          "$ref": "#/$defs/helm-values.webhook.denyPrivateIps"
+          "description": "Reject webhook URLs (success, error, events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0.",
+          "type": "boolean"
         },
         "denyPublicIps": {
-          "$ref": "#/$defs/helm-values.webhook.denyPublicIps"
+          "description": "Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
+          "type": "boolean"
         },
         "disable": {
-          "$ref": "#/$defs/helm-values.webhook.disable"
+          "description": "Disable the webhook feature",
+          "type": "boolean"
         },
         "enableEnvironmentProxy": {
-          "$ref": "#/$defs/helm-values.webhook.enableEnvironmentProxy"
+          "description": "Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.",
+          "type": "boolean"
         },
         "enableSyncMode": {
-          "$ref": "#/$defs/helm-values.webhook.enableSyncMode"
+          "description": "Enable synchronous mode for the webhook feature",
+          "type": "boolean"
         },
         "errorAllowList": {
-          "$ref": "#/$defs/helm-values.webhook.errorAllowList"
+          "description": "Deprecated: Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.",
+          "deprecated": true,
+          "type": "string"
         },
         "errorDenyList": {
-          "$ref": "#/$defs/helm-values.webhook.errorDenyList"
+          "description": "Deprecated: Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.",
+          "deprecated": true,
+          "type": "string"
         },
         "maxRetry": {
-          "$ref": "#/$defs/helm-values.webhook.maxRetry"
+          "description": "Set the maximum number of retries for the webhook feature (default 4)",
+          "type": "string"
         },
         "retryMaxWait": {
-          "$ref": "#/$defs/helm-values.webhook.retryMaxWait"
+          "description": "Set the maximum duration to wait before trying to call the webhook again (default 30s)",
+          "type": "string"
         },
         "retryMinWait": {
-          "$ref": "#/$defs/helm-values.webhook.retryMinWait"
+          "description": "Set the minimum duration to wait before trying to call the webhook again (default 1s)",
+          "type": "string"
         }
       },
       "additionalProperties": false
-    },
-    "helm-values.webhook.allowList": {
-      "description": "-- Set the allowed URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.webhook.clientTimeout": {
-      "description": "-- Set the time limit for requests to the webhook (default 30s)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.webhook.denyList": {
-      "description": "-- Set the denied URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks. Note: 8.31.0's permissive-by-default revert means this defaults to empty again in 8.32.0+; opt into IP-class filtering via `denyPrivateIps` / `denyPublicIps`.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.webhook.denyPrivateIps": {
-      "description": "-- Reject webhook URLs (success, error, events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Added in Gotenberg 8.32.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.webhook.denyPublicIps": {
-      "description": "-- Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.webhook.disable": {
-      "description": "-- Disable the webhook feature",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.webhook.enableEnvironmentProxy": {
-      "description": "-- Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.webhook.enableSyncMode": {
-      "description": "-- Enable synchronous mode for the webhook feature",
-      "type": "boolean",
-      "default": false
-    },
-    "helm-values.webhook.errorAllowList": {
-      "description": "-- (DEPRECATED) Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.webhook.errorDenyList": {
-      "description": "-- (DEPRECATED) Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.webhook.maxRetry": {
-      "description": "-- Set the maximum number of retries for the webhook feature (default 4)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.webhook.retryMaxWait": {
-      "description": "-- Set the maximum duration to wait before trying to call the webhook again (default 30s)",
-      "type": "string",
-      "default": ""
-    },
-    "helm-values.webhook.retryMinWait": {
-      "description": "-- Set the minimum duration to wait before trying to call the webhook again (default 1s)",
-      "type": "string",
-      "default": ""
     }
-  }
+  },
+  "additionalProperties": false
 }

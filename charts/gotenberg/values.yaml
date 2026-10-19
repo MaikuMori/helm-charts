@@ -9,7 +9,7 @@ enabled: true
 
 replicaCount: 1
 
-image:
+image:  # @schema additionalProperties: false
   repository: gotenberg/gotenberg
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
@@ -19,7 +19,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-serviceAccount:
+serviceAccount:  # @schema additionalProperties: false
   # -- Specifies whether a service account should be created
   create: false
   # -- Mount the service account's API token in the pods. Gotenberg doesn't use the Kubernetes API.
@@ -36,7 +36,7 @@ podAnnotations: {}
 testPodAnnotations: {}
 
 # -- Image configuration for the helm test pod
-testImage:
+testImage:  # @schema additionalProperties: false
   # -- Repository for the test image
   repository: busybox
   # -- Tag for the test image
@@ -56,13 +56,13 @@ podSecurityContext:
 # @default -- `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set.
 securityContext: {}
 
-service:
+service:  # @schema additionalProperties: false
   type: ClusterIP
   port: 80
   # -- Annotations to add to the service
   annotations: {}
-  # -- (DEPRECATED) Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead.
-  loadBalancerIP: ""
+  # -- Deprecated: Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead.
+  loadBalancerIP: ""  # @schema deprecated
 
 # Strategy is utilized to configure the desired upgrade approach and
 # configuration for the deployment.
@@ -90,42 +90,36 @@ lifecycle: {}
 #      seconds: 5
 
 # -- Define the liveness probe object for the container.
-# +docs:property
-# livenessProbe: {}
 livenessProbe:
   httpGet:
     path: /health
-    port: http
+    port: http  # @schema type: [string, integer]
 
 # -- Define the readiness probe object for the container.
-# +docs:property
-# readinessProbe: {}
 readinessProbe:
   httpGet:
     path: /health
-    port: http
+    port: http  # @schema type: [string, integer]
 
 # -- Define the startup probe object for the container.
-# +docs:property
-# startupProbe: {}
 startupProbe:
   httpGet:
     path: /health
-    port: http
+    port: http  # @schema type: [string, integer]
   failureThreshold: 30
   periodSeconds: 10
 
-autoscaling:
+autoscaling:  # @schema additionalProperties: false
   enabled: false
   minReplicas: 1
   maxReplicas: 100
   behavior: {}
   extraMetrics: []
   targetCPUUtilizationPercentage: 80
-  # +docs:property
-  # targetMemoryUtilizationPercentage: 80
+  # -- (int) Target average memory utilization percentage. Leave unset to not scale on memory.
+  targetMemoryUtilizationPercentage:  # @schema type: [integer, null]
 
-vpa:
+vpa:  # @schema additionalProperties: false
   # -- Create a VerticalPodAutoscaler resource for right-sizing pod resources.
   # Requires the VPA controller to be installed in the cluster.
   # See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
@@ -143,12 +137,12 @@ vpa:
   #        cpu: 2
   #        memory: 4Gi
 
-pdb:
+pdb:  # @schema additionalProperties: false
   create: false
   minAvailable: 1
   maxUnavailable: ""
   # -- Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow)
-  unhealthyPodEvictionPolicy:
+  unhealthyPodEvictionPolicy:  # @schema type: [string, null]; enum: [IfHealthyBudget, AlwaysAllow, null]
 
 nodeSelector: {}
 
@@ -187,7 +181,7 @@ initContainers: []
 #    image: busybox:1.28
 #    command: ['sh', '-c', 'echo init container']
 
-ingress:
+ingress:  # @schema additionalProperties: false
   # -- Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet.
   enabled: false
   # -- Set the class name of the ingress
@@ -218,7 +212,7 @@ ingress:
 # Gateway API HTTPRoute configuration.
 # WARNING: Gotenberg shouldn't be exposed to the internet.
 # See also: https://gateway-api.sigs.k8s.io/
-gateway:
+gateway:  # @schema additionalProperties: false
   # -- Set to true to create an HTTPRoute resource
   enabled: false
   # -- Annotations to add to the HTTPRoute
@@ -236,7 +230,7 @@ gateway:
 
 # The API module is an HTTP/1 and HTTP/2 (H2C) server. Other modules may add routes, middlewares, and health checks.
 # https://gotenberg.dev/docs/configuration#api
-api:
+api:  # @schema additionalProperties: false
   # -- Set the port on which the API should listen (default 3000)
   port: 3000
   # -- Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key)
@@ -247,12 +241,12 @@ api:
   bodyLimit: ""
   # -- Set the root path of the API - for service discovery via URL paths (default "/")
   rootPath: ""
-  # -- (DEPRECATED) Set the header name to use for identifying requests. Use correlationIdHeader instead.
-  traceHeader: ""
+  # -- Deprecated: Set the header name to use for identifying requests. Use correlationIdHeader instead.
+  traceHeader: ""  # @schema deprecated
   # -- Set the header name to use for identifying requests (default "Gotenberg-Trace")
   correlationIdHeader: ""
-  # -- (DEPRECATED) Disable health check route telemetry. Use disableHealthCheckRouteTelemetry instead.
-  disableHealthCheckLogging: false
+  # -- Deprecated: Disable health check route telemetry. Use disableHealthCheckRouteTelemetry instead.
+  disableHealthCheckLogging: false  # @schema deprecated
   # -- Disable health check route telemetry. Note: upstream default changed to true in Gotenberg 8.29.0 (health check telemetry is disabled by default even without this flag).
   disableHealthCheckRouteTelemetry: false
   # -- Enable debug route for debugging purposes
@@ -268,9 +262,9 @@ api:
   # -- Key in existingSecret for the password (default: password)
   existingSecretPasswordKey: ""
   # -- Set the basic authentication username (ignored if existingSecret is set)
-  basicAuthUsername:
+  basicAuthUsername:  # @schema type: [string, null]
   # -- Set the basic authentication password (ignored if existingSecret is set)
-  basicAuthPassword:
+  basicAuthPassword:  # @schema type: [string, null]
   # -- Enable OIDC bearer token authentication. Mutually exclusive with `enableBasicAuth`. Added in Gotenberg 8.36.0.
   enableOidcAuth: false
   # -- Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match. Added in Gotenberg 8.36.0.
@@ -290,7 +284,7 @@ api:
   # -- Set the maximum number of retries for the download from feature (default 4)
   downloadFromMaxRetry: 4
   # -- (int) Set the maximum number of concurrent fetches per request for the download from feature. Leave unset for the upstream default (10); set to 0 for no limit. Added in Gotenberg 8.37.0.
-  downloadFromMaxConcurrency:
+  downloadFromMaxConcurrency:  # @schema type: [integer, null]
   # -- Set the maximum number of entries in the `downloadFrom` array. Set to 0 for no limit (default 0). Added in Gotenberg 8.37.0.
   downloadFromMaxEntries: 0
   # -- Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Added in Gotenberg 8.35.0.
@@ -306,7 +300,7 @@ api:
 
 # The Chromium module interacts with the Chromium browser to convert HTML documents to PDF.
 # https://gotenberg.dev/docs/configuration#chromium
-chromium:
+chromium:  # @schema additionalProperties: false
   # -- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100)
   restartAfter: ""
   # -- Maximum number of concurrent Chromium conversions (default 6)
@@ -331,8 +325,8 @@ chromium:
   ignoreCertificateErrors: false
   # -- Don't enforce the same-origin policy
   disableWebSecurity: false
-  # -- (DEPRECATED) Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored.
-  incognito: false
+  # -- Deprecated: Start Chromium with incognito mode. This flag is deprecated as of Gotenberg 8.25.0 and its value is ignored.
+  incognito: false  # @schema deprecated
   # -- Set custom mappings to the host resolver
   hostResolverRules: ""
   # -- Set the outbound proxy server; this switch only affects HTTP and HTTPS requests
@@ -358,7 +352,7 @@ chromium:
 
 # The LibreOffice module interacts with LibreOffice to convert documents to PDF, thanks to unoconv.
 # https://gotenberg.dev/docs/configuration#libreoffice
-libreOffice:
+libreOffice:  # @schema additionalProperties: false
   # -- Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)
   restartAfter: ""
   # -- Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)
@@ -384,9 +378,9 @@ libreOffice:
 
 # The PDF Engines module gathers all engines that can manipulate PDF files.
 # https://gotenberg.dev/docs/configuration#pdf-engines
-pdfEngines:
-  # -- (DEPRECATED) Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines).
-  engines: ""
+pdfEngines:  # @schema additionalProperties: false
+  # -- Deprecated: Set the PDF engines and their order. This flag was deprecated in Gotenberg 8.13.0 and its value is ignored. Use the per-feature engine flags instead (mergeEngines, splitEngines, flattenEngines, convertEngines, readMetadataEngines, writeMetadataEngines, encryptEngines, embedEngines).
+  engines: ""  # @schema deprecated
   # -- Set the PDF engines and their order for the merge feature (default qpdf,pdfcpu,pdftk)
   mergeEngines: ""
   # -- Set the PDF engines and their order for the split feature (default pdfcpu,qpdf,pdftk)
@@ -427,7 +421,7 @@ pdfEngines:
 # The Webhook module provides a middleware that allows you to upload the output file
 # from multipart/form-data routes to the destination of your choice.
 # https://gotenberg.dev/docs/configuration#webhook
-webhook:
+webhook:  # @schema additionalProperties: false
   # -- Enable synchronous mode for the webhook feature
   enableSyncMode: false
   # -- Set the allowed URLs for the webhook feature using a regular expression. In Gotenberg 8.31.0+ this applies to both regular and error webhooks.
@@ -438,10 +432,10 @@ webhook:
   denyPrivateIps: false
   # -- Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. Added in Gotenberg 8.32.0.
   denyPublicIps: false
-  # -- (DEPRECATED) Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.
-  errorAllowList: ""
-  # -- (DEPRECATED) Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.
-  errorDenyList: ""
+  # -- Deprecated: Set the allowed URLs in case of an error for the webhook feature using a regular expression. Use `allowList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.
+  errorAllowList: ""  # @schema deprecated
+  # -- Deprecated: Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.
+  errorDenyList: ""  # @schema deprecated
   # -- Set the maximum number of retries for the webhook feature (default 4)
   maxRetry: ""
   # -- Set the minimum duration to wait before trying to call the webhook again (default 1s)
@@ -457,7 +451,7 @@ webhook:
 
 # The Prometheus module collects metrics from other modules.
 # https://gotenberg.dev/docs/configuration#prometheus
-prometheus:
+prometheus:  # @schema additionalProperties: false
   # -- Set the interval for collecting modules' metrics (default 1s)
   collectInterval: ""
   # -- Set the namespace of modules' metrics (default "gotenberg")
@@ -466,16 +460,16 @@ prometheus:
   metricsPath: ""
   # -- Disable the collect of metrics
   disableCollect: false
-  # -- (DEPRECATED) Disable the route logging. Use disableRouteTelemetry instead.
-  disableRouterLogging: false
+  # -- Deprecated: Disable the route logging. Use disableRouteTelemetry instead.
+  disableRouterLogging: false  # @schema deprecated
   # -- Disable route telemetry for the Prometheus metrics endpoint
   disableRouteTelemetry: false
 
 # The Logging module provides a logger to Gotenberg.
 # https://gotenberg.dev/docs/configuration#logging
-logging:
-  # -- (DEPRECATED) Set log format. Use stdFormat instead.
-  format: ""
+logging:  # @schema additionalProperties: false
+  # -- Deprecated: Set log format. Use stdFormat instead.
+  format: ""  # @schema deprecated
   # -- Set log standard output format - auto, json, or text (default "auto")
   stdFormat: ""
   # -- Set the case of the `level` field in standard output - lower or upper (default "lower"). Added in Gotenberg 8.34.0.
@@ -484,8 +478,8 @@ logging:
   level: ""
   # -- Prepend a specified prefix to each field in the logs
   fieldsPrefix: ""
-  # -- (DEPRECATED) Enable GCP log field mapping for Cloud Run. Use stdEnableGcpFields instead.
-  enableGcpFields: false
+  # -- Deprecated: Enable GCP log field mapping for Cloud Run. Use stdEnableGcpFields instead.
+  enableGcpFields: false  # @schema deprecated
   # -- Enable GCP log standard output field mapping for Cloud Run
   stdEnableGcpFields: false
   # -- Enable GCP severity field mapping
@@ -493,24 +487,24 @@ logging:
 
 # Misc.
 # https://gotenberg.dev/docs/configuration#graceful-shutdown
-gotenberg:
+gotenberg:  # @schema additionalProperties: false
   # -- Set the graceful shutdown duration (default 30s)
   gracefulShutdownDurationSec: 30
   # -- Hide the Gotenberg banner on startup
   hideBanner: false
 
-metrics:
-  serviceMonitor:
+metrics:  # @schema additionalProperties: false
+  serviceMonitor:  # @schema additionalProperties: false
     # -- Enable ServiceMonitor
     enabled: false
     # -- (string) Namespace for ServiceMonitor, defaults to release namespace
-    namespace:
+    namespace:  # @schema type: [string, null]
     # -- (string) Optional job label for the target service in Prometheus
-    jobLabel:
+    jobLabel:  # @schema type: [string, null]
     # -- (string) Interval at which metrics should be scraped
-    interval:
+    interval:  # @schema type: [string, null]
     # -- (string) Timeout after which the scrape is ended
-    scrapeTimeout:
+    scrapeTimeout:  # @schema type: [string, null]
     # -- HonorLabels chooses the metric’s labels on collisions with target labels
     honorLabels: false
     # -- List of metric relabel configs to apply to samples before ingestion
@@ -524,7 +518,7 @@ metrics:
 
 # Enable or Disable Network Policy.
 # See also: https://kubernetes.io/docs/concepts/services-networking/network-policies/
-networkPolicy:
+networkPolicy:  # @schema additionalProperties: false
   enabled: false
 
   # Allow all connections from any source. To be set to false if extraIngress is used.
