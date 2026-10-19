@@ -3,6 +3,46 @@ entries:
   gotenberg:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: Generate the values schema with helm-values-schema-json; descriptions are clean and deprecated values are marked deprecated
+        - kind: changed
+          description: The schema checks api.downloadFromMaxConcurrency and autoscaling.targetMemoryUtilizationPercentage are integers and pdb.unhealthyPodEvictionPolicy is IfHealthyBudget or AlwaysAllow
+        - kind: fixed
+          description: README no longer lists deprecated values with type DEPRECATED
+        - kind: added
+          description: Unit and snapshot tests for the chart's templates; no changes to rendered manifests
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+    apiVersion: v2
+    appVersion: 8.38.1
+    created: "2026-10-19T18:50:12.06408703Z"
+    description: A Helm chart for Gotenberg
+    digest: 85030415741ecd84926c2067c4ccc8b44d86e924a22e3f1d842b27a212c8aec0
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.27.1/gotenberg-1.27.1.tgz
+    version: 1.27.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: Add serviceAccount.automount to control automountServiceAccountToken on the pods and the created service account
         - kind: security
@@ -1608,4 +1648,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-19T17:30:24.994991798Z"
+generated: "2026-10-19T18:50:12.064545799Z"
