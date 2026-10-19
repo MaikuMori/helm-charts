@@ -4,7 +4,7 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.27.0"
+version: "1.27.1"
 appVersion: "8.38.1"
 
 keywords:
@@ -34,7 +34,5 @@ annotations:
     - name: Chart's Changelog
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
-    - kind: added
-      description: Add serviceAccount.automount to control automountServiceAccountToken on the pods and the created service account
-    - kind: security
-      description: Stop mounting the Kubernetes API token in the pods by default; set serviceAccount.automount to true if an init container needs it
+    - kind: changed
+      description: No changes to rendered manifests; the chart now has unit and snapshot tests

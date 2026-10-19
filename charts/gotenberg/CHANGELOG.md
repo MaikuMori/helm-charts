@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.27.1
+
+- No changes to rendered manifests. Add unit and snapshot tests for the chart's templates, and install it with default values in CI ([#71](https://github.com/MaikuMori/helm-charts/issues/71)).
+
 ## 1.27.0
 
 - Add `serviceAccount.automount` to control `automountServiceAccountToken` on the pods and the created service account ([@Jean-Beru](https://github.com/Jean-Beru)).
