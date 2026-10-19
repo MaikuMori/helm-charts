@@ -2,7 +2,8 @@
 
 ## 1.27.0
 
-- Add `serviceAccount.automount` (default `true`) to set `automountServiceAccountToken` on the created service account, so the pods can run without a Kubernetes API token. Requires `serviceAccount.create: true`.
+- Add `serviceAccount.automount` to control `automountServiceAccountToken` on the pods and the created service account.
+- The Kubernetes API token is no longer mounted in the pods by default. Set `serviceAccount.automount: true` if an init container needs it.
 
 ## 1.26.0
 

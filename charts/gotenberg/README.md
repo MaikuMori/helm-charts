@@ -239,7 +239,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
-| serviceAccount.automount | bool | `true` | Automatically mount the service account's API token in the pods. Only applies when `create` is true. |
+| serviceAccount.automount | bool | `false` | Mount the service account's API token in the pods. Gotenberg doesn't use the Kubernetes API. |
 | serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
 | startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. +docs:property startupProbe: {} |

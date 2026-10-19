@@ -35,4 +35,6 @@ annotations:
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
   artifacthub.io/changes: |
     - kind: added
-      description: Add serviceAccount.automount (default true) to stop mounting the API token in the pods; requires serviceAccount.create
+      description: Add serviceAccount.automount to control automountServiceAccountToken on the pods and the created service account
+    - kind: security
+      description: Stop mounting the Kubernetes API token in the pods by default; set serviceAccount.automount to true if an init container needs it

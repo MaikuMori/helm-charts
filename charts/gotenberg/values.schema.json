@@ -1523,9 +1523,9 @@
       "default": {}
     },
     "helm-values.serviceAccount.automount": {
-      "description": "-- Automatically mount the service account's API token in the pods. Only applies when `create` is true.",
+      "description": "-- Mount the service account's API token in the pods. Gotenberg doesn't use the Kubernetes API.",
       "type": "boolean",
-      "default": true
+      "default": false
     },
     "helm-values.serviceAccount.create": {
       "description": "-- Specifies whether a service account should be created",
