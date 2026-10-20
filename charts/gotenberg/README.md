@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.27.1](https://img.shields.io/badge/Version-1.27.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.38.1](https://img.shields.io/badge/AppVersion-8.38.1-informational?style=flat-square)
+![Version: 1.28.0](https://img.shields.io/badge/Version-1.28.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.38.1](https://img.shields.io/badge/AppVersion-8.38.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -36,6 +36,35 @@ helm install my-release --namespace gotenberg oci://ghcr.io/maikumori/helm-chart
 
 If you added the non-OCI repository above, you can also use the `maikumori/gotenberg` shorthand in place of the OCI URL in any of the commands below.
 
+## Verifying the Chart
+
+Each release is signed twice: with GPG as a Helm [provenance file](https://helm.sh/docs/topics/provenance/), and with keyless [cosign](https://github.com/sigstore/cosign) from this repository's release workflow.
+
+To verify the GPG signature, fetch the signing key (fingerprint `F29F20C1CBD1FDE9566828E0641F7D67BC03019B`) into a keyring file and pass it to Helm:
+
+```console
+curl -sSfL https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc | gpg --dearmor > maikumori.gpg
+helm pull oci://ghcr.io/maikumori/helm-charts/gotenberg --version <version> --verify --keyring maikumori.gpg
+```
+
+`helm install` and `helm upgrade` accept the same `--verify --keyring maikumori.gpg` flags.
+
+The cosign signatures need [cosign](https://github.com/sigstore/cosign) 3.0 or newer and exist for chart 1.28.0 and later. To verify the OCI chart:
+
+```console
+cosign verify ghcr.io/maikumori/helm-charts/gotenberg:<version> \
+  --certificate-identity https://github.com/MaikuMori/helm-charts/.github/workflows/release.yml@refs/heads/master \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
+Charts from the [GitHub releases](https://github.com/MaikuMori/helm-charts/releases) come with a `.sigstore.json` bundle:
+
+```console
+cosign verify-blob gotenberg-<version>.tgz --bundle gotenberg-<version>.tgz.sigstore.json \
+  --certificate-identity https://github.com/MaikuMori/helm-charts/.github/workflows/release.yml@refs/heads/master \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `my-release` deployment:
@@ -69,6 +98,17 @@ helm upgrade --install --atomic my-release oci://ghcr.io/maikumori/helm-charts/g
 ```
 
 This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes between versions.
+
+### Pinning Images by Digest
+
+Tags can be moved to point at a different image. To pull exactly the image you reviewed, set its digest along with the tag:
+
+```console
+helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg \
+  --set image.tag="8.38.1" --set image.digest="sha256:<digest>"
+```
+
+`docker buildx imagetools inspect gotenberg/gotenberg:8.38.1` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
 
 ## Values
 
@@ -149,6 +189,7 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | gateway.parentRefs | list | `[]` | Parent Gateway references, see values.yaml for an example. |
 | gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration (default 30s) |
 | gotenberg.hideBanner | bool | `false` | Hide the Gotenberg banner on startup |
+| image.digest | string | `""` | Image digest, e.g. `sha256:...`. When set, the image is pulled by digest. |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"gotenberg/gotenberg"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
@@ -245,9 +286,10 @@ This allows you to stay current with Gotenberg releases without waiting for a ne
 | serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
 | startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. |
 | strategy | object | `{}` |  |
-| testImage | object | `{"repository":"busybox","tag":"latest"}` | Image configuration for the helm test pod |
+| testImage | object | `{"digest":"sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e","repository":"busybox","tag":"1.38.0"}` | Image configuration for the helm test pod |
+| testImage.digest | string | `"sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e"` | Digest for the test image. Set to "" to pull by tag only. |
 | testImage.repository | string | `"busybox"` | Repository for the test image |
-| testImage.tag | string | `"latest"` | Tag for the test image |
+| testImage.tag | string | `"1.38.0"` | Tag for the test image |
 | testPodAnnotations | object | `{}` | Set annotations for the helm test pods (for example to disable certain kube-score checks) |
 | tolerations | list | `[]` |  |
 | topologySpreadConstraints | list | `[]` |  |

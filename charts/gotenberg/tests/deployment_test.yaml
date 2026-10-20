@@ -2,6 +2,16 @@ suite: deployment
 templates:
   - templates/deployment.yaml
 tests:
+  - it: pulls the image by digest when one is set
+    chart:
+      appVersion: 1.2.3
+    set:
+      image.digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: gotenberg/gotenberg:1.2.3@sha256:1111111111111111111111111111111111111111111111111111111111111111
+
   - it: falls back to the deprecated traceHeader for the correlation ID header
     set:
       api.traceHeader: X-Trace

@@ -14,6 +14,8 @@ image:  # @schema additionalProperties: false
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
+  # -- Image digest, e.g. `sha256:...`. When set, the image is pulled by digest.
+  digest: ""  # @schema pattern: ^(sha256:[a-f0-9]{64})?$
 
 imagePullSecrets: []
 nameOverride: ""
@@ -40,7 +42,9 @@ testImage:  # @schema additionalProperties: false
   # -- Repository for the test image
   repository: busybox
   # -- Tag for the test image
-  tag: latest
+  tag: "1.38.0"
+  # -- Digest for the test image. Set to "" to pull by tag only.
+  digest: "sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e"  # @schema pattern: ^(sha256:[a-f0-9]{64})?$
 
 # -- List of additional pod labels
 podLabels: {}

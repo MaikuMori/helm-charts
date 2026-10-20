@@ -4,7 +4,7 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.27.1"
+version: "1.28.0"
 appVersion: "8.38.1"
 
 keywords:
@@ -33,12 +33,15 @@ annotations:
       url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
     - name: Chart's Changelog
       url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+  artifacthub.io/signKey: |
+    fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
+    url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
   artifacthub.io/changes: |
-    - kind: changed
-      description: Generate the values schema with helm-values-schema-json; descriptions are clean and deprecated values are marked deprecated
-    - kind: changed
-      description: The schema checks api.downloadFromMaxConcurrency and autoscaling.targetMemoryUtilizationPercentage are integers and pdb.unhealthyPodEvictionPolicy is IfHealthyBudget or AlwaysAllow
-    - kind: fixed
-      description: README no longer lists deprecated values with type DEPRECATED
     - kind: added
-      description: Unit and snapshot tests for the chart's templates; no changes to rendered manifests
+      description: Sign the OCI chart and the release archive with keyless cosign, alongside the existing GPG provenance, and document how to verify both
+    - kind: added
+      description: Add image.digest and testImage.digest to pull images by digest
+    - kind: changed
+      description: Pin the helm test image to busybox 1.38.0 by digest instead of busybox:latest
+    - kind: security
+      description: Run the helm test pod without a service account token, as a non-root user with a read-only root filesystem, no capabilities and the RuntimeDefault seccomp profile

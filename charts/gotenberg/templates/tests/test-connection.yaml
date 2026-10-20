@@ -10,9 +10,24 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    {{- if not (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
+    runAsUser: 65534
+    runAsGroup: 65534
+    {{- end }}
+    seccompProfile:
+      type: RuntimeDefault
   containers:
     - name: wget
-      image: "{{ .Values.testImage.repository }}:{{ .Values.testImage.tag }}"
+      image: "{{ .Values.testImage.repository }}:{{ .Values.testImage.tag }}{{ with .Values.testImage.digest }}@{{ . }}{{ end }}"
       command: ['wget']
-      args: ['{{ include "gotenberg.fullname" . }}:{{ .Values.service.port }}/health']
+      args: ['-q', '-O', '/dev/null', '{{ include "gotenberg.fullname" . }}:{{ .Values.service.port }}/health']
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
   restartPolicy: Never

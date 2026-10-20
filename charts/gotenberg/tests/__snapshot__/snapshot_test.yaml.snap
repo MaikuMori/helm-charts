@@ -97,14 +97,30 @@ matches with default values:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
+      automountServiceAccountToken: false
       containers:
         - args:
+            - -q
+            - -O
+            - /dev/null
             - RELEASE-NAME-gotenberg:80/health
           command:
             - wget
-          image: busybox:latest
+          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
       restartPolicy: Never
+      securityContext:
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
 matches with every flag set:
   1: |
     apiVersion: apps/v1
@@ -306,14 +322,30 @@ matches with every flag set:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
+      automountServiceAccountToken: false
       containers:
         - args:
+            - -q
+            - -O
+            - /dev/null
             - RELEASE-NAME-gotenberg:80/health
           command:
             - wget
-          image: busybox:latest
+          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
       restartPolicy: Never
+      securityContext:
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
 matches with every optional resource enabled:
   1: |
     apiVersion: apps/v1
@@ -510,14 +542,30 @@ matches with every optional resource enabled:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
+      automountServiceAccountToken: false
       containers:
         - args:
+            - -q
+            - -O
+            - /dev/null
             - RELEASE-NAME-gotenberg:80/health
           command:
             - wget
-          image: busybox:latest
+          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
       restartPolicy: Never
+      securityContext:
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
 matches with the CRD-backed and policy resources enabled:
   1: |
     apiVersion: apps/v1
@@ -664,14 +712,30 @@ matches with the CRD-backed and policy resources enabled:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
+      automountServiceAccountToken: false
       containers:
         - args:
+            - -q
+            - -O
+            - /dev/null
             - RELEASE-NAME-gotenberg:80/health
           command:
             - wget
-          image: busybox:latest
+          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
       restartPolicy: Never
+      securityContext:
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
   6: |
     apiVersion: autoscaling.k8s.io/v1
     kind: VerticalPodAutoscaler

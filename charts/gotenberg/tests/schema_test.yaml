@@ -92,3 +92,10 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "/pdb/unhealthyPodEvictionPolicy"
+
+  - it: rejects malformed image digests
+    set:
+      image.digest: latest
+    asserts:
+      - failedTemplate:
+          errorPattern: "/image/digest"

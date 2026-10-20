@@ -7,23 +7,62 @@ on:
     paths:
       - "charts/**"
 
-permissions:
-  contents: write
-  packages: write
+permissions: {}
 
 concurrency:
   group: release-charts
   cancel-in-progress: false
 
 jobs:
-  release:
+  # Holds the GPG signing key, so it gets no write access.
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      packaged: ${{ steps.package.outputs.packaged }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Helm
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v4.3.1
+
+      - name: Package and sign unreleased charts
+        id: package
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          SIGNING_KEY_BASE64: ${{ secrets.HELM_SIGNING_PRIVATE_KEY }}
+          SIGNING_KEY_PASSPHRASE_BASE64: ${{ secrets.HELM_SIGNING_PRIVATE_KEY_PASSPHRASE }}
+        with:
+          script: |
+            const run = require('./.github/scripts/package-charts.js');
+            await run({ github, context, core });
+
+      - name: Upload packages
+        if: steps.package.outputs.packaged == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: chart-packages
+          path: .cr-release-packages/
+          if-no-files-found: error
+          retention-days: 7
+
+  # Never sees the signing key.
+  publish:
+    needs: package
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
-    runs-on: ubuntu-latest
+      id-token: write # keyless cosign signing
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 # zizmor: ignore[artipacked] later steps push with git
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 # zizmor: ignore[artipacked] chart-releaser pushes the index with git
         with:
           fetch-depth: 0
 
@@ -32,45 +71,29 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Install Helm
-        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+      - name: Download packages
+        if: needs.package.outputs.packaged == 'true'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: chart-packages
+          path: .cr-release-packages/
 
-      - name: Prepare keys for signing
-        env:
-          SIGNING_KEY_BASE64: ${{ secrets.HELM_SIGNING_PRIVATE_KEY }}
-          SIGNING_KEY_PASSPHRASE_BASE64: ${{ secrets.HELM_SIGNING_PRIVATE_KEY_PASSPHRASE }}
-          KEY_PATH: ".gpg-dir"
-          SIGNING_KEY_PATH: ".gpg-dir/secring.gpg"
-          SIGNING_KEY_PASSPHRASE_PATH: ".gpg-dir/passphrase"
-        run: |
-          mkdir "$KEY_PATH"
-          base64 -d <<< "$SIGNING_KEY_BASE64" > "$SIGNING_KEY_PATH"
-          base64 -d <<< "$SIGNING_KEY_PASSPHRASE_BASE64" > "$SIGNING_KEY_PASSPHRASE_PATH"
-          echo "CR_PASSPHRASE_FILE=$SIGNING_KEY_PASSPHRASE_PATH" >> "$GITHUB_ENV"
-          echo "CR_KEYRING=$SIGNING_KEY_PATH" >> "$GITHUB_ENV"
-
-      - name: Extract release notes from changelog
-        run: |
-          for chart_dir in charts/*/; do
-            version=$(grep '^version:' "${chart_dir}Chart.yaml" | awk '{print $2}' | tr -d '"')
-            changelog="${chart_dir}CHANGELOG.md"
-            notes="${chart_dir}RELEASE_NOTES.md"
-            if [ -f "$changelog" ]; then
-              awk -v ver="$version" '
-                $0 ~ "^## " ver "$" { found=1; next }
-                found && /^## / { exit }
-                found && NF { body=1 }
-                body { print }
-              ' "$changelog" > "$notes"
-            fi
-          done
-
-      - name: Run chart-releaser
+      - name: Create GitHub releases and update the index
+        if: needs.package.outputs.packaged == 'true'
         uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f # v1.7.0
         env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config: .cr.yaml
+          skip_packaging: true
+
+      - name: Install Helm
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v4.3.1
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
@@ -79,12 +102,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push Charts to GHCR
-        run: |
-          shopt -s nullglob
-          for pkg in .cr-release-packages/*.tgz; do
-            if [ -z "${pkg:-}" ]; then
-              break
-            fi
-            helm push "${pkg}" oci://ghcr.io/maikumori/helm-charts
-          done
+      - name: Push and sign charts
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          script: |
+            const run = require('./.github/scripts/publish-charts.js');
+            await run({ github, context, core });
