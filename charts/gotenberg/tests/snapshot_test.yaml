@@ -18,6 +18,12 @@ tests:
     asserts:
       - matchSnapshot: {}
 
+  - it: matches with the documented hardened values
+    values:
+      - ../ci/hardened-values.yaml
+    asserts:
+      - matchSnapshot: {}
+
   - it: matches with every flag set
     values:
       - values/all-flags.yaml

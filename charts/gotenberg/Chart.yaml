@@ -39,5 +39,7 @@ annotations:
   artifacthub.io/changes: |
     - kind: security
       description: The default container security context now meets the Pod Security restricted level, adding runAsNonRoot, dropping all capabilities and using the RuntimeDefault seccomp profile
+    - kind: added
+      description: Document resource recommendations and a hardened, CI-tested setup for untrusted input
     - kind: fixed
       description: The helm test connection check retries instead of hanging when it starts right after an upgrade

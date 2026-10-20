@@ -1,6 +1,7 @@
 // Converts the fixtures in test/render with every Gotenberg release installed
 // in the current cluster (left behind by `ct install --skip-clean-up`) and
-// checks each PDF contains the fixture's marker text.
+// checks each PDF contains the fixture's marker text. Releases running with
+// --chromium-deny-private-ips must also refuse to render a private address.
 // Usage: node .github/scripts/render-test.js
 
 const fs = require('fs');
@@ -9,6 +10,7 @@ const path = require('path');
 const { execFileSync, spawn } = require('child_process');
 
 const FIXTURES = path.join(__dirname, '..', '..', 'test', 'render');
+const PRIVATE_URL = 'http://169.254.169.254/latest/meta-data/';
 const CONVERSIONS = [
   {
     module: 'Chromium',
@@ -77,6 +79,9 @@ async function main() {
     ]).items;
     if (services.length !== 1) throw new Error(`Expected one Service for ${namespace}/${name}, found ${services.length}`);
     const service = services[0];
+    const args = json('kubectl', [
+      'get', 'deployment', '-n', namespace, '-l', `app.kubernetes.io/instance=${name}`, '-o', 'json',
+    ]).items[0].spec.template.spec.containers[0].args ?? [];
     const { localPort, stop } = await portForward(namespace, service.metadata.name, service.spec.ports[0].port);
 
     try {
@@ -92,6 +97,18 @@ async function main() {
         } catch (e) {
           failures++;
           console.log(`FAIL ${label}: ${e.message}`);
+        }
+      }
+      if (args.includes('--chromium-deny-private-ips')) {
+        const label = `${namespace}/${name}: Chromium refuses ${PRIVATE_URL}`;
+        const form = new FormData();
+        form.append('url', PRIVATE_URL);
+        const response = await fetch(`http://127.0.0.1:${localPort}/forms/chromium/convert/url`, { method: 'POST', body: form });
+        if (response.status === 403) {
+          console.log(`ok   ${label}`);
+        } else {
+          failures++;
+          console.log(`FAIL ${label}: got HTTP ${response.status}, want 403`);
         }
       }
     } finally {

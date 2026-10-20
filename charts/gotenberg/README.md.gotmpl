@@ -110,6 +110,28 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
 
 `docker buildx imagetools inspect gotenberg/gotenberg:8.38.1` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
 
+## Resources
+
+The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit:
+
+```yaml
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    memory: 2Gi
+```
+
+## Hardening for Untrusted Input
+
+The default security context already meets the Pod Security `restricted` level. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service. If callers or their documents aren't trusted, deny private addresses and limit the pod's network access. CI installs this configuration on every supported Kubernetes version, converts documents with it, and checks that Chromium refuses a private address:
+
+```yaml
+{{ .Files.Get "ci/hardened-values.yaml" }}```
+
+Also require authentication on the API, with `api.enableBasicAuth` or `api.enableOidcAuth`, and disable the routes you don't use, such as `chromium.disableRoutes` or `libreOffice.disableRoutes`. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
+
 {{ template "chart.requirementsSection" . }}
 
 {{ template "chart.valuesSection" . }}

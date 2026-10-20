@@ -110,6 +110,77 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
 
 `docker buildx imagetools inspect gotenberg/gotenberg:8.38.1` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
 
+## Resources
+
+The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit:
+
+```yaml
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    memory: 2Gi
+```
+
+## Hardening for Untrusted Input
+
+The default security context already meets the Pod Security `restricted` level. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service. If callers or their documents aren't trusted, deny private addresses and limit the pod's network access. CI installs this configuration on every supported Kubernetes version, converts documents with it, and checks that Chromium refuses a private address:
+
+```yaml
+# Hardened setup for converting documents from untrusted callers.
+
+# Reject outbound requests to private, loopback and link-local addresses from
+# every module that fetches URLs.
+api:
+  downloadFromDenyPrivateIps: true
+chromium:
+  denyPrivateIps: true
+libreOffice:
+  denyPrivateIps: true
+webhook:
+  denyPrivateIps: true
+
+networkPolicy:
+  enabled: true
+  # Only accept API calls from pods in the release's namespace. Replace the
+  # rule with a selector for your clients.
+  allowIngress: false
+  extraIngress:
+    - from:
+        - podSelector: {}
+      ports:
+        - port: 3000
+  # Only allow DNS and HTTP(S) to public addresses, so URLs in documents and
+  # webhooks can't reach the cluster network.
+  allowEgress: false
+  extraEgress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+              - 169.254.0.0/16
+              - 100.64.0.0/10
+      ports:
+        - port: 80
+        - port: 443
+```
+
+Also require authentication on the API, with `api.enableBasicAuth` or `api.enableOidcAuth`, and disable the routes you don't use, such as `chromium.disableRoutes` or `libreOffice.disableRoutes`. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
+
 ## Values
 
 | Key | Type | Default | Description |
