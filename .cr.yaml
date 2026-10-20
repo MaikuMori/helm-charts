@@ -1,5 +1,3 @@
-sign: true
-# UID of the GPG key to use
-key: helm@maikumori.com
+# Charts are packaged and GPG-signed by the release workflow's package job.
 release-notes-file: RELEASE_NOTES.md
 skip-existing: true

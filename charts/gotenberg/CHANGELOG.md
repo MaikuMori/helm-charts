@@ -1,9 +1,11 @@
 # Changelog
 
-## 1.27.2
+## 1.28.0
 
-- No changes to rendered manifests.
 - Sign the OCI chart and the release archive with keyless [cosign](https://github.com/sigstore/cosign), alongside the existing GPG provenance, and document how to verify both.
+- Add `image.digest` and `testImage.digest` to pull images by digest.
+- Pin the `helm test` image to `busybox:1.38.0` by digest instead of `busybox:latest`.
+- Run the `helm test` pod without a service account token, as a non-root user with a read-only root filesystem, no capabilities and the `RuntimeDefault` seccomp profile. On OpenShift the user is left to the cluster.
 
 ## 1.27.1
 

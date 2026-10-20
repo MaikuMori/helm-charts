@@ -1,0 +1,51 @@
+suite: helm test pod
+templates:
+  - templates/tests/test-connection.yaml
+tests:
+  - it: runs without a service account token as an unprivileged user
+    asserts:
+      - equal:
+          path: spec.automountServiceAccountToken
+          value: false
+      - equal:
+          path: spec.securityContext
+          value:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            seccompProfile:
+              type: RuntimeDefault
+      - equal:
+          path: spec.containers[0].securityContext
+          value:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+  - it: leaves the user to OpenShift
+    capabilities:
+      apiVersions:
+        - security.openshift.io/v1
+    asserts:
+      - equal:
+          path: spec.securityContext
+          value:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+
+  - it: pulls the test image by digest
+    asserts:
+      - matchRegex:
+          path: spec.containers[0].image
+          pattern: ^busybox:[0-9.]+@sha256:[a-f0-9]{64}$
+
+  - it: pulls the test image by tag when the digest is cleared
+    set:
+      testImage.digest: ""
+    asserts:
+      - equal:
+          path: spec.containers[0].image
+          value: busybox:1.38.0

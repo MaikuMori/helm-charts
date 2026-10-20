@@ -346,6 +346,11 @@
     "image": {
       "type": "object",
       "properties": {
+        "digest": {
+          "description": "Image digest, e.g. `sha256:...`. When set, the image is pulled by digest.",
+          "type": "string",
+          "pattern": "^(sha256:[a-f0-9]{64})?$"
+        },
         "pullPolicy": {
           "type": "string"
         },
@@ -861,6 +866,11 @@
       "description": "Image configuration for the helm test pod",
       "type": "object",
       "properties": {
+        "digest": {
+          "description": "Digest for the test image. Set to \"\" to pull by tag only.",
+          "type": "string",
+          "pattern": "^(sha256:[a-f0-9]{64})?$"
+        },
         "repository": {
           "description": "Repository for the test image",
           "type": "string"

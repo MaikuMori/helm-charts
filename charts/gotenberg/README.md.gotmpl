@@ -49,7 +49,7 @@ helm pull oci://ghcr.io/maikumori/helm-charts/gotenberg --version <version> --ve
 
 `helm install` and `helm upgrade` accept the same `--verify --keyring maikumori.gpg` flags.
 
-To verify the cosign signature of the OCI chart:
+The cosign signatures need [cosign](https://github.com/sigstore/cosign) 3.0 or newer and exist for chart 1.28.0 and later. To verify the OCI chart:
 
 ```console
 cosign verify ghcr.io/maikumori/helm-charts/gotenberg:<version> \
@@ -98,6 +98,17 @@ helm upgrade --install --atomic my-release oci://ghcr.io/maikumori/helm-charts/g
 ```
 
 This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes between versions.
+
+### Pinning Images by Digest
+
+Tags can be moved to point at a different image. To pull exactly the image you reviewed, set its digest along with the tag:
+
+```console
+helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg \
+  --set image.tag="8.38.1" --set image.digest="sha256:<digest>"
+```
+
+`docker buildx imagetools inspect gotenberg/gotenberg:8.38.1` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
 
 {{ template "chart.requirementsSection" . }}
 
