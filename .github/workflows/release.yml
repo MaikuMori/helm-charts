@@ -7,9 +7,7 @@ on:
     paths:
       - "charts/**"
 
-permissions:
-  contents: write
-  packages: write
+permissions: {}
 
 concurrency:
   group: release-charts
@@ -20,6 +18,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      id-token: write # keyless cosign signing
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,6 +33,11 @@ jobs:
 
       - name: Install Helm
         uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v4.3.1
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
       - name: Prepare keys for signing
         env:
@@ -79,12 +83,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push Charts to GHCR
-        run: |
-          shopt -s nullglob
-          for pkg in .cr-release-packages/*.tgz; do
-            if [ -z "${pkg:-}" ]; then
-              break
-            fi
-            helm push "${pkg}" oci://ghcr.io/maikumori/helm-charts
-          done
+      - name: Push and sign charts
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const run = require('./.github/scripts/publish-charts.js');
+            await run({ github, context, core });

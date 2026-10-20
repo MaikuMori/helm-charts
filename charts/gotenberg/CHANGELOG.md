@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.27.2
+
+- No changes to rendered manifests.
+- Sign the OCI chart and the release archive with keyless [cosign](https://github.com/sigstore/cosign), alongside the existing GPG provenance, and document how to verify both.
+
 ## 1.27.1
 
 - No changes to rendered manifests.

@@ -4,16 +4,19 @@ Adapted from the [Gotenberg Security Policy](https://github.com/gotenberg/gotenb
 
 ## Supported Versions
 
-Please ensure to keep your environment up-to-date and use only the latest version of charts and images.
+Only the latest release of each chart gets fixes, so keep your charts and images up to date.
 
-Supported Kubernetes versions are listed in test workflow file [here](.github/workflows/test.yml).
+Each chart release is tested on the Kubernetes versions in the `install` job matrix of [the test workflow](.github/workflows/test.yml).
+
+Releases are signed; see [Verifying Charts](README.md#verifying-charts).
 
 ## Reporting a Vulnerability
 
 We take all reports regarding security seriously.
 
 If you discover a security vulnerability, please refrain from publishing it publicly.
-Instead, kindly send us the details via email to _helm [at] maikumori [dot] com_.
+Instead, report it privately through [GitHub's vulnerability reporting](https://github.com/MaikuMori/helm-charts/security/advisories/new),
+or send the details via email to _helm [at] maikumori [dot] com_.
 
 In the subject of your email, please indicate that it's a security vulnerability report for specific chart.
 In your message, please include:
