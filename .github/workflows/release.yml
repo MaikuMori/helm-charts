@@ -82,7 +82,7 @@ jobs:
 
       - name: Create GitHub releases and update the index
         if: needs.package.outputs.packaged == 'true'
-        uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f # v1.7.0
+        uses: helm/chart-releaser-action@3e001cb8c68933439c7e721650f20a07a1a5c61e # v1.7.0-5-g3e001cb, unreleased fix for skip_packaging
         env:
           CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
