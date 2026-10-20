@@ -196,6 +196,19 @@ jobs:
           sudo apt-get install -y -qq poppler-utils >/dev/null
           node .github/scripts/render-test.js
 
+      - name: Show cluster state
+        if: failure() && steps.list-changed.outputs.changed == 'true'
+        run: |
+          kubectl get pods --all-namespaces -o wide
+          kubectl get events --all-namespaces --sort-by=.lastTimestamp | tail -100
+          for pod in $(kubectl get pods --all-namespaces -l app.kubernetes.io/name=gotenberg -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" "}{end}'); do
+            echo "::group::$pod"
+            kubectl describe pod -n "${pod%%/*}" "${pod#*/}"
+            kubectl logs -n "${pod%%/*}" "${pod#*/}" --all-containers --tail=200 || true
+            kubectl logs -n "${pod%%/*}" "${pod#*/}" --all-containers --previous --tail=200 2>/dev/null || true
+            echo "::endgroup::"
+          done
+
   # Stable check to require in branch protection: the install matrix check
   # names embed the kind node-image SHA and change on every image bump.
   ci-required:
