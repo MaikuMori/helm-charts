@@ -26,37 +26,46 @@ jobs:
 
       - name: Check for new Gotenberg release
         id: check
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          CURRENT=$(grep '^appVersion:' charts/gotenberg/Chart.yaml | sed 's/appVersion: *"\(.*\)"/\1/')
-          LATEST=$(gh api repos/gotenberg/gotenberg/releases/latest --jq '.tag_name | ltrimstr("v")')
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
 
-          if ! [[ "$LATEST" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Unexpected latest Gotenberg release: '$LATEST'"
-            exit 1
-          fi
+            const chart = fs.readFileSync('charts/gotenberg/Chart.yaml', 'utf8');
+            const current = chart.match(/^appVersion: *"(.*)"$/m)?.[1];
+            if (!current) {
+              core.setFailed('No appVersion in charts/gotenberg/Chart.yaml');
+              return;
+            }
 
-          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
-          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+            const { data: release } = await github.rest.repos.getLatestRelease({
+              owner: 'gotenberg', repo: 'gotenberg',
+            });
+            const latest = release.tag_name.replace(/^v/, '');
+            if (!/^\d+\.\d+\.\d+$/.test(latest)) {
+              core.setFailed(`Unexpected latest Gotenberg release: '${release.tag_name}'`);
+              return;
+            }
 
-          if [ "$CURRENT" = "$LATEST" ]; then
-            echo "update=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+            core.setOutput('current', current);
+            core.setOutput('latest', latest);
 
-          STATUS=$(curl -s -o /dev/null -w '%{http_code}' \
-            "https://hub.docker.com/v2/repositories/gotenberg/gotenberg/tags/$LATEST")
-          if [ "$STATUS" = "404" ]; then
-            echo "::warning::Release $LATEST has no gotenberg/gotenberg:$LATEST image yet; will retry on the next run."
-            echo "update=false" >> "$GITHUB_OUTPUT"
-          elif [ "$STATUS" = "200" ]; then
-            echo "update=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::error::Docker Hub tag lookup for $LATEST returned HTTP $STATUS"
-            exit 1
-          fi
+            if (current === latest) {
+              core.setOutput('update', 'false');
+              return;
+            }
+
+            const { status } = await fetch(
+              `https://hub.docker.com/v2/repositories/gotenberg/gotenberg/tags/${latest}`,
+            );
+            if (status === 404) {
+              core.warning(`Release ${latest} has no gotenberg/gotenberg:${latest} image yet; will retry on the next run.`);
+              core.setOutput('update', 'false');
+            } else if (status === 200) {
+              core.setOutput('update', 'true');
+            } else {
+              core.setFailed(`Docker Hub tag lookup for ${latest} returned HTTP ${status}`);
+            }
 
       - name: Create or update pull request
         if: steps.check.outputs.update == 'true'
@@ -319,27 +328,8 @@ jobs:
           persist-credentials: false
 
       - name: Open, update or close the tracking issue
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TITLE: Update pinned test tools
-        run: |
-          set -euo pipefail
-          updates=$(.github/scripts/check-pinned-tools.sh)
-          issue=$(gh issue list --state open --label dependencies --search "in:title \"$TITLE\"" \
-            --json number,title --jq "map(select(.title == env.TITLE)) | .[0].number // empty")
-
-          if [ -z "$updates" ]; then
-            if [ -n "$issue" ]; then
-              gh issue close "$issue" --comment "All pinned test tools are current."
-            fi
-            exit 0
-          fi
-
-          body=$(printf '%s\n\n%s\n' \
-            "Newer releases of tools pinned in \`.github/workflows/test.yml\` (at least a week old):" \
-            "$updates")
-          if [ -n "$issue" ]; then
-            gh issue edit "$issue" --body "$body"
-          else
-            gh issue create --title "$TITLE" --label dependencies --body "$body"
-          fi
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const run = require('./.github/scripts/check-pinned-tools.js');
+            await run({ github, context, core });
