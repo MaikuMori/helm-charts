@@ -51,6 +51,18 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Labels for helm test pods. Their name differs from the selector labels, so the
+Service, PodDisruptionBudget and NetworkPolicy don't select them.
+*/}}
+{{- define "gotenberg.testLabels" -}}
+helm.sh/chart: {{ include "gotenberg.chart" . }}
+app.kubernetes.io/name: {{ include "gotenberg.name" . }}-test
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: test
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "gotenberg.serviceAccountName" -}}

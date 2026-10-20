@@ -1,7 +1,10 @@
-// Converts the fixtures in test/render with every Gotenberg release installed
-// in the current cluster (left behind by `ct install --skip-clean-up`) and
-// checks each PDF contains the fixture's marker text. Releases running with
-// --chromium-deny-private-ips must also refuse to render a private address.
+// Exercises every Gotenberg release installed in the current cluster (left
+// behind by `ct install --skip-clean-up`) with the fixtures in test/render:
+// Chromium and LibreOffice conversions, a Chromium screenshot, and merging,
+// PDF/A conversion and metadata reading with the PDF engines. Each result is
+// checked for the fixture's text, not just its file type. Releases running
+// with --chromium-deny-private-ips must also refuse to render a private address.
+// Needs pdftotext and pdfinfo (poppler-utils).
 // Usage: node .github/scripts/render-test.js
 
 const fs = require('fs');
@@ -11,22 +14,8 @@ const { execFileSync, spawn } = require('child_process');
 
 const FIXTURES = path.join(__dirname, '..', '..', 'test', 'render');
 const PRIVATE_URL = 'http://169.254.169.254/latest/meta-data/';
-const CONVERSIONS = [
-  {
-    module: 'Chromium',
-    route: '/forms/chromium/convert/html',
-    file: 'index.html',
-    contentType: 'text/html',
-    markers: ['Chromium render test', 'JavaScript render marker'],
-  },
-  {
-    module: 'LibreOffice',
-    route: '/forms/libreoffice/convert',
-    file: 'document.docx',
-    contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    markers: ['LibreOffice render test'],
-  },
-];
+// A screenshot of an empty page is about 2.7KB; the fixture renders to about 10KB.
+const MIN_SCREENSHOT_BYTES = 5000;
 
 const json = (cmd, args) => JSON.parse(execFileSync(cmd, args, { encoding: 'utf8' }));
 
@@ -45,9 +34,12 @@ function portForward(namespace, service, port) {
   });
 }
 
-async function convert(baseUrl, { route, file, contentType }) {
+const fixture = name => ({ name, data: fs.readFileSync(path.join(FIXTURES, name)) });
+
+async function post(baseUrl, route, files, fields = {}) {
   const form = new FormData();
-  form.append('files', new Blob([fs.readFileSync(path.join(FIXTURES, file))], { type: contentType }), file);
+  for (const { name, data } of files) form.append('files', new Blob([data]), name);
+  for (const [key, value] of Object.entries(fields)) form.append(key, value);
   for (let attempt = 1; ; attempt++) {
     try {
       const response = await fetch(`${baseUrl}${route}`, { method: 'POST', body: form });
@@ -61,11 +53,68 @@ async function convert(baseUrl, { route, file, contentType }) {
   }
 }
 
-function pdfText(pdf) {
-  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'render-')), 'out.pdf');
+function poppler(tool, pdf, args = []) {
+  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'render-')), 'in.pdf');
   fs.writeFileSync(file, pdf);
-  return execFileSync('pdftotext', [file, '-'], { encoding: 'utf8' });
+  return execFileSync(tool, [...args, file, ...(tool === 'pdftotext' ? ['-'] : [])], { encoding: 'utf8' });
 }
+
+function expectPdf(pdf, markers, pages) {
+  if (pdf.subarray(0, 5).toString() !== '%PDF-') throw new Error('response is not a PDF');
+  const text = poppler('pdftotext', pdf);
+  const missing = markers.filter(m => !text.includes(m));
+  if (missing.length > 0) throw new Error(`PDF is missing ${missing.map(m => `"${m}"`).join(', ')}`);
+  if (pages !== undefined) {
+    const count = Number(poppler('pdfinfo', pdf).match(/^Pages:\s+(\d+)$/m)?.[1]);
+    if (count !== pages) throw new Error(`PDF has ${count} pages, want ${pages}`);
+  }
+  return `${pdf.length} bytes`;
+}
+
+// Steps share results through `out`; a step whose input failed fails too.
+const STEPS = [
+  ['Chromium converts HTML (and runs its JavaScript)', async (api, out) => {
+    out.chromium = await api('/forms/chromium/convert/html', [fixture('index.html')]);
+    return expectPdf(out.chromium, ['Chromium render test', 'JavaScript render marker'], 1);
+  }],
+  ['LibreOffice converts a Word document', async (api, out) => {
+    out.libreoffice = await api('/forms/libreoffice/convert', [fixture('document.docx')]);
+    return expectPdf(out.libreoffice, ['LibreOffice render test'], 1);
+  }],
+  ['LibreOffice converts a spreadsheet (and evaluates its formula)', async api => {
+    const pdf = await api('/forms/libreoffice/convert', [fixture('spreadsheet.xlsx')]);
+    return expectPdf(pdf, ['Spreadsheet render test', '42']);
+  }],
+  ['Chromium takes a screenshot', async api => {
+    const png = await api('/forms/chromium/screenshot/html', [fixture('index.html')]);
+    if (!png.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) {
+      throw new Error('response is not a PNG');
+    }
+    const width = png.readUInt32BE(16);
+    const height = png.readUInt32BE(20);
+    if (width !== 800 || height !== 600) throw new Error(`screenshot is ${width}x${height}, want 800x600`);
+    if (png.length < MIN_SCREENSHOT_BYTES) throw new Error(`screenshot is ${png.length} bytes, looks blank`);
+    return `${width}x${height}, ${png.length} bytes`;
+  }],
+  ['PDF engines merge two PDFs', async (api, out) => {
+    out.merged = await api('/forms/pdfengines/merge', [
+      { name: '1.pdf', data: out.chromium }, { name: '2.pdf', data: out.libreoffice },
+    ]);
+    return expectPdf(out.merged, ['Chromium render test', 'LibreOffice render test'], 2);
+  }],
+  ['PDF engines read metadata', async (api, out) => {
+    const metadata = JSON.parse((await api('/forms/pdfengines/metadata/read', [{ name: 'merged.pdf', data: out.merged }])).toString());
+    const pages = metadata['merged.pdf']?.PageCount;
+    if (pages !== 2) throw new Error(`metadata PageCount is ${pages}, want 2`);
+    return `PageCount ${pages}`;
+  }],
+  ['PDF engines convert to PDF/A-2b', async (api, out) => {
+    const pdf = await api('/forms/pdfengines/convert', [{ name: 'in.pdf', data: out.libreoffice }], { pdfa: 'PDF/A-2b' });
+    const xmp = poppler('pdfinfo', pdf, ['-meta']);
+    if (!/<pdfaid:part>2<\/pdfaid:part>/.test(xmp)) throw new Error('PDF has no PDF/A-2 identification');
+    return expectPdf(pdf, ['LibreOffice render test']);
+  }],
+];
 
 async function main() {
   const releases = json('helm', ['list', '--all-namespaces', '--output', 'json'])
@@ -83,32 +132,30 @@ async function main() {
       'get', 'deployment', '-n', namespace, '-l', `app.kubernetes.io/instance=${name}`, '-o', 'json',
     ]).items[0].spec.template.spec.containers[0].args ?? [];
     const { localPort, stop } = await portForward(namespace, service.metadata.name, service.spec.ports[0].port);
+    const baseUrl = `http://127.0.0.1:${localPort}`;
+    const api = (route, files, fields) => post(baseUrl, route, files, fields);
 
     try {
-      for (const conversion of CONVERSIONS) {
-        const label = `${namespace}/${name}: ${conversion.module} (${conversion.file})`;
+      const out = {};
+      for (const [label, step] of STEPS) {
         try {
-          const pdf = await convert(`http://127.0.0.1:${localPort}`, conversion);
-          if (pdf.subarray(0, 5).toString() !== '%PDF-') throw new Error('response is not a PDF');
-          const text = pdfText(pdf);
-          const missing = conversion.markers.filter(m => !text.includes(m));
-          if (missing.length > 0) throw new Error(`PDF is missing ${missing.map(m => `"${m}"`).join(', ')}`);
-          console.log(`ok   ${label}: ${pdf.length} bytes`);
+          console.log(`ok   ${namespace}/${name}: ${label}: ${await step(api, out)}`);
         } catch (e) {
           failures++;
-          console.log(`FAIL ${label}: ${e.message}`);
+          console.log(`FAIL ${namespace}/${name}: ${label}: ${e.message}`);
         }
       }
+
       if (args.includes('--chromium-deny-private-ips')) {
-        const label = `${namespace}/${name}: Chromium refuses ${PRIVATE_URL}`;
+        const label = `Chromium refuses ${PRIVATE_URL}`;
         const form = new FormData();
         form.append('url', PRIVATE_URL);
-        const response = await fetch(`http://127.0.0.1:${localPort}/forms/chromium/convert/url`, { method: 'POST', body: form });
+        const response = await fetch(`${baseUrl}/forms/chromium/convert/url`, { method: 'POST', body: form });
         if (response.status === 403) {
-          console.log(`ok   ${label}`);
+          console.log(`ok   ${namespace}/${name}: ${label}`);
         } else {
           failures++;
-          console.log(`FAIL ${label}: got HTTP ${response.status}, want 403`);
+          console.log(`FAIL ${namespace}/${name}: ${label}: got HTTP ${response.status}, want 403`);
         }
       }
     } finally {

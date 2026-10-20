@@ -96,10 +96,10 @@ matches with default values:
       annotations:
         helm.sh/hook: test
       labels:
+        app.kubernetes.io/component: test
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: gotenberg
-        app.kubernetes.io/version: 0.0.0
+        app.kubernetes.io/name: gotenberg-test
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
@@ -330,10 +330,10 @@ matches with every flag set:
       annotations:
         helm.sh/hook: test
       labels:
+        app.kubernetes.io/component: test
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: gotenberg
-        app.kubernetes.io/version: 0.0.0
+        app.kubernetes.io/name: gotenberg-test
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
@@ -559,10 +559,10 @@ matches with every optional resource enabled:
       annotations:
         helm.sh/hook: test
       labels:
+        app.kubernetes.io/component: test
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: gotenberg
-        app.kubernetes.io/version: 0.0.0
+        app.kubernetes.io/name: gotenberg-test
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
@@ -738,10 +738,10 @@ matches with the CRD-backed and policy resources enabled:
       annotations:
         helm.sh/hook: test
       labels:
+        app.kubernetes.io/component: test
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: gotenberg
-        app.kubernetes.io/version: 0.0.0
+        app.kubernetes.io/name: gotenberg-test
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
@@ -939,10 +939,10 @@ matches with the documented hardened values:
       annotations:
         helm.sh/hook: test
       labels:
+        app.kubernetes.io/component: test
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: gotenberg
-        app.kubernetes.io/version: 0.0.0
+        app.kubernetes.io/name: gotenberg-test
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:

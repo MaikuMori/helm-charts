@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   name: "{{ include "gotenberg.fullname" . }}-test-connection"
   labels:
-    {{- include "gotenberg.labels" . | nindent 4 }}
+    {{- include "gotenberg.testLabels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
     {{- with .Values.testPodAnnotations }}

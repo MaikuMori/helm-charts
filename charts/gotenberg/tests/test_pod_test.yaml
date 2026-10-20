@@ -49,3 +49,9 @@ tests:
       - equal:
           path: spec.containers[0].image
           value: busybox:1.38.0
+
+  - it: isn't selected by the chart's Service, PodDisruptionBudget or NetworkPolicy
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: gotenberg-test

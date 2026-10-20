@@ -44,4 +44,6 @@ annotations:
     - kind: added
       description: Document resource recommendations and a hardened, CI-tested setup for untrusted input
     - kind: fixed
+      description: helm test pods no longer match the chart's Service, PodDisruptionBudget and NetworkPolicy selectors
+    - kind: fixed
       description: The helm test connection check retries instead of hanging when it starts right after an upgrade

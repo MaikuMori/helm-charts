@@ -201,7 +201,7 @@ jobs:
         run: |
           kubectl get pods --all-namespaces -o wide
           kubectl get events --all-namespaces --sort-by=.lastTimestamp | tail -100
-          for pod in $(kubectl get pods --all-namespaces -l app.kubernetes.io/name=gotenberg -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" "}{end}'); do
+          for pod in $(kubectl get pods --all-namespaces -l 'app.kubernetes.io/name in (gotenberg,gotenberg-test)' -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" "}{end}'); do
             echo "::group::$pod"
             kubectl describe pod -n "${pod%%/*}" "${pod#*/}"
             kubectl logs -n "${pod%%/*}" "${pod#*/}" --all-containers --tail=200 || true
