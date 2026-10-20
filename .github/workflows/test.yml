@@ -157,12 +157,18 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@720270857a28afd41e2426521a7801db09e9b510 # v2.9.0
 
+      # Changes to the render test itself install every chart, so they get exercised.
       - name: Run chart-testing (list-changed)
         id: list-changed
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
         run: |
           changed=$(ct list-changed --config ct.yaml)
           if [[ -n "$changed" ]]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif ! git diff --quiet "$BASE" HEAD -- test/render .github/scripts/render-test.js; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "all=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create kind ${{ matrix.k8s }} cluster
@@ -176,10 +182,19 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.3/standard-install.yaml
 
-      # Installs once per charts/<chart>/ci/*-values.yaml file.
+      # Installs once per charts/<chart>/ci/*-values.yaml file and keeps the releases for the render test.
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct install --config ct.yaml --upgrade
+        env:
+          ALL: ${{ steps.list-changed.outputs.all }}
+        run: ct install --config ct.yaml --upgrade --skip-clean-up ${ALL:+--all}
+
+      - name: Render documents with every installed release
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils >/dev/null
+          node .github/scripts/render-test.js
 
   # Stable check to require in branch protection: the install matrix check
   # names embed the kind node-image SHA and change on every image bump.
