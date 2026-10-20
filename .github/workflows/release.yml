@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - "charts/**"
+  workflow_dispatch:
 
 permissions: {}
 
@@ -50,6 +51,7 @@ jobs:
           name: chart-packages
           path: .cr-release-packages/
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 7
 
   # Never sees the signing key.
