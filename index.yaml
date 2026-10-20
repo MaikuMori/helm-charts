@@ -3,6 +3,49 @@ entries:
   gotenberg:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: Sign the OCI chart and the release archive with keyless cosign, alongside the existing GPG provenance, and document how to verify both
+        - kind: added
+          description: Add image.digest and testImage.digest to pull images by digest
+        - kind: changed
+          description: Pin the helm test image to busybox 1.38.0 by digest instead of busybox:latest
+        - kind: security
+          description: Run the helm test pod without a service account token, as a non-root user with a read-only root filesystem, no capabilities and the RuntimeDefault seccomp profile
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+      artifacthub.io/signKey: |
+        fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
+        url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
+    apiVersion: v2
+    appVersion: 8.38.1
+    created: "2026-10-20T07:22:55.177644675Z"
+    description: A Helm chart for Gotenberg
+    digest: cfe1a063514a1986c003b5a7dd0815910596d42e62effd1d18ae1ead408b9a9a
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.28.0/gotenberg-1.28.0.tgz
+    version: 1.28.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: Generate the values schema with helm-values-schema-json; descriptions are clean and deprecated values are marked deprecated
         - kind: changed
@@ -1648,4 +1691,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-19T18:50:12.064545799Z"
+generated: "2026-10-20T07:22:55.177944336Z"
