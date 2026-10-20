@@ -33,4 +33,4 @@ CI pins `helm-docs`, `helm schema`, `helm-tool` and `actionlint` in `tools/*/go.
 - A value without a default needs its type, e.g. `# @schema type: [string, null]`.
 - Deprecated values get `# @schema deprecated` and a description starting with `Deprecated:`.
 
-CI also installs the chart once per values file in `charts/gotenberg/ci/` on each supported Kubernetes version, then runs `.github/scripts/render-test.js` against every installed release: it converts the documents in `test/render/` with Chromium and LibreOffice, takes a screenshot, merges, reads and PDF/A-converts the results with the PDF engines, and checks each result contains the documents' text.
+CI also installs the chart once per values file in `charts/gotenberg/ci/` on each supported Kubernetes version, in kind clusters that enforce the Pod Security `restricted` level (`.github/kind/`), then runs `.github/scripts/render-test.js` against every installed release: it converts the documents in `test/render/` with Chromium and LibreOffice, takes a screenshot, merges, reads and PDF/A-converts the results with the PDF engines, and checks each result contains the documents' text.

@@ -123,7 +123,9 @@ jobs:
         uses: helm/chart-testing-action@720270857a28afd41e2426521a7801db09e9b510 # v2.9.0
 
       - name: Run chart-testing (lint)
-        run: ct lint --config ct.yaml
+        env:
+          TARGET_BRANCH: ${{ github.base_ref }}
+        run: ct lint --config ct.yaml --target-branch "$TARGET_BRANCH"
 
   install:
     runs-on: ubuntu-latest
@@ -157,16 +159,17 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@720270857a28afd41e2426521a7801db09e9b510 # v2.9.0
 
-      # Changes to the render test itself install every chart, so they get exercised.
+      # Changes to the render test or the cluster setup install every chart, so they get exercised.
       - name: Run chart-testing (list-changed)
         id: list-changed
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
+          TARGET_BRANCH: ${{ github.base_ref }}
         run: |
-          changed=$(ct list-changed --config ct.yaml)
+          changed=$(ct list-changed --config ct.yaml --target-branch "$TARGET_BRANCH")
           if [[ -n "$changed" ]]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-          elif ! git diff --quiet "$BASE" HEAD -- test/render .github/scripts/render-test.js; then
+          elif ! git diff --quiet "$BASE" HEAD -- test/render .github/scripts/render-test.js .github/kind; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "all=true" >> "$GITHUB_OUTPUT"
           fi
@@ -177,6 +180,7 @@ jobs:
         with:
           version: v0.33.0
           node_image: kindest/node:${{ matrix.k8s }}
+          config: .github/kind/cluster.yaml
 
       - name: Install Gateway API CRDs
         if: steps.list-changed.outputs.changed == 'true'
@@ -187,7 +191,8 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         env:
           ALL: ${{ steps.list-changed.outputs.all }}
-        run: ct install --config ct.yaml --upgrade --skip-clean-up ${ALL:+--all}
+          TARGET_BRANCH: ${{ github.base_ref }}
+        run: ct install --config ct.yaml --target-branch "$TARGET_BRANCH" --upgrade --skip-clean-up ${ALL:+--all}
 
       - name: Render documents with every installed release
         if: steps.list-changed.outputs.changed == 'true'

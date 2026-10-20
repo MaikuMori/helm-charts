@@ -1,0 +1,37 @@
+# kind cluster for the install tests: the API server enforces pod-security.yaml.
+# kind uses kubeadm's v1beta3 or v1beta4 config depending on the Kubernetes
+# version, and applies only the patch whose apiVersion matches.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraMounts:
+      - hostPath: .github/kind/pod-security.yaml
+        containerPath: /etc/kubernetes/pod-security/admission.yaml
+        readOnly: true
+    kubeadmConfigPatches:
+      - |
+        apiVersion: kubeadm.k8s.io/v1beta3
+        kind: ClusterConfiguration
+        apiServer:
+          extraArgs:
+            admission-control-config-file: /etc/kubernetes/pod-security/admission.yaml
+          extraVolumes:
+            - name: pod-security
+              hostPath: /etc/kubernetes/pod-security
+              mountPath: /etc/kubernetes/pod-security
+              readOnly: true
+              pathType: Directory
+      - |
+        apiVersion: kubeadm.k8s.io/v1beta4
+        kind: ClusterConfiguration
+        apiServer:
+          extraArgs:
+            - name: admission-control-config-file
+              value: /etc/kubernetes/pod-security/admission.yaml
+          extraVolumes:
+            - name: pod-security
+              hostPath: /etc/kubernetes/pod-security
+              mountPath: /etc/kubernetes/pod-security
+              readOnly: true
+              pathType: Directory
