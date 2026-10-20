@@ -2,9 +2,12 @@
 // release archive signed with a Sigstore bundle on the GitHub release.
 // Always works from the archive attached to the GitHub release, never pushes
 // over an existing OCI version, and only signs what isn't verifiably signed,
-// so re-runs repair a partially published release.
+// so re-runs repair a partially published release. Writes the archives' and
+// OCI charts' digests to a checksums file for the provenance attestation step
+// and returns its path as the `subjects` output.
 // Runs through actions/github-script.
 
+const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -74,6 +77,7 @@ module.exports = async ({ github, context, core }) => {
   const identity = `https://github.com/${process.env.GITHUB_WORKFLOW_REF}`;
   const verifyFlags = ['--certificate-identity', identity, '--certificate-oidc-issuer', OIDC_ISSUER];
   const workDir = fs.mkdtempSync(path.join(process.env.RUNNER_TEMP || os.tmpdir(), 'publish-'));
+  const subjects = [];
 
   for (const entry of fs.readdirSync(CHARTS, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
@@ -109,6 +113,8 @@ module.exports = async ({ github, context, core }) => {
     }
 
     const image = `${REGISTRY_HOST}/${REGISTRY_PATH}/${name}@${digest}`;
+    subjects.push(`${crypto.createHash('sha256').update(fs.readFileSync(pkg)).digest('hex')}  ${archive}`);
+    subjects.push(`${digest.replace(/^sha256:/, '')}  ${REGISTRY_HOST}/${REGISTRY_PATH}/${name}`);
     if (!run(core, 'cosign', ['verify', image, ...verifyFlags], { check: false }).ok) {
       run(core, 'cosign', ['sign', '--yes', image]);
       run(core, 'cosign', ['verify', image, ...verifyFlags]);
@@ -137,5 +143,11 @@ module.exports = async ({ github, context, core }) => {
       headers: { 'content-type': 'application/json' },
     });
     core.info(`Signed ${image} and attached ${bundleName} to ${tag}.`);
+  }
+
+  if (subjects.length > 0) {
+    const file = path.join(workDir, 'attestation-subjects.txt');
+    fs.writeFileSync(file, `${subjects.join('\n')}\n`);
+    core.setOutput('subjects', file);
   }
 };

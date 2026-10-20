@@ -65,6 +65,15 @@ cosign verify-blob gotenberg-<version>.tgz --bundle gotenberg-<version>.tgz.sigs
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```
 
+From chart 1.29.0, releases also carry [GitHub artifact attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations) recording the workflow run that built them. Verify them with the GitHub CLI:
+
+```console
+gh attestation verify oci://ghcr.io/maikumori/helm-charts/gotenberg:<version> --repo MaikuMori/helm-charts \
+  --signer-workflow MaikuMori/helm-charts/.github/workflows/release.yml
+gh attestation verify gotenberg-<version>.tgz --repo MaikuMori/helm-charts \
+  --signer-workflow MaikuMori/helm-charts/.github/workflows/release.yml
+```
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `my-release` deployment:
