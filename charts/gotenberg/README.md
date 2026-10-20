@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.28.0](https://img.shields.io/badge/Version-1.28.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.38.1](https://img.shields.io/badge/AppVersion-8.38.1-informational?style=flat-square)
+![Version: 1.29.0](https://img.shields.io/badge/Version-1.29.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.38.1](https://img.shields.io/badge/AppVersion-8.38.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -275,7 +275,7 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
 | readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set. | Define the security context for the container. By default will use upstream recommended values. |
+| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001 (left to the cluster on OpenShift), with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile. The root filesystem stays writable for Chromium. | Define the security context for the container. Replaces the default entirely when set. |
 | service.annotations | object | `{}` | Annotations to add to the service |
 | service.loadBalancerIP | string | `""` | Deprecated: Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead. |
 | service.port | int | `80` |  |

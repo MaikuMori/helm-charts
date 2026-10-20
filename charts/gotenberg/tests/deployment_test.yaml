@@ -127,14 +127,20 @@ tests:
       - isNullOrEmpty:
           path: spec.template.spec.containers[0].env
 
-  - it: runs as the image's gotenberg user by default
+  - it: runs as the image's gotenberg user with a restricted security context by default
     asserts:
       - equal:
           path: spec.template.spec.containers[0].securityContext
           value:
             privileged: false
             runAsUser: 1001
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
             readOnlyRootFilesystem: false
       - isNullOrEmpty:
           path: spec.template.spec.containers[0].env
@@ -146,6 +152,13 @@ tests:
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].securityContext.runAsUser
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.capabilities.drop
+          value:
+            - ALL
       - contains:
           path: spec.template.spec.containers[0].env
           content:

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.29.0
+
+- The default container security context now meets the Pod Security `restricted` level: it adds `runAsNonRoot: true`, drops all capabilities and uses the `RuntimeDefault` seccomp profile, on OpenShift too. A custom `securityContext` still replaces the default entirely. CI converts real documents with Chromium and LibreOffice under these settings on every supported Kubernetes version.
+
 ## 1.28.0
 
 - Sign the OCI chart and the release archive with keyless [cosign](https://github.com/sigstore/cosign), alongside the existing GPG provenance, and document how to verify both.

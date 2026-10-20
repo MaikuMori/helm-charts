@@ -49,9 +49,15 @@ matches with default values:
               resources: {}
               securityContext:
                 allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
                 privileged: false
                 readOnlyRootFilesystem: false
+                runAsNonRoot: true
                 runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
               startupProbe:
                 failureThreshold: 30
                 httpGet:
@@ -274,9 +280,15 @@ matches with every flag set:
               resources: {}
               securityContext:
                 allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
                 privileged: false
                 readOnlyRootFilesystem: false
+                runAsNonRoot: true
                 runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
               startupProbe:
                 failureThreshold: 30
                 httpGet:
@@ -396,9 +408,15 @@ matches with every optional resource enabled:
               resources: {}
               securityContext:
                 allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
                 privileged: false
                 readOnlyRootFilesystem: false
+                runAsNonRoot: true
                 runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
               startupProbe:
                 failureThreshold: 30
                 httpGet:
@@ -617,9 +635,15 @@ matches with the CRD-backed and policy resources enabled:
               resources: {}
               securityContext:
                 allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
                 privileged: false
                 readOnlyRootFilesystem: false
+                runAsNonRoot: true
                 runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
               startupProbe:
                 failureThreshold: 30
                 httpGet:

@@ -73,18 +73,19 @@ And apply recommended settings from upstream project.
 {{- define "gotenberg.securityContext" -}}
 {{- if .Values.securityContext }}
 {{- toYaml .Values.securityContext }}
-{{- else}}
-{{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
-privileged: false
-allowPrivilegeEscalation: false
-# Issue with Chromium, see: https://github.com/gotenberg/gotenberg/issues/949
-readOnlyRootFilesystem: false
 {{- else -}}
 privileged: false
+{{- if not (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
 runAsUser: 1001
+{{- end }}
+runAsNonRoot: true
 allowPrivilegeEscalation: false
+capabilities:
+  drop:
+    - ALL
+seccompProfile:
+  type: RuntimeDefault
 # Issue with Chromium, see: https://github.com/gotenberg/gotenberg/issues/949
 readOnlyRootFilesystem: false
-{{- end}}
-{{- end}}
-{{- end}}
+{{- end }}
+{{- end }}

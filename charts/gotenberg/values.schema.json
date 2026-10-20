@@ -787,7 +787,7 @@
       "type": "object"
     },
     "securityContext": {
-      "description": "Define the security context for the container. By default will use upstream recommended values.",
+      "description": "Define the security context for the container. Replaces the default entirely when set.",
       "type": "object"
     },
     "service": {
