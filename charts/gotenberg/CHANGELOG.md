@@ -3,6 +3,7 @@
 ## 1.29.0
 
 - The default container security context now meets the Pod Security `restricted` level: it adds `runAsNonRoot: true`, drops all capabilities and uses the `RuntimeDefault` seccomp profile, on OpenShift too. A custom `securityContext` still replaces the default entirely. CI converts real documents with Chromium and LibreOffice under these settings on every supported Kubernetes version.
+- The `helm test` connection check retries for up to about a minute with a 5-second timeout per attempt. Right after an upgrade, the Service could still route its single attempt to the replaced pod, and it then hung for two minutes before failing.
 
 ## 1.28.0
 

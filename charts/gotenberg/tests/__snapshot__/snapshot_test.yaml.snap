@@ -106,12 +106,15 @@ matches with default values:
       automountServiceAccountToken: false
       containers:
         - args:
-            - -q
-            - -O
-            - /dev/null
-            - RELEASE-NAME-gotenberg:80/health
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
           command:
-            - wget
+            - /bin/sh
+            - -c
           image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
           securityContext:
@@ -337,12 +340,15 @@ matches with every flag set:
       automountServiceAccountToken: false
       containers:
         - args:
-            - -q
-            - -O
-            - /dev/null
-            - RELEASE-NAME-gotenberg:80/health
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
           command:
-            - wget
+            - /bin/sh
+            - -c
           image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
           securityContext:
@@ -563,12 +569,15 @@ matches with every optional resource enabled:
       automountServiceAccountToken: false
       containers:
         - args:
-            - -q
-            - -O
-            - /dev/null
-            - RELEASE-NAME-gotenberg:80/health
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
           command:
-            - wget
+            - /bin/sh
+            - -c
           image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
           securityContext:
@@ -739,12 +748,15 @@ matches with the CRD-backed and policy resources enabled:
       automountServiceAccountToken: false
       containers:
         - args:
-            - -q
-            - -O
-            - /dev/null
-            - RELEASE-NAME-gotenberg:80/health
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
           command:
-            - wget
+            - /bin/sh
+            - -c
           image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
           securityContext:
