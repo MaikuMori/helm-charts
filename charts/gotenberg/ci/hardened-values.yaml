@@ -22,7 +22,8 @@ networkPolicy:
       ports:
         - port: 3000
   # Only allow DNS and HTTP(S) to public addresses, so URLs in documents and
-  # webhooks can't reach the cluster network.
+  # webhooks can't reach the cluster network. DNS pods are kube-dns, or
+  # openshift-dns listening on 5353 on OpenShift.
   allowEgress: false
   extraEgress:
     - to:
@@ -30,10 +31,20 @@ networkPolicy:
           podSelector:
             matchLabels:
               k8s-app: kube-dns
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+          podSelector:
+            matchLabels:
+              dns.operator.openshift.io/daemonset-dns: default
       ports:
         - port: 53
           protocol: UDP
         - port: 53
+          protocol: TCP
+        - port: 5353
+          protocol: UDP
+        - port: 5353
           protocol: TCP
     - to:
         - ipBlock:

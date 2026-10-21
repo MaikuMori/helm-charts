@@ -2,16 +2,17 @@
 // behind by `ct install --skip-clean-up`, or through test/subchart) with the
 // fixtures in test/render: Chromium and LibreOffice conversions, a Chromium
 // screenshot, and merging, PDF/A conversion and metadata reading with the PDF
-// engines. Each result is
-// checked for the fixture's text, not just its file type. Releases running
-// with --chromium-deny-private-ips must also refuse to render a private address.
+// engines. Each result is checked for the fixture's text, not just its file
+// type. Releases running with --chromium-deny-private-ips must also refuse to
+// render a private address, and releases with a NetworkPolicy must resolve and reach public addresses but
+// not the Kubernetes API.
 // Needs pdftotext and pdfinfo (poppler-utils).
 // Usage: node .github/scripts/render-test.js
 
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execFileSync, spawn } = require('child_process');
+const { execFileSync, spawn, spawnSync } = require('child_process');
 
 const FIXTURES = path.join(__dirname, '..', '..', 'test', 'render');
 const PRIVATE_URL = 'http://169.254.169.254/latest/meta-data/';
@@ -71,6 +72,13 @@ function expectPdf(pdf, markers, pages) {
   }
   return `${pdf.length} bytes`;
 }
+
+// Run in the Gotenberg container of releases with a NetworkPolicy: [label, bash script, should succeed].
+const EGRESS_CHECKS = [
+  ['NetworkPolicy allows DNS', 'getent hosts github.com', true],
+  ['NetworkPolicy allows HTTPS to a public address', 'timeout 10 bash -c "exec 3<>/dev/tcp/github.com/443"', true],
+  ['NetworkPolicy blocks the Kubernetes API', 'timeout 10 bash -c "exec 3<>/dev/tcp/kubernetes.default.svc/443"', false],
+];
 
 // Steps share results through `out`; a step whose input failed fails too.
 const STEPS = [
@@ -134,9 +142,13 @@ async function main() {
     ]).items;
     if (services.length !== 1) throw new Error(`Expected one Service for ${namespace}/${name}, found ${services.length}`);
     const service = services[0];
-    const args = json('kubectl', [
+    const deployment = json('kubectl', [
       'get', 'deployment', '-n', namespace, '-l', `app.kubernetes.io/instance=${name}`, '-o', 'json',
-    ]).items[0].spec.template.spec.containers[0].args ?? [];
+    ]).items[0];
+    const args = deployment.spec.template.spec.containers[0].args ?? [];
+    const networkPolicies = json('kubectl', [
+      'get', 'networkpolicy', '-n', namespace, '-l', `app.kubernetes.io/instance=${name}`, '-o', 'json',
+    ]).items;
     const { localPort, stop } = await portForward(namespace, service.metadata.name, service.spec.ports[0].port);
     const baseUrl = `http://127.0.0.1:${localPort}`;
     const api = (route, files, fields) => post(baseUrl, route, files, fields);
@@ -162,6 +174,20 @@ async function main() {
         } else {
           failures++;
           console.log(`FAIL ${namespace}/${name}: ${label}: got HTTP ${response.status}, want 403`);
+        }
+      }
+
+      if (networkPolicies.length > 0) {
+        for (const [label, script, allowed] of EGRESS_CHECKS) {
+          const { status, stderr } = spawnSync('kubectl', [
+            'exec', '-n', namespace, `deployment/${deployment.metadata.name}`, '--', 'bash', '-c', script,
+          ], { encoding: 'utf8', timeout: 30000 });
+          if ((status === 0) === allowed) {
+            console.log(`ok   ${namespace}/${name}: ${label}`);
+          } else {
+            failures++;
+            console.log(`FAIL ${namespace}/${name}: ${label}: exit ${status} ${stderr.trim()}`);
+          }
         }
       }
     } finally {

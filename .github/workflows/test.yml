@@ -281,11 +281,14 @@ jobs:
           kubectl get securitycontextconstraints
 
       # restricted-v2 assigns a namespace UID. anyuid keeps the image's user and
-      # rejects pods that set a seccomp profile.
-      - name: Install under the restricted-v2 and anyuid SCCs
+      # rejects pods that set a seccomp profile. The hardened values' NetworkPolicy
+      # has to allow OpenShift's DNS.
+      - name: Install with the default and hardened values, and under the anyuid SCC
         if: steps.list-changed.outputs.changed == 'true'
         run: |
           helm install restricted charts/gotenberg --namespace restricted --create-namespace --wait --timeout 5m
+          helm install hardened charts/gotenberg --namespace hardened --create-namespace \
+            --values charts/gotenberg/ci/hardened-values.yaml --wait --timeout 5m
 
           kubectl create namespace anyuid
           kubectl -n anyuid create serviceaccount gotenberg
@@ -293,11 +296,12 @@ jobs:
           kubectl -n anyuid create rolebinding gotenberg-anyuid --role=use-anyuid --serviceaccount=anyuid:gotenberg
           helm install anyuid charts/gotenberg --namespace anyuid --set serviceAccount.create=false --set serviceAccount.name=gotenberg --wait --timeout 5m
 
-          for release in restricted anyuid; do
+          for expected in restricted:restricted-v2 hardened:restricted-v2 anyuid:anyuid; do
+            release=${expected%%:*}
             scc=$(kubectl -n "$release" get pods -l app.kubernetes.io/instance="$release",app.kubernetes.io/name=gotenberg -o jsonpath='{.items[0].metadata.annotations.openshift\.io/scc}')
             echo "$release: admitted under $scc"
-            if [[ "$scc" != "$release"* ]]; then
-              echo "::error::$release was admitted under the $scc SCC"
+            if [[ "$scc" != "${expected#*:}" ]]; then
+              echo "::error::$release was admitted under the $scc SCC, want ${expected#*:}"
               exit 1
             fi
             helm test "$release" --namespace "$release" --logs
@@ -315,7 +319,8 @@ jobs:
         run: |
           kubectl get pods --all-namespaces -o wide || true
           kubectl get events --all-namespaces --sort-by=.lastTimestamp | tail -100 || true
-          for namespace in restricted anyuid; do
+          kubectl -n openshift-dns get pods --show-labels || true
+          for namespace in restricted hardened anyuid; do
             kubectl -n "$namespace" describe pods || true
             kubectl -n "$namespace" logs -l app.kubernetes.io/instance="$namespace" --all-containers --tail=200 || true
           done

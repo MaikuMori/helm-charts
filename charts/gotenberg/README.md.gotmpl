@@ -134,7 +134,7 @@ resources:
 
 ## Hardening for Untrusted Input
 
-The default security context already meets the Pod Security `restricted` level. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service. If callers or their documents aren't trusted, deny private addresses and limit the pod's network access. CI installs this configuration on every supported Kubernetes version, converts documents with it, and checks that Chromium refuses a private address:
+The default security context already meets the Pod Security `restricted` level. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service. If callers or their documents aren't trusted, deny private addresses and limit the pod's network access. CI installs this configuration on every supported Kubernetes version and on OpenShift (MicroShift), converts documents with it, and checks that Chromium refuses a private address and that the NetworkPolicy allows DNS and public HTTPS but blocks the Kubernetes API:
 
 ```yaml
 {{ .Files.Get "ci/hardened-values.yaml" }}```

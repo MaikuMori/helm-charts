@@ -882,11 +882,21 @@ matches with the documented hardened values:
               protocol: UDP
             - port: 53
               protocol: TCP
+            - port: 5353
+              protocol: UDP
+            - port: 5353
+              protocol: TCP
           to:
             - namespaceSelector: {}
               podSelector:
                 matchLabels:
                   k8s-app: kube-dns
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: openshift-dns
+              podSelector:
+                matchLabels:
+                  dns.operator.openshift.io/daemonset-dns: default
         - ports:
             - port: 80
             - port: 443
