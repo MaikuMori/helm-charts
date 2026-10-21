@@ -16,6 +16,15 @@ Please also open an issue. If you use the chart as a dependency and need an olde
 
 **Behaviour change for values set to `0`:** `api.downloadFromMaxRetry: 0` and `gotenberg.gracefulShutdownDurationSec: 0` were dropped, so Gotenberg kept its default of 4 retries and a 30s shutdown. They now pass `0`: downloads aren't retried, and Gotenberg's shutdown matches the pod's `terminationGracePeriodSeconds: 0`, which already stopped the pod immediately. To keep the old behaviour, remove the value. `chromium.restartAfter`, `libreOffice.restartAfter` and `webhook.maxRetry` now accept numbers too, including `0`; the strings they took before render as they did. `pdb.minAvailable: 0` still leaves `minAvailable` out, so `pdb.maxUnavailable` can be used.
 
+With `api.downloadFromMaxRetry: 0` and `gotenberg.gracefulShutdownDurationSec: 0`, the Deployment's container args change like this:
+
+```diff
+   - gotenberg
+   - --api-port=3000
++  - --api-download-from-max-retry=0
++  - --gotenberg-graceful-shutdown-duration=0s
+```
+
 - Outside OpenShift, the default container security context now meets the Pod Security `restricted` level: it adds `runAsNonRoot: true`, drops all capabilities and uses the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, it only drops all capabilities and leaves the rest to the SCC. OpenShift is detected only when Helm can see the cluster: rendering offline (`helm template`, some GitOps setups) emits the non-OpenShift default, whose seccomp profile the `anyuid` SCC rejects, unless you pass `--api-versions security.openshift.io/v1`. OpenShift support is best effort, tested on MicroShift built from OKD. A custom `securityContext` still replaces the default entirely. CI converts real documents with Chromium and LibreOffice under these settings on the Kubernetes versions CI covers (1.34 to 1.37).
 - Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations, verifiable with `gh attestation verify`.
 - Document resource recommendations and a hardening example to start from for untrusted input (deny private addresses in every module that fetches URLs, plus a NetworkPolicy that allows DNS on Kubernetes and OpenShift). CI installs the example on the Kubernetes versions CI covers (1.34 to 1.37) and on MicroShift to catch regressions.
