@@ -29,8 +29,12 @@ tests:
       apiVersions:
         - security.openshift.io/v1
     asserts:
-      - notExists:
+      - equal:
           path: spec.securityContext
+          value:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
 
   - it: pulls the test image by digest
     asserts:
