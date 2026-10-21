@@ -4,13 +4,12 @@
 // Covers every integer or number value in values.schema.json whose default
 // isn't already 0, rendered with the defaults and with every optional feature
 // enabled. Values where 0 has no meaning of its own are listed in ZERO_IGNORED.
-// Usage: node .github/scripts/zero-values-test.js
+// Usage: node test/zero-values-test.js
 
 const fs = require('fs');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { CHART, text } = require('./lib');
 
-const CHART = path.join(__dirname, '..', '..', 'charts', 'gotenberg');
 const SENTINEL = '4271';
 const API_VERSIONS = ['monitoring.coreos.com/v1', 'autoscaling.k8s.io/v1', 'gateway.networking.k8s.io/v1'];
 
@@ -43,14 +42,14 @@ function switches(schema, prefix = '') {
   return out;
 }
 
-const render = (base, set) => execFileSync('helm', [
+const render = (base, set) => text('helm', [
   'template', 'zero', CHART, ...API_VERSIONS.flatMap(v => ['--api-versions', v]),
   ...[...base, ...set].flatMap(s => ['--set-json', s]),
-], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+], { stdio: ['ignore', 'pipe', 'pipe'] });
 
 function main() {
   const schema = JSON.parse(fs.readFileSync(path.join(CHART, 'values.schema.json'), 'utf8'));
-  const values = execFileSync('helm', ['show', 'values', CHART], { encoding: 'utf8' });
+  const values = text('helm', ['show', 'values', CHART]);
   const bases = [[], switches(schema).map(s => `${s}=true`)];
   let failures = 0;
   for (const { name } of leaves(schema)) {
@@ -93,8 +92,7 @@ function main() {
 }
 
 function lookup(yaml, name) {
-  const json = execFileSync('yq', ['-o=json', `.${name}`], { input: yaml, encoding: 'utf8' });
-  return JSON.parse(json);
+  return JSON.parse(text('yq', ['-o=json', `.${name}`], { input: yaml }));
 }
 
 main();

@@ -4,27 +4,17 @@
 // with the default values. Releases go into one namespace that only enforces
 // the Pod Security baseline level, since earlier versions may not meet
 // restricted, and are kept for the render test.
-// Usage: node .github/scripts/upgrade-test.js <target branch> [published minor releases]
+// Usage: node test/upgrade-test.js <target branch> [published minor releases]
 
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execFile, execFileSync } = require('child_process');
+const { execFileSync } = require('child_process');
+const { CHART, ROOT, text, run } = require('./lib');
 
-const CHART = 'charts/gotenberg';
 const REPO = 'https://maikumori.github.io/helm-charts';
 const NAMESPACE = 'upgrade';
-const HARDENED = `${CHART}/ci/hardened-values.yaml`;
-
-function run(cmd, args) {
-  return new Promise((resolve, reject) => {
-    execFile(cmd, args, { maxBuffer: 16 * 1024 * 1024 }, (error, stdout, stderr) => {
-      const output = `$ ${cmd} ${args.join(' ')}\n${stdout}${stderr}`;
-      if (error) reject(new Error(`${output}\n${error.message}`));
-      else resolve(output);
-    });
-  });
-}
+const HARDENED = path.join(CHART, 'ci', 'hardened-values.yaml');
 
 async function upgrade({ release, from, values }) {
   const common = ['--namespace', NAMESPACE, '--wait', '--timeout', '5m', ...(values ? ['--values', values] : [])];
@@ -39,10 +29,10 @@ async function main() {
   if (!targetBranch) throw new Error('Usage: upgrade-test.js <target branch> [published minor releases]');
 
   const previous = fs.mkdtempSync(path.join(process.env.RUNNER_TEMP || os.tmpdir(), 'previous-'));
-  execFileSync('bash', ['-c', `git archive "origin/${targetBranch}" ${CHART} | tar -x -C "${previous}"`], { stdio: 'inherit' });
-  const previousChart = path.join(previous, CHART);
+  execFileSync('bash', ['-c', `git archive "origin/${targetBranch}" charts/gotenberg | tar -x -C "${previous}"`], { cwd: ROOT, stdio: 'inherit' });
+  const previousChart = path.join(previous, 'charts', 'gotenberg');
 
-  const index = execFileSync('curl', ['-fsSL', `${REPO}/index.yaml`], { encoding: 'utf8' });
+  const index = text('curl', ['-fsSL', `${REPO}/index.yaml`]);
   const minors = [...index.matchAll(/^\s+version: "?(\d+\.\d+\.0)"?$/gm)].map(m => m[1])
     .filter((v, i, all) => all.indexOf(v) === i)
     .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))

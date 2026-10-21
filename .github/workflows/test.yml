@@ -95,13 +95,13 @@ jobs:
 
       - name: Run helm-unittest
         run: |
-          if ! helm unittest --strict charts/*; then
+          if ! npm run test:unit; then
             echo "::error::If the rendered output changed on purpose, update the snapshots with 'helm unittest -u charts/gotenberg' and commit them."
             exit 1
           fi
 
       - name: Check that numeric values set to 0 are rendered
-        run: node .github/scripts/zero-values-test.js
+        run: npm run test:zero
 
       - name: Render as a subchart
         run: |
@@ -180,7 +180,7 @@ jobs:
           changed=$(ct list-changed --config ct.yaml --target-branch "$TARGET_BRANCH")
           if [[ -n "$changed" ]]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-          elif ! git diff --quiet "origin/$TARGET_BRANCH...HEAD" -- test/render test/subchart .github/scripts/render-test.js .github/kind .github/workflows/test.yml; then
+          elif ! git diff --quiet "origin/$TARGET_BRANCH...HEAD" -- test .github/workflows/test.yml; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "all=true" >> "$GITHUB_OUTPUT"
           fi
@@ -191,7 +191,7 @@ jobs:
         with:
           version: v0.33.0
           node_image: kindest/node:${{ matrix.k8s }}
-          config: .github/kind/cluster.yaml
+          config: test/kind/cluster.yaml
 
       - name: Install Gateway API CRDs
         if: steps.list-changed.outputs.changed == 'true'
@@ -211,7 +211,7 @@ jobs:
         env:
           TARGET_BRANCH: ${{ github.base_ref || 'master' }}
           RELEASES: ${{ strategy.job-index == 0 && 5 || 0 }}
-        run: node .github/scripts/upgrade-test.js "$TARGET_BRANCH" "$RELEASES"
+        run: npm run test:upgrade -- "$TARGET_BRANCH" "$RELEASES"
 
       - name: Install as a subchart
         if: steps.list-changed.outputs.changed == 'true'
@@ -225,7 +225,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq poppler-utils >/dev/null
-          node .github/scripts/render-test.js
+          npm run test:render
 
       - name: Show cluster state
         if: failure() && steps.list-changed.outputs.changed == 'true'
@@ -269,7 +269,7 @@ jobs:
           TARGET_BRANCH: ${{ github.base_ref || 'master' }}
         run: |
           if [[ -n "$(ct list-changed --config ct.yaml --target-branch "$TARGET_BRANCH")" ]] ||
-            ! git diff --quiet "origin/$TARGET_BRANCH...HEAD" -- test/render .github/scripts/render-test.js .github/workflows/test.yml; then
+            ! git diff --quiet "origin/$TARGET_BRANCH...HEAD" -- test/render test/lib.js .github/workflows/test.yml; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -333,7 +333,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq poppler-utils >/dev/null
-          node .github/scripts/render-test.js
+          npm run test:render
 
       - name: Show cluster state
         if: failure() && steps.list-changed.outputs.changed == 'true'

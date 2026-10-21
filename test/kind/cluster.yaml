@@ -6,7 +6,7 @@ apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
   - role: control-plane
     extraMounts:
-      - hostPath: .github/kind/pod-security.yaml
+      - hostPath: test/kind/pod-security.yaml
         containerPath: /etc/kubernetes/pod-security/admission.yaml
         readOnly: true
     kubeadmConfigPatches:

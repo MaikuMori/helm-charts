@@ -17,6 +17,15 @@ CI pins `helm-docs`, `helm schema`, `helm-tool` and `actionlint` in `tools/*/go.
 
 ## Tests
 
+Tests inside the chart follow Helm's conventions: `charts/gotenberg/tests/` for unit tests and `charts/gotenberg/ci/` for the values chart-testing installs. Everything else is in `test/`. `package.json` lists the entry points CI runs, and needs no `npm install`:
+
+```console
+npm test                  # unit tests and the zero-value check, no cluster needed
+npm run test:cluster      # kind cluster enforcing Pod Security restricted
+npm run test:render       # against every Gotenberg release in the current cluster
+npm run test:upgrade -- master 5
+```
+
 `charts/gotenberg/tests/` holds [helm-unittest](https://github.com/helm-unittest/helm-unittest) suites:
 
 - `snapshot_test.yaml` renders the chart with the `ci/` values files and `tests/values/all-flags.yaml`, and compares the output with `tests/__snapshot__/`. When you change rendered output on purpose, run `helm unittest -u charts/gotenberg` and commit the updated snapshot. Its diff in the pull request shows reviewers exactly what changed in the manifests.
@@ -25,7 +34,7 @@ CI pins `helm-docs`, `helm schema`, `helm-tool` and `actionlint` in `tools/*/go.
 
 `schema_test.yaml` checks what `values.schema.json` accepts and rejects.
 
-`.github/scripts/zero-values-test.js` sets every integer value in the schema to 0 and fails if 0 doesn't render wherever another number would, so a value guarded by `{{ if .Values.x }}` doesn't silently drop 0. Guard numeric flags with `{{ if or .Values.x (eq (toString .Values.x) "0") }}`, or add the value to its `ZERO_IGNORED` list with the reason 0 has no meaning of its own.
+`test/zero-values-test.js` sets every integer value in the schema to 0 and fails if 0 doesn't render wherever another number would, so a value guarded by `{{ if .Values.x }}` doesn't silently drop 0. Guard numeric flags with `{{ if include "gotenberg.isSet" .Values.x }}`, or add the value to its `ZERO_IGNORED` list with the reason 0 has no meaning of its own.
 
 `test/subchart/` is a parent chart that depends on `charts/gotenberg` and sets Helm `global` values. CI renders it with each of the chart's `ci/` and `tests/values/` files nested under `gotenberg:`, and installs it in the kind clusters, so the chart keeps working as a dependency.
 
@@ -39,4 +48,4 @@ The `openshift` job installs the chart on [MicroShift](https://github.com/micros
 - A value without a default needs its type, e.g. `# @schema type: [string, null]`.
 - Deprecated values get `# @schema deprecated` and a description starting with `Deprecated:`.
 
-CI also installs the chart once per values file in `charts/gotenberg/ci/` on each Kubernetes version in the `install` matrix, in kind clusters that enforce the Pod Security `restricted` level (`.github/kind/`), then runs `.github/scripts/render-test.js` against every installed release: it converts the documents in `test/render/` with Chromium and LibreOffice, takes a screenshot, merges, reads and PDF/A-converts the results with the PDF engines, and checks the PDFs' text and page counts and the screenshot's format, dimensions and size. It also checks each release's egress: every release must reach a public address, and only releases without a restricting NetworkPolicy may reach another release's Service, or get a refused connection (rather than a timeout) on its pod's port 443. `.github/scripts/upgrade-test.js` upgrades from the target branch's chart, with the default and the hardened values, and on the first Kubernetes version from the last five published minor releases, in a namespace that enforces only `baseline`.
+CI also installs the chart once per values file in `charts/gotenberg/ci/` on each Kubernetes version in the `install` matrix, in kind clusters that enforce the Pod Security `restricted` level (`test/kind/`), then runs `test/render/render-test.js` against every installed release: it converts the documents in `test/render/` with Chromium and LibreOffice, takes a screenshot, merges, reads and PDF/A-converts the results with the PDF engines, and checks the PDFs' text and page counts and the screenshot's format, dimensions and size. It also checks each release's egress: every release must reach a public address, and only releases without a restricting NetworkPolicy may reach another release's Service, or get a refused connection (rather than a timeout) on its pod's port 443. `test/upgrade-test.js` upgrades from the target branch's chart, with the default and the hardened values, and on the first Kubernetes version from the last five published minor releases, in a namespace that enforces only `baseline`.

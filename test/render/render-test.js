@@ -7,19 +7,18 @@
 // Every release must resolve and reach a public address, and reach another
 // release's Service and pod only when no NetworkPolicy restricts its egress.
 // Needs pdftotext and pdfinfo (poppler-utils).
-// Usage: node .github/scripts/render-test.js
+// Usage: node test/render/render-test.js
 
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execFileSync, spawn, spawnSync } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
+const { text, json, releaseObjects } = require('../lib');
 
-const FIXTURES = path.join(__dirname, '..', '..', 'test', 'render');
+const FIXTURES = __dirname;
 const PRIVATE_URL = 'http://169.254.169.254/latest/meta-data/';
 // A screenshot of an empty page is about 2.7KB; the fixture renders to about 10KB.
 const MIN_SCREENSHOT_BYTES = 5000;
-
-const json = (cmd, args) => JSON.parse(execFileSync(cmd, args, { encoding: 'utf8' }));
 
 function portForward(namespace, service, port) {
   const child = spawn('kubectl', ['port-forward', '-n', namespace, `svc/${service}`, `0:${port}`]);
@@ -58,7 +57,7 @@ async function post(baseUrl, route, files, fields = {}) {
 function poppler(tool, pdf, args = []) {
   const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'render-')), 'in.pdf');
   fs.writeFileSync(file, pdf);
-  return execFileSync(tool, [...args, file, ...(tool === 'pdftotext' ? ['-'] : [])], { encoding: 'utf8' });
+  return text(tool, [...args, file, ...(tool === 'pdftotext' ? ['-'] : [])]);
 }
 
 function expectPdf(pdf, markers, pages) {
@@ -140,9 +139,7 @@ async function main() {
   if (releases.length === 0) throw new Error('No Gotenberg releases installed');
 
   const installed = releases.map(({ name, namespace }) => {
-    const get = kind => json('kubectl', [
-      'get', kind, '-n', namespace, '-l', `app.kubernetes.io/instance=${name}`, '-o', 'json',
-    ]).items;
+    const get = kind => releaseObjects(kind, namespace, name);
     const services = get('service');
     if (services.length !== 1) throw new Error(`Expected one Service for ${namespace}/${name}, found ${services.length}`);
     const pod = get('pod').find(p => p.status.phase === 'Running' && p.metadata.labels['app.kubernetes.io/component'] !== 'test');
