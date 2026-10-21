@@ -2,6 +2,18 @@
 
 ## 1.29.0
 
+The stricter default security context is new and experimental. If it breaks your deployment, set `securityContext` to the 1.28.0 default, which replaces the new one entirely:
+
+```yaml
+securityContext:
+  privileged: false
+  runAsUser: 1001 # leave out on OpenShift
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+```
+
+Please also open an issue. If you use the chart as a dependency and need an older version, 1.27.0 is the last one before Helm's `global` values were rejected (1.27.1 to 1.28.0).
+
 - The default container security context now meets the Pod Security `restricted` level: it adds `runAsNonRoot: true`, drops all capabilities and uses the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, it only drops all capabilities and leaves the rest to the SCC; the `helm test` pod no longer sets `runAsNonRoot` or a seccomp profile there. OpenShift support is best effort, tested on MicroShift built from OKD. A custom `securityContext` still replaces the default entirely. CI converts real documents with Chromium and LibreOffice under these settings on every supported Kubernetes version.
 - Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations, verifiable with `gh attestation verify`.
 - Document resource recommendations and a hardening example to start from for untrusted input (deny private addresses in every module that fetches URLs, plus a NetworkPolicy that allows DNS on Kubernetes and OpenShift). CI installs the example on every supported Kubernetes version and on MicroShift to catch regressions.
