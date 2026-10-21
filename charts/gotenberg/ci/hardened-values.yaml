@@ -24,7 +24,9 @@ networkPolicy:
         - port: 3000
   # Only allow DNS, and HTTP(S) outside the private ranges below. Adapt the
   # ranges to your cluster and check that your CNI enforces NetworkPolicies;
-  # this alone doesn't guarantee the cluster network is unreachable. IPv4
+  # this alone doesn't guarantee the cluster network is unreachable. Some
+  # CNIs don't apply NetworkPolicies to the node's own addresses, which can
+  # include the Kubernetes API (as on MicroShift). IPv4
   # only: on dual-stack clusters, add ::/0 excepting fc00::/7 and fe80::/10.
   # DNS pods are kube-dns, or openshift-dns listening on 5353 on OpenShift.
   allowEgress: false

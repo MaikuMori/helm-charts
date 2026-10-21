@@ -4,8 +4,8 @@
 // engines. PDFs are checked for the fixture's text and page count, the
 // screenshot for its format, dimensions and size. Releases running with
 // --chromium-deny-private-ips must also refuse to render a private address.
-// Every release must resolve and reach a public address, and reach the
-// Kubernetes API only when no NetworkPolicy restricts its egress.
+// Every release must resolve and reach a public address, and reach another
+// release's Service only when no NetworkPolicy restricts its egress.
 // Needs pdftotext and pdfinfo (poppler-utils).
 // Usage: node .github/scripts/render-test.js
 
@@ -137,20 +137,21 @@ async function main() {
     });
   if (releases.length === 0) throw new Error('No Gotenberg releases installed');
 
-  let failures = 0;
-  for (const { name, namespace } of releases) {
-    const services = json('kubectl', [
-      'get', 'service', '-n', namespace, '-l', `app.kubernetes.io/instance=${name}`, '-o', 'json',
+  const installed = releases.map(({ name, namespace }) => {
+    const get = kind => json('kubectl', [
+      'get', kind, '-n', namespace, '-l', `app.kubernetes.io/instance=${name}`, '-o', 'json',
     ]).items;
+    const services = get('service');
     if (services.length !== 1) throw new Error(`Expected one Service for ${namespace}/${name}, found ${services.length}`);
-    const service = services[0];
-    const deployment = json('kubectl', [
-      'get', 'deployment', '-n', namespace, '-l', `app.kubernetes.io/instance=${name}`, '-o', 'json',
-    ]).items[0];
+    return { name, namespace, service: services[0], deployment: get('deployment')[0], networkPolicies: get('networkpolicy') };
+  });
+  // Releases without a NetworkPolicy accept connections from anywhere in the cluster.
+  const peers = installed.filter(r => r.networkPolicies.length === 0)
+    .map(r => ({ release: r, host: `${r.service.metadata.name}.${r.namespace}.svc`, port: r.service.spec.ports[0].port }));
+
+  let failures = 0;
+  for (const { name, namespace, service, deployment, networkPolicies } of installed) {
     const args = deployment.spec.template.spec.containers[0].args ?? [];
-    const networkPolicies = json('kubectl', [
-      'get', 'networkpolicy', '-n', namespace, '-l', `app.kubernetes.io/instance=${name}`, '-o', 'json',
-    ]).items;
     const { localPort, stop } = await portForward(namespace, service.metadata.name, service.spec.ports[0].port);
     const baseUrl = `http://127.0.0.1:${localPort}`;
     const api = (route, files, fields) => post(baseUrl, route, files, fields);
@@ -179,11 +180,13 @@ async function main() {
         }
       }
 
-      // Releases without egress rules are the control: they must reach the Kubernetes API.
+      // Releases without egress rules are the control: they must reach another release's Service.
       const restricted = restrictsEgress(networkPolicies);
+      const peer = peers.find(p => p.release.name !== name || p.release.namespace !== namespace);
+      if (!peer) throw new Error(`No other release without a NetworkPolicy for ${namespace}/${name} to connect to`);
       const egressChecks = [
         ['github.com', 443, 'connected'],
-        ['kubernetes.default.svc', 443, restricted ? 'blocked' : 'connected'],
+        [peer.host, peer.port, restricted ? 'blocked' : 'connected'],
       ];
       for (const [host, port, want] of egressChecks) {
         const label = `${host}:${port} is ${want}${restricted ? ' with the NetworkPolicy' : ''}`;

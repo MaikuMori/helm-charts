@@ -136,7 +136,7 @@ resources:
 
 Outside OpenShift, the chart's default security contexts already meet the Pod Security `restricted` level; on OpenShift, the SCC decides. Containers and volumes you add, such as `initContainers`, have to meet it too. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service.
 
-The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium refuses a private address, and that the NetworkPolicy allows DNS and public HTTPS but not the Kubernetes API:
+The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium refuses a private address, and that the NetworkPolicy allows DNS and public HTTPS but not another release's Service:
 
 ```yaml
 {{ .Files.Get "ci/hardened-values.yaml" }}```

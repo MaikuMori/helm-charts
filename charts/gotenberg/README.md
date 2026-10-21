@@ -136,7 +136,7 @@ resources:
 
 Outside OpenShift, the chart's default security contexts already meet the Pod Security `restricted` level; on OpenShift, the SCC decides. Containers and volumes you add, such as `initContainers`, have to meet it too. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service.
 
-The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium refuses a private address, and that the NetworkPolicy allows DNS and public HTTPS but not the Kubernetes API:
+The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium refuses a private address, and that the NetworkPolicy allows DNS and public HTTPS but not another release's Service:
 
 ```yaml
 # Example hardening for untrusted callers: a starting point to adjust to your
@@ -165,7 +165,9 @@ networkPolicy:
         - port: 3000
   # Only allow DNS, and HTTP(S) outside the private ranges below. Adapt the
   # ranges to your cluster and check that your CNI enforces NetworkPolicies;
-  # this alone doesn't guarantee the cluster network is unreachable. IPv4
+  # this alone doesn't guarantee the cluster network is unreachable. Some
+  # CNIs don't apply NetworkPolicies to the node's own addresses, which can
+  # include the Kubernetes API (as on MicroShift). IPv4
   # only: on dual-stack clusters, add ::/0 excepting fc00::/7 and fe80::/10.
   # DNS pods are kube-dns, or openshift-dns listening on 5353 on OpenShift.
   allowEgress: false
