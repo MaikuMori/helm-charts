@@ -3,9 +3,9 @@
 // Always works from the archive attached to the GitHub release, never pushes
 // over an existing OCI version, and only signs what isn't verifiably signed,
 // so re-runs repair a partially published release. Writes the digests of the
-// archives packaged by this run, and of their OCI charts, to a checksums file
-// for the provenance attestation step and returns its path as the `subjects`
-// output.
+// archives, and of their OCI charts, to a checksums file for the provenance
+// attestation step and returns its path as the `subjects` output: those this
+// run packaged, and unattested ones whose release tag is this run's commit.
 // Runs through actions/github-script.
 
 const crypto = require('crypto');
@@ -74,6 +74,24 @@ async function ociDigest(name, version) {
   return response.headers.get('docker-content-digest');
 }
 
+async function tagCommit(github, context, tag) {
+  const { data: ref } = await github.rest.git.getRef({ ...context.repo, ref: `tags/${tag}` });
+  if (ref.object.type !== 'tag') return ref.object.sha;
+  return (await github.rest.git.getTag({ ...context.repo, tag_sha: ref.object.sha })).data.object.sha;
+}
+
+async function isAttested(github, context, digest) {
+  try {
+    const { data } = await github.request('GET /repos/{owner}/{repo}/attestations/{subject_digest}', {
+      ...context.repo, subject_digest: digest, per_page: 1,
+    });
+    return data.attestations.length > 0;
+  } catch (e) {
+    if (e.status === 404) return false;
+    throw e;
+  }
+}
+
 module.exports = async ({ github, context, core }) => {
   const identity = `https://github.com/${process.env.GITHUB_WORKFLOW_REF}`;
   const verifyFlags = ['--certificate-identity', identity, '--certificate-oidc-issuer', OIDC_ISSUER];
@@ -85,6 +103,11 @@ module.exports = async ({ github, context, core }) => {
     const { name, version } = chartMetadata(path.join(CHARTS, entry.name));
     const tag = `${name}-${version}`;
     const archive = `${tag}.tgz`;
+
+    const attest = (archiveDigest, ociDigest) => subjects.push(
+      `${archiveDigest.replace(/^sha256:/, '')}  ${archive}`,
+      `${ociDigest.replace(/^sha256:/, '')}  ${REGISTRY_HOST}/${REGISTRY_PATH}/${name}`,
+    );
 
     const release = await releaseByTag(github, context, tag);
     if (!release) {
@@ -114,11 +137,15 @@ module.exports = async ({ github, context, core }) => {
     }
 
     const image = `${REGISTRY_HOST}/${REGISTRY_PATH}/${name}@${digest}`;
+    const archiveDigest = `sha256:${crypto.createHash('sha256').update(fs.readFileSync(pkg)).digest('hex')}`;
     if (fs.existsSync(path.join(PACKAGES, archive))) {
-      subjects.push(`${crypto.createHash('sha256').update(fs.readFileSync(pkg)).digest('hex')}  ${archive}`);
-      subjects.push(`${digest.replace(/^sha256:/, '')}  ${REGISTRY_HOST}/${REGISTRY_PATH}/${name}`);
+      attest(archiveDigest, digest);
+    } else if (await tagCommit(github, context, tag) !== process.env.GITHUB_SHA) {
+      core.info(`${tag} was built from another commit; not attesting it here.`);
+    } else if (await isAttested(github, context, archiveDigest) && await isAttested(github, context, digest)) {
+      core.info(`${tag} is already attested.`);
     } else {
-      core.info(`${archive} was packaged by an earlier run; not attesting it here.`);
+      attest(archiveDigest, digest);
     }
     if (!run(core, 'cosign', ['verify', image, ...verifyFlags], { check: false }).ok) {
       run(core, 'cosign', ['sign', '--yes', image]);
