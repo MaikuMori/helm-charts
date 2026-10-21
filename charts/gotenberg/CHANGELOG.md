@@ -22,7 +22,7 @@ Please also open an issue. If you use the chart as a dependency and need an olde
 - `helm test` pods get their own `app.kubernetes.io/name` (`gotenberg-test`), so the chart's Service, PodDisruptionBudget and NetworkPolicy no longer select them. Update any selectors or policies of your own that matched the test pod by its old labels. With `networkPolicy` egress rules, the policy applied to the test pod and blocked its connection to Gotenberg.
 - The `helm test` connection check retries for up to about a minute with a 5-second timeout per attempt. Right after an upgrade, the Service could still route its single attempt to the replaced pod, and it then hung for two minutes before failing.
 - Fix the chart failing as a dependency of another chart with `additional properties 'global' not allowed` since 1.27.1 ([#118](https://github.com/MaikuMori/helm-charts/issues/118)). The chart accepts `global` values but doesn't use them.
-- Accept numbers, not only strings, for `chromium.restartAfter`, `libreOffice.restartAfter` and `webhook.maxRetry`. The schema rejected them since 1.27.0.
+- Accept numbers, not only strings, for `chromium.restartAfter`, `libreOffice.restartAfter` and `webhook.maxRetry` again. The schema added in 1.8.0 rejected them with `got number, want string`.
 
 ## 1.28.0
 
