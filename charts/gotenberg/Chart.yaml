@@ -48,7 +48,7 @@ annotations:
     - kind: fixed
       description: Accept numbers for chromium.restartAfter, libreOffice.restartAfter and webhook.maxRetry
     - kind: fixed
-      description: "Behaviour change: chromium.restartAfter, libreOffice.restartAfter, api.downloadFromMaxRetry, webhook.maxRetry and gotenberg.gracefulShutdownDurationSec set to 0 now pass 0 to Gotenberg instead of leaving its default"
+      description: "Behaviour change: api.downloadFromMaxRetry and gotenberg.gracefulShutdownDurationSec set to 0 now pass 0 to Gotenberg instead of leaving its default"
     - kind: fixed
       description: helm test pods no longer match the chart's Service, PodDisruptionBudget and NetworkPolicy selectors
     - kind: fixed
