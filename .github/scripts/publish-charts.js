@@ -2,9 +2,10 @@
 // release archive signed with a Sigstore bundle on the GitHub release.
 // Always works from the archive attached to the GitHub release, never pushes
 // over an existing OCI version, and only signs what isn't verifiably signed,
-// so re-runs repair a partially published release. Writes the archives' and
-// OCI charts' digests to a checksums file for the provenance attestation step
-// and returns its path as the `subjects` output.
+// so re-runs repair a partially published release. Writes the digests of the
+// archives packaged by this run, and of their OCI charts, to a checksums file
+// for the provenance attestation step and returns its path as the `subjects`
+// output.
 // Runs through actions/github-script.
 
 const crypto = require('crypto');
@@ -113,8 +114,12 @@ module.exports = async ({ github, context, core }) => {
     }
 
     const image = `${REGISTRY_HOST}/${REGISTRY_PATH}/${name}@${digest}`;
-    subjects.push(`${crypto.createHash('sha256').update(fs.readFileSync(pkg)).digest('hex')}  ${archive}`);
-    subjects.push(`${digest.replace(/^sha256:/, '')}  ${REGISTRY_HOST}/${REGISTRY_PATH}/${name}`);
+    if (fs.existsSync(path.join(PACKAGES, archive))) {
+      subjects.push(`${crypto.createHash('sha256').update(fs.readFileSync(pkg)).digest('hex')}  ${archive}`);
+      subjects.push(`${digest.replace(/^sha256:/, '')}  ${REGISTRY_HOST}/${REGISTRY_PATH}/${name}`);
+    } else {
+      core.info(`${archive} was packaged by an earlier run; not attesting it here.`);
+    }
     if (!run(core, 'cosign', ['verify', image, ...verifyFlags], { check: false }).ok) {
       run(core, 'cosign', ['sign', '--yes', image]);
       run(core, 'cosign', ['verify', image, ...verifyFlags]);

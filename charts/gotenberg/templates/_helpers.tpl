@@ -56,7 +56,7 @@ Service, PodDisruptionBudget and NetworkPolicy don't select them.
 */}}
 {{- define "gotenberg.testLabels" -}}
 helm.sh/chart: {{ include "gotenberg.chart" . }}
-app.kubernetes.io/name: {{ include "gotenberg.name" . }}-test
+app.kubernetes.io/name: {{ include "gotenberg.name" . | trunc 58 | trimSuffix "-" }}-test
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: test
 app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -79,7 +79,8 @@ Create a security context
 If .Values.securityContext is set, use it. Otherwise, use the defaults.
 
 Defaults:
-If we detect OpenShift, we remove the "runAsUser", fsGroup, "runAsGroup" fields since they're not supported.
+On OpenShift, the user and non-root check are left to the SCC, since the image's user isn't numeric.
+The seccomp profile is left to the pod when podSecurityContext sets one.
 And apply recommended settings from upstream project.
 */}}
 {{- define "gotenberg.securityContext" -}}
@@ -89,14 +90,16 @@ And apply recommended settings from upstream project.
 privileged: false
 {{- if not (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
 runAsUser: 1001
-{{- end }}
 runAsNonRoot: true
+{{- end }}
 allowPrivilegeEscalation: false
 capabilities:
   drop:
     - ALL
+{{- if not .Values.podSecurityContext.seccompProfile }}
 seccompProfile:
   type: RuntimeDefault
+{{- end }}
 # Issue with Chromium, see: https://github.com/gotenberg/gotenberg/issues/949
 readOnlyRootFilesystem: false
 {{- end }}

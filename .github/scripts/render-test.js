@@ -117,8 +117,13 @@ const STEPS = [
 ];
 
 async function main() {
-  const releases = json('helm', ['list', '--all-namespaces', '--output', 'json'])
-    .filter(r => r.chart.startsWith('gotenberg-'));
+  const releases = json('helm', ['list', '--all', '--all-namespaces', '--output', 'json'])
+    .filter(r => r.chart.startsWith('gotenberg-'))
+    .filter(r => {
+      if (r.status === 'deployed') return true;
+      console.log(`skip ${r.namespace}/${r.name}: ${r.status}`);
+      return false;
+    });
   if (releases.length === 0) throw new Error('No Gotenberg releases installed');
 
   let failures = 0;

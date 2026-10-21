@@ -2,7 +2,7 @@
 
 ## 1.29.0
 
-- The default container security context now meets the Pod Security `restricted` level: it adds `runAsNonRoot: true`, drops all capabilities and uses the `RuntimeDefault` seccomp profile, on OpenShift too. A custom `securityContext` still replaces the default entirely. CI converts real documents with Chromium and LibreOffice under these settings on every supported Kubernetes version.
+- The default container security context now meets the Pod Security `restricted` level: it adds `runAsNonRoot: true` (outside OpenShift, where the SCC enforces it), drops all capabilities and uses the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. A custom `securityContext` still replaces the default entirely. CI converts real documents with Chromium and LibreOffice under these settings on every supported Kubernetes version.
 - Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations, verifiable with `gh attestation verify`.
 - Document resource recommendations and a hardened setup for untrusted input (deny private addresses in every module that fetches URLs, plus a NetworkPolicy). CI installs the documented configuration on every supported Kubernetes version and checks that Chromium refuses a private address.
 - `helm test` pods get their own `app.kubernetes.io/name` (`gotenberg-test`), so the chart's Service, PodDisruptionBudget and NetworkPolicy no longer select them. With `networkPolicy` egress rules, the policy applied to the test pod and blocked its connection to Gotenberg.

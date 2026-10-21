@@ -32,7 +32,6 @@ tests:
       - equal:
           path: spec.securityContext
           value:
-            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
 
@@ -55,3 +54,11 @@ tests:
       - equal:
           path: metadata.labels["app.kubernetes.io/name"]
           value: gotenberg-test
+
+  - it: keeps the test pod's name label valid with a long name override
+    set:
+      nameOverride: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-test

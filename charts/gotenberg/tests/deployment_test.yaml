@@ -152,9 +152,8 @@ tests:
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].securityContext.runAsUser
-      - equal:
+      - notExists:
           path: spec.template.spec.containers[0].securityContext.runAsNonRoot
-          value: true
       - equal:
           path: spec.template.spec.containers[0].securityContext.capabilities.drop
           value:
@@ -164,6 +163,19 @@ tests:
           content:
             name: HOME
             value: /home/gotenberg
+
+  - it: leaves the seccomp profile to the pod when it sets one
+    set:
+      podSecurityContext:
+        seccompProfile:
+          type: Localhost
+          localhostProfile: profiles/gotenberg.json
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].securityContext.seccompProfile
+      - equal:
+          path: spec.template.spec.securityContext.seccompProfile.type
+          value: Localhost
 
   - it: uses a custom securityContext as is and sets HOME for another user
     set:

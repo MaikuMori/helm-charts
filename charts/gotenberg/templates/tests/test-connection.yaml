@@ -12,8 +12,8 @@ metadata:
 spec:
   automountServiceAccountToken: false
   securityContext:
-    runAsNonRoot: true
     {{- if not (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
+    runAsNonRoot: true
     runAsUser: 65534
     runAsGroup: 65534
     {{- end }}
