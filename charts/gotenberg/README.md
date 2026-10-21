@@ -169,7 +169,8 @@ networkPolicy:
   # CNIs don't apply NetworkPolicies to the node's own addresses, which can
   # include the Kubernetes API (as on MicroShift). IPv4
   # only: on dual-stack clusters, add ::/0 excepting fc00::/7 and fe80::/10.
-  # DNS pods are kube-dns, or openshift-dns listening on 5353 on OpenShift.
+  # DNS pods are kube-dns, or openshift-dns listening on 5353 on OpenShift
+  # (not tested with OVN-Kubernetes).
   allowEgress: false
   extraEgress:
     - to:
@@ -212,7 +213,7 @@ Also require authentication on the API, with `api.enableBasicAuth` or `api.enabl
 
 ## OpenShift
 
-OpenShift support is best effort. When the cluster serves the `security.openshift.io/v1` API, the default security context leaves the user, non-root check and seccomp profile to the SCC. CI installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, under the `restricted-v2` and `anyuid` SCCs; it isn't tested on OpenShift Container Platform. Detection needs Helm to see the cluster's APIs: when rendering without cluster access, such as `helm template`, pass `--api-versions security.openshift.io/v1`. Issues and pull requests from OpenShift users are welcome.
+OpenShift support is best effort. When the cluster serves the `security.openshift.io/v1` API, the default security context leaves the user, non-root check and seccomp profile to the SCC. CI installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, with the Kindnet CNI rather than OVN-Kubernetes, under the `restricted-v2` and `anyuid` SCCs; it isn't tested on OpenShift Container Platform. Detection needs Helm to see the cluster's APIs: when rendering without cluster access, such as `helm template`, pass `--api-versions security.openshift.io/v1`. Issues and pull requests from OpenShift users are welcome.
 
 ## Values
 
@@ -379,7 +380,7 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium. | Define the security context for the container. Replaces the default entirely when set. |
+| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user, non-root check and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium. | Define the security context for the container. Replaces the default entirely when set. |
 | service.annotations | object | `{}` | Annotations to add to the service |
 | service.loadBalancerIP | string | `""` | Deprecated: Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead. |
 | service.port | int | `80` |  |

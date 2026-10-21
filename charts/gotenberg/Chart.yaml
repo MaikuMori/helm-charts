@@ -46,6 +46,8 @@ annotations:
     - kind: fixed
       description: Allow Helm's global values in the schema so the chart works as a dependency of another chart
     - kind: fixed
+      description: Accept numbers for chromium.restartAfter, libreOffice.restartAfter and webhook.maxRetry
+    - kind: fixed
       description: helm test pods no longer match the chart's Service, PodDisruptionBudget and NetworkPolicy selectors
     - kind: fixed
       description: The helm test connection check retries instead of hanging when it starts right after an upgrade

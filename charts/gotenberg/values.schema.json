@@ -275,7 +275,10 @@
         },
         "restartAfter": {
           "description": "Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100)",
-          "type": "string"
+          "type": [
+            "string",
+            "integer"
+          ]
         },
         "sharedBrowserContext": {
           "description": "Share one browser context, with its cookies, cache and storage, across all conversions. Since Gotenberg 8.38.0 each conversion gets its own isolated context by default; enable this only when all callers trust each other. Added in Gotenberg 8.38.0.",
@@ -450,7 +453,10 @@
         },
         "restartAfter": {
           "description": "Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)",
-          "type": "string"
+          "type": [
+            "string",
+            "integer"
+          ]
         },
         "startTimeout": {
           "description": "Maximum duration to wait for LibreOffice to start or restart (default 10s)",
@@ -971,7 +977,10 @@
         },
         "maxRetry": {
           "description": "Set the maximum number of retries for the webhook feature (default 4)",
-          "type": "string"
+          "type": [
+            "string",
+            "integer"
+          ]
         },
         "retryMaxWait": {
           "description": "Set the maximum duration to wait before trying to call the webhook again (default 30s)",

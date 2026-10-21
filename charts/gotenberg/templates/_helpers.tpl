@@ -55,8 +55,8 @@ Labels for helm test pods. Their name differs from the selector labels, so the
 Service, PodDisruptionBudget and NetworkPolicy don't select them.
 */}}
 {{- define "gotenberg.testLabels" -}}
-{{- $name := include "gotenberg.name" . }}
-{{- $prefix := $name | trunc 58 | trimSuffix "-" }}
+{{- $name := include "gotenberg.name" . -}}
+{{- $prefix := $name | trunc 58 | trimSuffix "-" -}}
 helm.sh/chart: {{ include "gotenberg.chart" . }}
 app.kubernetes.io/name: {{ ternary (printf "%s-hook" $prefix) (printf "%s-test" $prefix) (eq (printf "%s-test" $prefix) $name) }}
 app.kubernetes.io/instance: {{ .Release.Name }}
