@@ -352,6 +352,16 @@ jobs:
           kubectl get pods --all-namespaces -o wide || true
           kubectl get events --all-namespaces --sort-by=.lastTimestamp | tail -100 || true
           kubectl -n openshift-dns get pods --show-labels || true
+          kubectl get endpointslices -n default -o wide || true
+          kubectl get networkpolicies --all-namespaces || true
+          kubectl -n kube-kindnet get daemonset -o wide || true
+          # Which destinations the hardened pod's NetworkPolicy actually blocks.
+          dns=$(kubectl -n openshift-dns get pods -l dns.operator.openshift.io/daemonset-dns=default -o jsonpath='{.items[0].status.podIP}') || true
+          gotenberg=$(kubectl -n restricted get pods -l app.kubernetes.io/name=gotenberg -o jsonpath='{.items[0].status.podIP}') || true
+          for target in "$dns/5353" "$dns/53" "$gotenberg/3000" 1.1.1.1/53 1.1.1.1/443; do
+            result=$(kubectl -n hardened exec deployment/hardened-gotenberg -- timeout 5 bash -c "exec 3<>/dev/tcp/$target" 2>&1 && echo connected || echo blocked)
+            echo "hardened -> $target: $result"
+          done
           for namespace in restricted hardened anyuid; do
             kubectl -n "$namespace" describe pods || true
             kubectl -n "$namespace" logs -l app.kubernetes.io/instance="$namespace" --all-containers --tail=200 || true
