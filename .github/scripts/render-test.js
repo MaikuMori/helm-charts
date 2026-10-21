@@ -117,7 +117,7 @@ const STEPS = [
 ];
 
 async function main() {
-  const releases = json('helm', ['list', '--all', '--all-namespaces', '--output', 'json'])
+  const releases = json('helm', ['list', '--all-namespaces', '--output', 'json'])
     .filter(r => r.chart.startsWith('gotenberg-'))
     .filter(r => {
       if (r.status === 'deployed') return true;
