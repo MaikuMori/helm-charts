@@ -124,7 +124,7 @@ jobs:
 
       - name: Run chart-testing (lint)
         env:
-          TARGET_BRANCH: ${{ github.base_ref }}
+          TARGET_BRANCH: ${{ github.base_ref || 'master' }}
         run: ct lint --config ct.yaml --target-branch "$TARGET_BRANCH"
 
   install:
@@ -163,13 +163,12 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         env:
-          BASE: ${{ github.event.pull_request.base.sha }}
-          TARGET_BRANCH: ${{ github.base_ref }}
+          TARGET_BRANCH: ${{ github.base_ref || 'master' }}
         run: |
           changed=$(ct list-changed --config ct.yaml --target-branch "$TARGET_BRANCH")
           if [[ -n "$changed" ]]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-          elif ! git diff --quiet "$BASE" HEAD -- test/render .github/scripts/render-test.js .github/kind; then
+          elif ! git diff --quiet "origin/$TARGET_BRANCH...HEAD" -- test/render .github/scripts/render-test.js .github/kind; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "all=true" >> "$GITHUB_OUTPUT"
           fi
@@ -191,7 +190,7 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         env:
           ALL: ${{ steps.list-changed.outputs.all }}
-          TARGET_BRANCH: ${{ github.base_ref }}
+          TARGET_BRANCH: ${{ github.base_ref || 'master' }}
         run: ct install --config ct.yaml --target-branch "$TARGET_BRANCH" --upgrade --skip-clean-up ${ALL:+--all}
 
       - name: Render documents with every installed release
