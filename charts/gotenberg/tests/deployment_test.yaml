@@ -154,6 +154,8 @@ tests:
           path: spec.template.spec.containers[0].securityContext.runAsUser
       - notExists:
           path: spec.template.spec.containers[0].securityContext.runAsNonRoot
+      - notExists:
+          path: spec.template.spec.containers[0].securityContext.seccompProfile
       - equal:
           path: spec.template.spec.containers[0].securityContext.capabilities.drop
           value:

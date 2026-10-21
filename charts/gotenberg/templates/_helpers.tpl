@@ -79,8 +79,9 @@ Create a security context
 If .Values.securityContext is set, use it. Otherwise, use the defaults.
 
 Defaults:
-On OpenShift, the user and non-root check are left to the SCC, since the image's user isn't numeric.
-The seccomp profile is left to the pod when podSecurityContext sets one.
+On OpenShift, the user, non-root check and seccomp profile are left to the SCC, since the image's
+user isn't numeric and SCCs without seccompProfiles reject pods that set one.
+Elsewhere, the seccomp profile is left to the pod when podSecurityContext sets one.
 And apply recommended settings from upstream project.
 */}}
 {{- define "gotenberg.securityContext" -}}
@@ -96,7 +97,7 @@ allowPrivilegeEscalation: false
 capabilities:
   drop:
     - ALL
-{{- if not .Values.podSecurityContext.seccompProfile }}
+{{- if not (or .Values.podSecurityContext.seccompProfile (.Capabilities.APIVersions.Has "security.openshift.io/v1")) }}
 seccompProfile:
   type: RuntimeDefault
 {{- end }}

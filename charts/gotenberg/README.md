@@ -355,7 +355,7 @@ Also require authentication on the API, with `api.enableBasicAuth` or `api.enabl
 | readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001 (left to the SCC on OpenShift), with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. The root filesystem stays writable for Chromium. | Define the security context for the container. Replaces the default entirely when set. |
+| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium. | Define the security context for the container. Replaces the default entirely when set. |
 | service.annotations | object | `{}` | Annotations to add to the service |
 | service.loadBalancerIP | string | `""` | Deprecated: Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead. |
 | service.port | int | `80` |  |

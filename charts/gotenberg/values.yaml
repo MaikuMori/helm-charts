@@ -57,7 +57,7 @@ podSecurityContext:
   # fsGroup: 2000
 
 # -- Define the security context for the container. Replaces the default entirely when set.
-# @default -- Meets the Pod Security `restricted` level: runs as non-root user 1001 (left to the SCC on OpenShift), with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. The root filesystem stays writable for Chromium.
+# @default -- Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium.
 securityContext: {}
 
 service:  # @schema additionalProperties: false

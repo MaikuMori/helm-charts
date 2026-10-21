@@ -11,14 +11,14 @@ metadata:
     {{- end }}
 spec:
   automountServiceAccountToken: false
+  {{- if not (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
   securityContext:
-    {{- if not (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
     runAsNonRoot: true
     runAsUser: 65534
     runAsGroup: 65534
-    {{- end }}
     seccompProfile:
       type: RuntimeDefault
+  {{- end }}
   containers:
     - name: wget
       image: "{{ .Values.testImage.repository }}:{{ .Values.testImage.tag }}{{ with .Values.testImage.digest }}@{{ . }}{{ end }}"
