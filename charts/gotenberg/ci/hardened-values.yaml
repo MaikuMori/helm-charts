@@ -1,4 +1,5 @@
-# Hardened setup for converting documents from untrusted callers.
+# Example hardening for untrusted callers: a starting point to adjust to your
+# cluster, not a complete setup.
 
 # Reject outbound requests to private, loopback and link-local addresses from
 # every module that fetches URLs.

@@ -132,12 +132,15 @@ resources:
     memory: 2Gi
 ```
 
-## Hardening for Untrusted Input
+## Hardening Example
 
-The default security context already meets the Pod Security `restricted` level. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service. If callers or their documents aren't trusted, deny private addresses and limit the pod's network access. CI installs this configuration on every supported Kubernetes version and on OpenShift (MicroShift), converts documents with it, and checks that Chromium refuses a private address and that the NetworkPolicy allows DNS and public HTTPS but blocks the Kubernetes API:
+The default security context already meets the Pod Security `restricted` level. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service.
+
+The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium refuses a private address, and that the NetworkPolicy allows DNS and public HTTPS but not the Kubernetes API:
 
 ```yaml
-# Hardened setup for converting documents from untrusted callers.
+# Example hardening for untrusted callers: a starting point to adjust to your
+# cluster, not a complete setup.
 
 # Reject outbound requests to private, loopback and link-local addresses from
 # every module that fetches URLs.
@@ -200,6 +203,10 @@ networkPolicy:
 ```
 
 Also require authentication on the API, with `api.enableBasicAuth` or `api.enableOidcAuth`, and disable the routes you don't use, such as `chromium.disableRoutes` or `libreOffice.disableRoutes`. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
+
+## OpenShift
+
+OpenShift support is best effort. When the cluster serves the `security.openshift.io/v1` API, the default security context leaves the user, non-root check and seccomp profile to the SCC. CI installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, under the `restricted-v2` and `anyuid` SCCs; it isn't tested on OpenShift Container Platform. Issues and pull requests from OpenShift users are welcome.
 
 ## Values
 

@@ -42,7 +42,7 @@ annotations:
     - kind: added
       description: Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations
     - kind: added
-      description: Document resource recommendations and a hardened, CI-tested setup for untrusted input
+      description: Document resource recommendations and a hardening example to start from for untrusted input
     - kind: fixed
       description: Allow Helm's global values in the schema so the chart works as a dependency of another chart
     - kind: fixed
