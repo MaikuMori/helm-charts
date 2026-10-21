@@ -15,7 +15,7 @@ webhook:
 networkPolicy:
   enabled: true
   # Only accept API calls from pods in the release's namespace. Replace the
-  # rule with a selector for your clients.
+  # rule with a selector for your clients. 3000 is api.port.
   allowIngress: false
   extraIngress:
     - from:
@@ -24,8 +24,9 @@ networkPolicy:
         - port: 3000
   # Only allow DNS, and HTTP(S) outside the private ranges below. Adapt the
   # ranges to your cluster and check that your CNI enforces NetworkPolicies;
-  # this alone doesn't guarantee the cluster network is unreachable. DNS pods
-  # are kube-dns, or openshift-dns listening on 5353 on OpenShift.
+  # this alone doesn't guarantee the cluster network is unreachable. IPv4
+  # only: on dual-stack clusters, add ::/0 excepting fc00::/7 and fe80::/10.
+  # DNS pods are kube-dns, or openshift-dns listening on 5353 on OpenShift.
   allowEgress: false
   extraEgress:
     - to:

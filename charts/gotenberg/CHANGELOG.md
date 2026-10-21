@@ -14,12 +14,12 @@ securityContext:
 
 Please also open an issue. If you use the chart as a dependency and need an older version, 1.27.0 is the last one before Helm's `global` values were rejected (1.27.1 to 1.28.0).
 
-- Outside OpenShift, the default container security context now meets the Pod Security `restricted` level: it adds `runAsNonRoot: true`, drops all capabilities and uses the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, it only drops all capabilities and leaves the rest to the SCC. OpenShift support is best effort, tested on MicroShift built from OKD. A custom `securityContext` still replaces the default entirely. CI converts real documents with Chromium and LibreOffice under these settings on every supported Kubernetes version.
+- Outside OpenShift, the default container security context now meets the Pod Security `restricted` level: it adds `runAsNonRoot: true`, drops all capabilities and uses the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, it only drops all capabilities and leaves the rest to the SCC. OpenShift support is best effort, tested on MicroShift built from OKD. A custom `securityContext` still replaces the default entirely. CI converts real documents with Chromium and LibreOffice under these settings on the Kubernetes versions CI covers (1.34 to 1.37).
 - Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations, verifiable with `gh attestation verify`.
-- Document resource recommendations and a hardening example to start from for untrusted input (deny private addresses in every module that fetches URLs, plus a NetworkPolicy that allows DNS on Kubernetes and OpenShift). CI installs the example on every supported Kubernetes version and on MicroShift to catch regressions.
+- Document resource recommendations and a hardening example to start from for untrusted input (deny private addresses in every module that fetches URLs, plus a NetworkPolicy that allows DNS on Kubernetes and OpenShift). CI installs the example on the Kubernetes versions CI covers (1.34 to 1.37) and on MicroShift to catch regressions.
 - `helm test` pods get their own `app.kubernetes.io/name` (`gotenberg-test`), so the chart's Service, PodDisruptionBudget and NetworkPolicy no longer select them. With `networkPolicy` egress rules, the policy applied to the test pod and blocked its connection to Gotenberg.
 - The `helm test` connection check retries for up to about a minute with a 5-second timeout per attempt. Right after an upgrade, the Service could still route its single attempt to the replaced pod, and it then hung for two minutes before failing.
-- Fix the chart failing as a dependency of another chart with `additional properties 'global' not allowed` since 1.27.1 ([#118](https://github.com/MaikuMori/helm-charts/issues/118)).
+- Fix the chart failing as a dependency of another chart with `additional properties 'global' not allowed` since 1.27.1 ([#118](https://github.com/MaikuMori/helm-charts/issues/118)). The chart accepts `global` values but doesn't use them.
 
 ## 1.28.0
 

@@ -80,7 +80,8 @@ If .Values.securityContext is set, use it. Otherwise, use the defaults.
 
 Defaults:
 On OpenShift, the user, non-root check and seccomp profile are left to the SCC, since the image's
-user isn't numeric and SCCs without seccompProfiles reject pods that set one.
+user isn't numeric and a pod that sets a seccomp profile can't be admitted under SCCs without
+seccompProfiles, such as anyuid.
 Elsewhere, the seccomp profile is left to the pod when podSecurityContext sets one.
 And apply recommended settings from upstream project.
 */}}
