@@ -274,7 +274,7 @@ jobs:
           mkdir -p ~/.kube
           sudo podman exec microshift cat "$kubeconfig" | tee ~/.kube/config > /dev/null
           kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}{"\n"}'
-          timeout 600 bash -c 'until kubectl get nodes >/dev/null 2>&1; do sleep 5; done'
+          timeout 600 bash -c 'until kubectl get nodes -o name 2>/dev/null | grep -q .; do sleep 5; done'
           kubectl wait --for=condition=Ready nodes --all --timeout=10m
           timeout 600 bash -c 'until kubectl -n openshift-dns get daemonset dns-default >/dev/null 2>&1; do sleep 5; done'
           kubectl -n openshift-dns rollout status daemonset/dns-default --timeout=10m
