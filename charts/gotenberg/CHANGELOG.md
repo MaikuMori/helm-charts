@@ -2,7 +2,22 @@
 
 ## 1.29.0
 
-The stricter default security context is new and experimental. If it breaks your deployment, set `securityContext` to the 1.28.0 default, which replaces the new one entirely:
+The stricter default security context is new and experimental. With the default values, the Gotenberg container's `securityContext` changes like this:
+
+```diff
+   privileged: false
+   runAsUser: 1001
++  runAsNonRoot: true
+   allowPrivilegeEscalation: false
++  capabilities:
++    drop:
++      - ALL
++  seccompProfile:
++    type: RuntimeDefault
+   readOnlyRootFilesystem: false
+```
+
+On OpenShift it only gains `capabilities.drop: [ALL]`. If it breaks your deployment, set `securityContext` to the 1.28.0 default, which replaces the new one entirely:
 
 ```yaml
 securityContext:
