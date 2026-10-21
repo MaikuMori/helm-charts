@@ -25,7 +25,9 @@ CI pins `helm-docs`, `helm schema`, `helm-tool` and `actionlint` in `tools/*/go.
 
 `schema_test.yaml` checks what `values.schema.json` accepts and rejects.
 
-`test/subchart/` is a parent chart that depends on `charts/gotenberg` and sets Helm `global` values. CI renders it with each of the chart's `ci/` and `tests/values/` files nested under `gotenberg:`, so the chart keeps working as a dependency.
+`test/subchart/` is a parent chart that depends on `charts/gotenberg` and sets Helm `global` values. CI renders it with each of the chart's `ci/` and `tests/values/` files nested under `gotenberg:`, and installs it in the kind clusters, so the chart keeps working as a dependency.
+
+The `openshift` job installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, once under the `restricted-v2` SCC and once with a service account allowed the `anyuid` SCC, and checks each pod was admitted under the expected SCC before running `helm test` and the render test.
 
 ## Values schema
 

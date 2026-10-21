@@ -1,7 +1,8 @@
 // Exercises every Gotenberg release installed in the current cluster (left
-// behind by `ct install --skip-clean-up`) with the fixtures in test/render:
-// Chromium and LibreOffice conversions, a Chromium screenshot, and merging,
-// PDF/A conversion and metadata reading with the PDF engines. Each result is
+// behind by `ct install --skip-clean-up`, or through test/subchart) with the
+// fixtures in test/render: Chromium and LibreOffice conversions, a Chromium
+// screenshot, and merging, PDF/A conversion and metadata reading with the PDF
+// engines. Each result is
 // checked for the fixture's text, not just its file type. Releases running
 // with --chromium-deny-private-ips must also refuse to render a private address.
 // Needs pdftotext and pdfinfo (poppler-utils).
@@ -118,7 +119,7 @@ const STEPS = [
 
 async function main() {
   const releases = json('helm', ['list', '--all-namespaces', '--output', 'json'])
-    .filter(r => r.chart.startsWith('gotenberg-'))
+    .filter(r => /^(gotenberg|subchart-test)-/.test(r.chart))
     .filter(r => {
       if (r.status === 'deployed') return true;
       console.log(`skip ${r.namespace}/${r.name}: ${r.status}`);

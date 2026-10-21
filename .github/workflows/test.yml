@@ -177,7 +177,7 @@ jobs:
           changed=$(ct list-changed --config ct.yaml --target-branch "$TARGET_BRANCH")
           if [[ -n "$changed" ]]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-          elif ! git diff --quiet "origin/$TARGET_BRANCH...HEAD" -- test/render .github/scripts/render-test.js .github/kind; then
+          elif ! git diff --quiet "origin/$TARGET_BRANCH...HEAD" -- test/render test/subchart .github/scripts/render-test.js .github/kind; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "all=true" >> "$GITHUB_OUTPUT"
           fi
@@ -202,6 +202,13 @@ jobs:
           TARGET_BRANCH: ${{ github.base_ref || 'master' }}
         run: ct install --config ct.yaml --target-branch "$TARGET_BRANCH" --upgrade --skip-clean-up ${ALL:+--all}
 
+      - name: Install as a subchart
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          helm dependency build test/subchart
+          helm install subchart test/subchart --namespace subchart --create-namespace --wait --timeout 5m
+          helm test subchart --namespace subchart --logs
+
       - name: Render documents with every installed release
         if: steps.list-changed.outputs.changed == 'true'
         run: |
@@ -222,10 +229,102 @@ jobs:
             echo "::endgroup::"
           done
 
+  # MicroShift built from OKD, for the chart's OpenShift defaults and SCC admission.
+  openshift:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Helm
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v4.3.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.x"
+          check-latest: true
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@720270857a28afd41e2426521a7801db09e9b510 # v2.9.0
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        env:
+          TARGET_BRANCH: ${{ github.base_ref || 'master' }}
+        run: |
+          if [[ -n "$(ct list-changed --config ct.yaml --target-branch "$TARGET_BRANCH")" ]] ||
+            ! git diff --quiet "origin/$TARGET_BRANCH...HEAD" -- test/render .github/scripts/render-test.js .github/workflows/test.yml; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Start MicroShift
+        if: steps.list-changed.outputs.changed == 'true'
+        env:
+          # Look up: https://github.com/microshift-io/microshift/releases
+          IMAGE: ghcr.io/microshift-io/microshift:4.20.0_g153ff0ca9_4.20.0_okd_scos.16@sha256:235980dd065b3b0ef9c3d8788ee72a8583fd4b0f1e5ac996c09d5cbf1900e1ce
+        run: |
+          sudo podman run --privileged --detach --tty --name microshift --hostname 127.0.0.1.nip.io --publish 6443:6443 "$IMAGE"
+          kubeconfig=/var/lib/microshift/resources/kubeadmin/kubeconfig
+          timeout 600 bash -c "until sudo podman exec microshift test -f $kubeconfig; do sleep 2; done"
+          mkdir -p ~/.kube
+          sudo podman exec microshift cat "$kubeconfig" | tee ~/.kube/config > /dev/null
+          kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}{"\n"}'
+          timeout 600 bash -c 'until kubectl get nodes >/dev/null 2>&1; do sleep 5; done'
+          kubectl wait --for=condition=Ready nodes --all --timeout=10m
+          timeout 600 bash -c 'until kubectl -n openshift-dns get daemonset dns-default >/dev/null 2>&1; do sleep 5; done'
+          kubectl -n openshift-dns rollout status daemonset/dns-default --timeout=10m
+          kubectl get securitycontextconstraints
+
+      # restricted-v2 assigns a namespace UID. anyuid keeps the image's user and
+      # rejects pods that set a seccomp profile.
+      - name: Install under the restricted-v2 and anyuid SCCs
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          helm install restricted charts/gotenberg --namespace restricted --create-namespace --wait --timeout 5m
+
+          kubectl create namespace anyuid
+          kubectl -n anyuid create serviceaccount gotenberg
+          kubectl -n anyuid create role use-anyuid --verb=use --resource=securitycontextconstraints.security.openshift.io --resource-name=anyuid
+          kubectl -n anyuid create rolebinding gotenberg-anyuid --role=use-anyuid --serviceaccount=anyuid:gotenberg
+          helm install anyuid charts/gotenberg --namespace anyuid --set serviceAccount.create=false --set serviceAccount.name=gotenberg --wait --timeout 5m
+
+          for release in restricted anyuid; do
+            scc=$(kubectl -n "$release" get pods -l app.kubernetes.io/instance="$release",app.kubernetes.io/name=gotenberg -o jsonpath='{.items[0].metadata.annotations.openshift\.io/scc}')
+            echo "$release: admitted under $scc"
+            if [[ "$scc" != "$release"* ]]; then
+              echo "::error::$release was admitted under the $scc SCC"
+              exit 1
+            fi
+            helm test "$release" --namespace "$release" --logs
+          done
+
+      - name: Render documents with every installed release
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils >/dev/null
+          node .github/scripts/render-test.js
+
+      - name: Show cluster state
+        if: failure() && steps.list-changed.outputs.changed == 'true'
+        run: |
+          kubectl get pods --all-namespaces -o wide || true
+          kubectl get events --all-namespaces --sort-by=.lastTimestamp | tail -100 || true
+          for namespace in restricted anyuid; do
+            kubectl -n "$namespace" describe pods || true
+            kubectl -n "$namespace" logs -l app.kubernetes.io/instance="$namespace" --all-containers --tail=200 || true
+          done
+          sudo podman logs --tail 200 microshift || true
+
   # Stable check to require in branch protection: the install matrix check
   # names embed the kind node-image SHA and change on every image bump.
   ci-required:
-    needs: [workflow-lint, helm-tools, unit-test, lint, install]
+    needs: [workflow-lint, helm-tools, unit-test, lint, install, openshift]
     if: always()
     runs-on: ubuntu-latest
     steps:
