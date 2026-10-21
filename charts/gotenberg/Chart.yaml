@@ -46,7 +46,7 @@ annotations:
     - kind: fixed
       description: Allow Helm's global values in the schema so the chart works as a dependency of another chart
     - kind: fixed
-      description: Accept numbers for chromium.restartAfter, libreOffice.restartAfter and webhook.maxRetry
+      description: Accept numbers again for chromium.restartAfter, libreOffice.restartAfter and webhook.maxRetry, rejected since 1.8.0
     - kind: fixed
       description: "Behaviour change: api.downloadFromMaxRetry and gotenberg.gracefulShutdownDurationSec set to 0 now pass 0 to Gotenberg instead of leaving its default"
     - kind: fixed

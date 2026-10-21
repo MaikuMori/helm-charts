@@ -219,7 +219,7 @@ tests:
             - name: HOME
               value: /tmp
 
-  - it: passes zero restart and retry counts instead of dropping them
+  - it: passes 0 for restart, retry and shutdown values
     set:
       chromium.restartAfter: 0
       libreOffice.restartAfter: "0"
