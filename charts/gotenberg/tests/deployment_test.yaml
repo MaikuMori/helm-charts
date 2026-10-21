@@ -225,6 +225,7 @@ tests:
       libreOffice.restartAfter: "0"
       api.downloadFromMaxRetry: 0
       webhook.maxRetry: 0
+      gotenberg.gracefulShutdownDurationSec: 0
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
@@ -238,3 +239,9 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].args
           content: --webhook-max-retry=0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --gotenberg-graceful-shutdown-duration=0s
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 0

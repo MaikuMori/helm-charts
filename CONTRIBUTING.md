@@ -25,6 +25,8 @@ CI pins `helm-docs`, `helm schema`, `helm-tool` and `actionlint` in `tools/*/go.
 
 `schema_test.yaml` checks what `values.schema.json` accepts and rejects.
 
+`.github/scripts/zero-values-test.js` sets every integer value in the schema to 0 and fails if 0 doesn't render wherever another number would, so a value guarded by `{{ if .Values.x }}` doesn't silently drop 0. Guard numeric flags with `{{ if or .Values.x (eq (toString .Values.x) "0") }}`, or add the value to its `ZERO_IGNORED` list with the reason 0 has no meaning of its own.
+
 `test/subchart/` is a parent chart that depends on `charts/gotenberg` and sets Helm `global` values. CI renders it with each of the chart's `ci/` and `tests/values/` files nested under `gotenberg:`, and installs it in the kind clusters, so the chart keeps working as a dependency.
 
 The `openshift` job installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD (with the Kindnet CNI, not OVN-Kubernetes), with the default and the hardened values under the `restricted-v2` SCC, and with a service account allowed the `anyuid` SCC, and checks each release's Gotenberg pod was admitted under the expected SCC before running `helm test` and the render test.

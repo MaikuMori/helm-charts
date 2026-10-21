@@ -371,7 +371,7 @@ spec:
           - --log-enable-gcp-severity
           {{- end }}
 
-          {{- if .Values.gotenberg.gracefulShutdownDurationSec }}
+          {{- if or .Values.gotenberg.gracefulShutdownDurationSec (eq (toString .Values.gotenberg.gracefulShutdownDurationSec) "0") }}
           - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s
           {{- end }}
           {{- if .Values.gotenberg.hideBanner }}
