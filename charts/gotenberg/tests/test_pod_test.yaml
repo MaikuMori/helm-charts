@@ -63,3 +63,11 @@ tests:
       - equal:
           path: metadata.labels["app.kubernetes.io/name"]
           value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-test
+
+  - it: keeps the test pod's name label distinct from a name override ending in -test
+    set:
+      nameOverride: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-test
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-hook
