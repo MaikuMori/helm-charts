@@ -3,6 +3,57 @@ entries:
   gotenberg:
   - annotations:
       artifacthub.io/changes: |
+        - kind: security
+          description: Outside OpenShift, the default container security context now meets the Pod Security restricted level, adding runAsNonRoot, dropping all capabilities and using the RuntimeDefault seccomp profile. Experimental; see the changelog to revert it
+        - kind: added
+          description: Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations
+        - kind: added
+          description: Document resource recommendations and a hardening example to start from for untrusted input
+        - kind: fixed
+          description: Allow Helm's global values in the schema so the chart works as a dependency of another chart
+        - kind: fixed
+          description: Accept numbers again for chromium.restartAfter, libreOffice.restartAfter and webhook.maxRetry, rejected since 1.8.0
+        - kind: fixed
+          description: "Behaviour change: api.downloadFromMaxRetry and gotenberg.gracefulShutdownDurationSec set to 0 now pass 0 to Gotenberg instead of leaving its default"
+        - kind: fixed
+          description: helm test pods no longer match the chart's Service, PodDisruptionBudget and NetworkPolicy selectors
+        - kind: fixed
+          description: The helm test connection check retries instead of hanging when it starts right after an upgrade
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+      artifacthub.io/signKey: |
+        fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
+        url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
+    apiVersion: v2
+    appVersion: 8.38.1
+    created: "2026-10-21T23:49:11.961866843Z"
+    description: A Helm chart for Gotenberg
+    digest: a69583119eee96cc68f66486cb60e2aea3b6fb4c77f9f682c3cca68e73ac887f
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.29.0/gotenberg-1.29.0.tgz
+    version: 1.29.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: Sign the OCI chart and the release archive with keyless cosign, alongside the existing GPG provenance, and document how to verify both
         - kind: added
@@ -1691,4 +1742,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-20T07:22:55.177944336Z"
+generated: "2026-10-21T23:49:11.96248898Z"
