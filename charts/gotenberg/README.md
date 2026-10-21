@@ -177,6 +177,12 @@ networkPolicy:
           podSelector:
             matchLabels:
               k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: openshift-dns
@@ -184,10 +190,6 @@ networkPolicy:
             matchLabels:
               dns.operator.openshift.io/daemonset-dns: default
       ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
         - port: 5353
           protocol: UDP
         - port: 5353
@@ -210,7 +212,7 @@ Also require authentication on the API, with `api.enableBasicAuth` or `api.enabl
 
 ## OpenShift
 
-OpenShift support is best effort. When the cluster serves the `security.openshift.io/v1` API, the default security context leaves the user, non-root check and seccomp profile to the SCC. CI installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, under the `restricted-v2` and `anyuid` SCCs; it isn't tested on OpenShift Container Platform. Issues and pull requests from OpenShift users are welcome.
+OpenShift support is best effort. When the cluster serves the `security.openshift.io/v1` API, the default security context leaves the user, non-root check and seccomp profile to the SCC. CI installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, under the `restricted-v2` and `anyuid` SCCs; it isn't tested on OpenShift Container Platform. Detection needs Helm to see the cluster's APIs: when rendering without cluster access, such as `helm template`, pass `--api-versions security.openshift.io/v1`. Issues and pull requests from OpenShift users are welcome.
 
 ## Values
 
