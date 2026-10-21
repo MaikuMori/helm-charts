@@ -65,7 +65,7 @@ cosign verify-blob gotenberg-<version>.tgz --bundle gotenberg-<version>.tgz.sigs
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```
 
-From chart 1.29.0, releases also carry [GitHub artifact attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations) recording the workflow run that built them. Verify them with the GitHub CLI:
+From chart 1.29.0, releases also carry [GitHub artifact attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations) recording the release workflow and source commit. Verify them with the GitHub CLI:
 
 ```console
 gh attestation verify oci://ghcr.io/maikumori/helm-charts/gotenberg:<version> --repo MaikuMori/helm-charts \
@@ -134,7 +134,7 @@ resources:
 
 ## Hardening Example
 
-The default security context already meets the Pod Security `restricted` level. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service.
+Outside OpenShift, the default security context already meets the Pod Security `restricted` level; on OpenShift, the SCC decides. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service.
 
 The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium refuses a private address, and that the NetworkPolicy allows DNS and public HTTPS but not the Kubernetes API:
 
@@ -163,9 +163,10 @@ networkPolicy:
         - podSelector: {}
       ports:
         - port: 3000
-  # Only allow DNS and HTTP(S) to public addresses, so URLs in documents and
-  # webhooks can't reach the cluster network. DNS pods are kube-dns, or
-  # openshift-dns listening on 5353 on OpenShift.
+  # Only allow DNS, and HTTP(S) outside the private ranges below. Adapt the
+  # ranges to your cluster and check that your CNI enforces NetworkPolicies;
+  # this alone doesn't guarantee the cluster network is unreachable. DNS pods
+  # are kube-dns, or openshift-dns listening on 5353 on OpenShift.
   allowEgress: false
   extraEgress:
     - to:

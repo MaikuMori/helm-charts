@@ -27,7 +27,7 @@ CI pins `helm-docs`, `helm schema`, `helm-tool` and `actionlint` in `tools/*/go.
 
 `test/subchart/` is a parent chart that depends on `charts/gotenberg` and sets Helm `global` values. CI renders it with each of the chart's `ci/` and `tests/values/` files nested under `gotenberg:`, and installs it in the kind clusters, so the chart keeps working as a dependency.
 
-The `openshift` job installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, with the default and the hardened values under the `restricted-v2` SCC, and with a service account allowed the `anyuid` SCC, and checks each pod was admitted under the expected SCC before running `helm test` and the render test.
+The `openshift` job installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, with the default and the hardened values under the `restricted-v2` SCC, and with a service account allowed the `anyuid` SCC, and checks each release's Gotenberg pod was admitted under the expected SCC before running `helm test` and the render test.
 
 ## Values schema
 
@@ -37,4 +37,4 @@ The `openshift` job installs the chart on [MicroShift](https://github.com/micros
 - A value without a default needs its type, e.g. `# @schema type: [string, null]`.
 - Deprecated values get `# @schema deprecated` and a description starting with `Deprecated:`.
 
-CI also installs the chart once per values file in `charts/gotenberg/ci/` on each supported Kubernetes version, in kind clusters that enforce the Pod Security `restricted` level (`.github/kind/`), then runs `.github/scripts/render-test.js` against every installed release: it converts the documents in `test/render/` with Chromium and LibreOffice, takes a screenshot, merges, reads and PDF/A-converts the results with the PDF engines, and checks each result contains the documents' text.
+CI also installs the chart once per values file in `charts/gotenberg/ci/` on each supported Kubernetes version, in kind clusters that enforce the Pod Security `restricted` level (`.github/kind/`), then runs `.github/scripts/render-test.js` against every installed release: it converts the documents in `test/render/` with Chromium and LibreOffice, takes a screenshot, merges, reads and PDF/A-converts the results with the PDF engines, and checks the PDFs' text and page counts and the screenshot's format, dimensions and size. It also checks each release's egress: every release must reach a public address, and only releases without a restricting NetworkPolicy may reach the Kubernetes API. A separate step upgrades from the target branch's chart, with the default and the hardened values, in a namespace that enforces only `baseline`.

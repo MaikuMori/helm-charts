@@ -38,7 +38,7 @@ annotations:
     url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
   artifacthub.io/changes: |
     - kind: security
-      description: The default container security context now meets the Pod Security restricted level, adding runAsNonRoot, dropping all capabilities and using the RuntimeDefault seccomp profile
+      description: Outside OpenShift, the default container security context now meets the Pod Security restricted level, adding runAsNonRoot, dropping all capabilities and using the RuntimeDefault seccomp profile. Experimental; see the changelog to revert it
     - kind: added
       description: Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations
     - kind: added

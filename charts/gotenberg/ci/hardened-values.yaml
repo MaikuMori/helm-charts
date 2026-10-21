@@ -22,9 +22,10 @@ networkPolicy:
         - podSelector: {}
       ports:
         - port: 3000
-  # Only allow DNS and HTTP(S) to public addresses, so URLs in documents and
-  # webhooks can't reach the cluster network. DNS pods are kube-dns, or
-  # openshift-dns listening on 5353 on OpenShift.
+  # Only allow DNS, and HTTP(S) outside the private ranges below. Adapt the
+  # ranges to your cluster and check that your CNI enforces NetworkPolicies;
+  # this alone doesn't guarantee the cluster network is unreachable. DNS pods
+  # are kube-dns, or openshift-dns listening on 5353 on OpenShift.
   allowEgress: false
   extraEgress:
     - to:

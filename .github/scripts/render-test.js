@@ -1,11 +1,11 @@
-// Exercises every Gotenberg release installed in the current cluster (left
-// behind by `ct install --skip-clean-up`, or through test/subchart) with the
+// Exercises every Gotenberg release installed in the current cluster with the
 // fixtures in test/render: Chromium and LibreOffice conversions, a Chromium
 // screenshot, and merging, PDF/A conversion and metadata reading with the PDF
-// engines. Each result is checked for the fixture's text, not just its file
-// type. Releases running with --chromium-deny-private-ips must also refuse to
-// render a private address, and releases with a NetworkPolicy must resolve and reach public addresses but
-// not the Kubernetes API.
+// engines. PDFs are checked for the fixture's text and page count, the
+// screenshot for its format, dimensions and size. Releases running with
+// --chromium-deny-private-ips must also refuse to render a private address.
+// Every release must resolve and reach a public address, and reach the
+// Kubernetes API only when no NetworkPolicy restricts its egress.
 // Needs pdftotext and pdfinfo (poppler-utils).
 // Usage: node .github/scripts/render-test.js
 
@@ -73,12 +73,14 @@ function expectPdf(pdf, markers, pages) {
   return `${pdf.length} bytes`;
 }
 
-// Run in the Gotenberg container of releases with a NetworkPolicy: [label, bash script, should succeed].
-const EGRESS_CHECKS = [
-  ['NetworkPolicy allows DNS', 'getent hosts github.com', true],
-  ['NetworkPolicy allows HTTPS to a public address', 'timeout 10 bash -c "exec 3<>/dev/tcp/github.com/443"', true],
-  ['NetworkPolicy blocks the Kubernetes API', 'timeout 10 bash -c "exec 3<>/dev/tcp/kubernetes.default.svc/443"', false],
-];
+// Prints `unresolved`, `connected` or `blocked` for a TCP connection from the Gotenberg container.
+const probe = (host, port) =>
+  `getent hosts ${host} >/dev/null || { echo unresolved; exit; }; ` +
+  `if timeout 10 bash -c 'exec 3<>/dev/tcp/${host}/${port}' 2>/dev/null; then echo connected; else echo blocked; fi`;
+
+// Egress is restricted when an Egress policy has no rule allowing everything.
+const restrictsEgress = policies => policies.some(p =>
+  (p.spec.policyTypes ?? []).includes('Egress') && !(p.spec.egress ?? []).some(r => Object.keys(r).length === 0));
 
 // Steps share results through `out`; a step whose input failed fails too.
 const STEPS = [
@@ -177,17 +179,23 @@ async function main() {
         }
       }
 
-      if (networkPolicies.length > 0) {
-        for (const [label, script, allowed] of EGRESS_CHECKS) {
-          const { status, stderr } = spawnSync('kubectl', [
-            'exec', '-n', namespace, `deployment/${deployment.metadata.name}`, '--', 'bash', '-c', script,
-          ], { encoding: 'utf8', timeout: 30000 });
-          if ((status === 0) === allowed) {
-            console.log(`ok   ${namespace}/${name}: ${label}`);
-          } else {
-            failures++;
-            console.log(`FAIL ${namespace}/${name}: ${label}: exit ${status} ${stderr.trim()}`);
-          }
+      // Releases without egress rules are the control: they must reach the Kubernetes API.
+      const restricted = restrictsEgress(networkPolicies);
+      const egressChecks = [
+        ['github.com', 443, 'connected'],
+        ['kubernetes.default.svc', 443, restricted ? 'blocked' : 'connected'],
+      ];
+      for (const [host, port, want] of egressChecks) {
+        const label = `${host}:${port} is ${want}${restricted ? ' with the NetworkPolicy' : ''}`;
+        const { status, stdout, stderr } = spawnSync('kubectl', [
+          'exec', '-n', namespace, `deployment/${deployment.metadata.name}`, '--', 'bash', '-c', probe(host, port),
+        ], { encoding: 'utf8', timeout: 30000 });
+        const got = status === 0 ? stdout.trim() : `kubectl exec failed (${status}): ${(stderr ?? '').trim()}`;
+        if (got === want) {
+          console.log(`ok   ${namespace}/${name}: ${label}`);
+        } else {
+          failures++;
+          console.log(`FAIL ${namespace}/${name}: ${label}: got ${got}`);
         }
       }
     } finally {
