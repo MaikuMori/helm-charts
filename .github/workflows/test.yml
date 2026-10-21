@@ -292,7 +292,17 @@ jobs:
 
           kubectl create namespace anyuid
           kubectl -n anyuid create serviceaccount gotenberg
-          kubectl -n anyuid create role use-anyuid --verb=use --resource=securitycontextconstraints.security.openshift.io --resource-name=anyuid
+          kubectl -n anyuid apply -f - <<'YAML'
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: Role
+          metadata:
+            name: use-anyuid
+          rules:
+            - apiGroups: [security.openshift.io]
+              resources: [securitycontextconstraints]
+              resourceNames: [anyuid]
+              verbs: [use]
+          YAML
           kubectl -n anyuid create rolebinding gotenberg-anyuid --role=use-anyuid --serviceaccount=anyuid:gotenberg
           helm install anyuid charts/gotenberg --namespace anyuid --set serviceAccount.create=false --set serviceAccount.name=gotenberg --wait --timeout 5m
 
