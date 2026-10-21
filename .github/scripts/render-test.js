@@ -5,7 +5,7 @@
 // screenshot for its format, dimensions and size. Releases running with
 // --chromium-deny-private-ips must also refuse to render a private address.
 // Every release must resolve and reach a public address, and reach another
-// release's Service only when no NetworkPolicy restricts its egress.
+// release's Service and pod only when no NetworkPolicy restricts its egress.
 // Needs pdftotext and pdfinfo (poppler-utils).
 // Usage: node .github/scripts/render-test.js
 
@@ -73,10 +73,12 @@ function expectPdf(pdf, markers, pages) {
   return `${pdf.length} bytes`;
 }
 
-// Prints `unresolved`, `connected` or `blocked` for a TCP connection from the Gotenberg container.
+// Prints `unresolved`, `connected`, `refused` (nothing listening) or `blocked`
+// (timed out) for a TCP connection from the Gotenberg container.
 const probe = (host, port) =>
-  `getent hosts ${host} >/dev/null || { echo unresolved; exit; }; ` +
-  `if timeout 10 bash -c 'exec 3<>/dev/tcp/${host}/${port}' 2>/dev/null; then echo connected; else echo blocked; fi`;
+  (/^[0-9.]+$/.test(host) ? '' : `getent hosts ${host} >/dev/null || { echo unresolved; exit; }; `) +
+  `timeout 10 bash -c 'exec 3<>/dev/tcp/${host}/${port}' 2>/dev/null; rc=$?; ` +
+  'if [ $rc = 0 ]; then echo connected; elif [ $rc = 124 ]; then echo blocked; else echo refused; fi';
 
 // Egress is restricted when an Egress policy has no rule allowing everything.
 const restrictsEgress = policies => policies.some(p =>
@@ -143,11 +145,15 @@ async function main() {
     ]).items;
     const services = get('service');
     if (services.length !== 1) throw new Error(`Expected one Service for ${namespace}/${name}, found ${services.length}`);
-    return { name, namespace, service: services[0], deployment: get('deployment')[0], networkPolicies: get('networkpolicy') };
+    const pod = get('pod').find(p => p.status.phase === 'Running' && p.metadata.labels['app.kubernetes.io/component'] !== 'test');
+    return {
+      name, namespace, service: services[0], deployment: get('deployment')[0], podIP: pod?.status.podIP,
+      networkPolicies: get('networkpolicy'),
+    };
   });
   // Releases without a NetworkPolicy accept connections from anywhere in the cluster.
   const peers = installed.filter(r => r.networkPolicies.length === 0)
-    .map(r => ({ release: r, host: `${r.service.metadata.name}.${r.namespace}.svc`, port: r.service.spec.ports[0].port }));
+    .map(r => ({ release: r, host: `${r.service.metadata.name}.${r.namespace}.svc`, port: r.service.spec.ports[0].port, podIP: r.podIP }));
 
   let failures = 0;
   for (const { name, namespace, service, deployment, networkPolicies } of installed) {
@@ -180,13 +186,17 @@ async function main() {
         }
       }
 
-      // Releases without egress rules are the control: they must reach another release's Service.
+      // Releases without egress rules are the control: they must reach another
+      // release's Service, and get refused on its pod's port 443, where nothing
+      // listens. Restricted releases must time out on both: the Service port isn't
+      // allowed, and 443 is only allowed to public addresses.
       const restricted = restrictsEgress(networkPolicies);
       const peer = peers.find(p => p.release.name !== name || p.release.namespace !== namespace);
       if (!peer) throw new Error(`No other release without a NetworkPolicy for ${namespace}/${name} to connect to`);
       const egressChecks = [
         ['github.com', 443, 'connected'],
         [peer.host, peer.port, restricted ? 'blocked' : 'connected'],
+        [peer.podIP, 443, restricted ? 'blocked' : 'refused'],
       ];
       for (const [host, port, want] of egressChecks) {
         const label = `${host}:${port} is ${want}${restricted ? ' with the NetworkPolicy' : ''}`;
