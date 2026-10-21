@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.28.1
+
+- Fix the chart failing as a dependency of another chart with `additional properties 'global' not allowed` since 1.27.1 ([#118](https://github.com/MaikuMori/helm-charts/issues/118)).
+
 ## 1.28.0
 
 - Sign the OCI chart and the release archive with keyless [cosign](https://github.com/sigstore/cosign), alongside the existing GPG provenance, and document how to verify both.

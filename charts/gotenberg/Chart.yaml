@@ -4,7 +4,7 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.28.0"
+version: "1.28.1"
 appVersion: "8.38.1"
 
 keywords:
@@ -37,11 +37,5 @@ annotations:
     fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
     url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
   artifacthub.io/changes: |
-    - kind: added
-      description: Sign the OCI chart and the release archive with keyless cosign, alongside the existing GPG provenance, and document how to verify both
-    - kind: added
-      description: Add image.digest and testImage.digest to pull images by digest
-    - kind: changed
-      description: Pin the helm test image to busybox 1.38.0 by digest instead of busybox:latest
-    - kind: security
-      description: Run the helm test pod without a service account token, as a non-root user with a read-only root filesystem, no capabilities and the RuntimeDefault seccomp profile
+    - kind: fixed
+      description: Allow Helm's global values in the schema so the chart works as a dependency of another chart
