@@ -105,7 +105,7 @@ spec:
           {{- if .Values.api.downloadFromDenyPublicIps }}
           - --api-download-from-deny-public-ips
           {{- end }}
-          {{- if .Values.api.downloadFromMaxRetry }}
+          {{- if or .Values.api.downloadFromMaxRetry (eq (toString .Values.api.downloadFromMaxRetry) "0") }}
           - --api-download-from-max-retry={{ .Values.api.downloadFromMaxRetry }}
           {{- end }}
           {{- if not (kindIs "invalid" .Values.api.downloadFromMaxConcurrency) }}
@@ -130,7 +130,7 @@ spec:
           - --api-disable-version-route-telemetry
           {{- end }}
 
-          {{- if .Values.chromium.restartAfter }}
+          {{- if or .Values.chromium.restartAfter (eq (toString .Values.chromium.restartAfter) "0") }}
           - --chromium-restart-after={{ .Values.chromium.restartAfter }}
           {{- end }}
           {{- if .Values.chromium.autoStart }}
@@ -203,7 +203,7 @@ spec:
           - --chromium-idle-shutdown-timeout={{ .Values.chromium.idleShutdownTimeout }}
           {{- end }}
 
-          {{- if .Values.libreOffice.restartAfter }}
+          {{- if or .Values.libreOffice.restartAfter (eq (toString .Values.libreOffice.restartAfter) "0") }}
           - --libreoffice-restart-after={{ .Values.libreOffice.restartAfter }}
           {{- end }}
           {{- if .Values.libreOffice.autoStart }}
@@ -316,7 +316,7 @@ spec:
           {{- if .Values.webhook.errorDenyList }}
           - --webhook-error-deny-list={{ .Values.webhook.errorDenyList }}
           {{- end }}
-          {{- if .Values.webhook.maxRetry }}
+          {{- if or .Values.webhook.maxRetry (eq (toString .Values.webhook.maxRetry) "0") }}
           - --webhook-max-retry={{ .Values.webhook.maxRetry }}
           {{- end }}
           {{- if .Values.webhook.retryMinWait }}

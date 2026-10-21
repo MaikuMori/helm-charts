@@ -48,6 +48,8 @@ annotations:
     - kind: fixed
       description: Accept numbers for chromium.restartAfter, libreOffice.restartAfter and webhook.maxRetry
     - kind: fixed
+      description: Setting chromium.restartAfter, libreOffice.restartAfter, api.downloadFromMaxRetry or webhook.maxRetry to 0 passes 0 to Gotenberg instead of leaving its default
+    - kind: fixed
       description: helm test pods no longer match the chart's Service, PodDisruptionBudget and NetworkPolicy selectors
     - kind: fixed
       description: The helm test connection check retries instead of hanging when it starts right after an upgrade

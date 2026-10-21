@@ -202,27 +202,13 @@ jobs:
           TARGET_BRANCH: ${{ github.base_ref || 'master' }}
         run: ct install --config ct.yaml --target-branch "$TARGET_BRANCH" --skip-clean-up ${ALL:+--all}
 
-      # Previous versions may not meet the restricted level, so this namespace
-      # only enforces baseline. The previous chart's schema must accept the
-      # current hardened values.
-      - name: Upgrade from the target branch's chart
+      # Published releases are only upgraded from on the first Kubernetes version.
+      - name: Upgrade from the target branch's chart and recent releases
         if: steps.list-changed.outputs.changed == 'true'
         env:
           TARGET_BRANCH: ${{ github.base_ref || 'master' }}
-        run: |
-          previous="$RUNNER_TEMP/previous"
-          mkdir -p "$previous"
-          git archive "origin/$TARGET_BRANCH" charts/gotenberg | tar -x -C "$previous"
-          kubectl create namespace upgrade
-          kubectl label namespace upgrade pod-security.kubernetes.io/enforce=baseline
-          for values in none charts/gotenberg/ci/hardened-values.yaml; do
-            release="upgrade-$(basename "$values" -values.yaml)"
-            args=(--namespace upgrade --wait --timeout 5m)
-            [[ "$values" != none ]] && args+=(--values "$values")
-            helm install "$release" "$previous/charts/gotenberg" "${args[@]}"
-            helm upgrade "$release" charts/gotenberg "${args[@]}"
-            helm test "$release" --namespace upgrade --logs
-          done
+          RELEASES: ${{ strategy.job-index == 0 && 5 || 0 }}
+        run: node .github/scripts/upgrade-test.js "$TARGET_BRANCH" "$RELEASES"
 
       - name: Install as a subchart
         if: steps.list-changed.outputs.changed == 'true'

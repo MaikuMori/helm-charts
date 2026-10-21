@@ -218,3 +218,23 @@ tests:
           value:
             - name: HOME
               value: /tmp
+
+  - it: passes zero restart and retry counts instead of dropping them
+    set:
+      chromium.restartAfter: 0
+      libreOffice.restartAfter: "0"
+      api.downloadFromMaxRetry: 0
+      webhook.maxRetry: 0
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --chromium-restart-after=0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --libreoffice-restart-after=0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-download-from-max-retry=0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --webhook-max-retry=0

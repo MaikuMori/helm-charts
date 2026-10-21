@@ -21,6 +21,7 @@ Please also open an issue. If you use the chart as a dependency and need an olde
 - The `helm test` connection check retries for up to about a minute with a 5-second timeout per attempt. Right after an upgrade, the Service could still route its single attempt to the replaced pod, and it then hung for two minutes before failing.
 - Fix the chart failing as a dependency of another chart with `additional properties 'global' not allowed` since 1.27.1 ([#118](https://github.com/MaikuMori/helm-charts/issues/118)). The chart accepts `global` values but doesn't use them.
 - Accept numbers, not only strings, for `chromium.restartAfter`, `libreOffice.restartAfter` and `webhook.maxRetry`. The schema rejected them since 1.27.0.
+- Setting `chromium.restartAfter`, `libreOffice.restartAfter`, `api.downloadFromMaxRetry` or `webhook.maxRetry` to `0` now passes `0` to Gotenberg, as documented, instead of leaving Gotenberg's default (restart after 100 or 10 conversions, 4 retries). If you set one of them to `0`, expect restarts to stop or retries to be disabled after upgrading.
 
 ## 1.28.0
 
