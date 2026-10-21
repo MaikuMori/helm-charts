@@ -65,6 +65,14 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Non-empty when a value is set, including to 0, which `if` treats as unset.
+Use as `{{ if include "gotenberg.isSet" .Values.x }}` for numeric flags.
+*/}}
+{{- define "gotenberg.isSet" -}}
+{{- if or . (eq (toString .) "0") }}true{{ end }}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "gotenberg.serviceAccountName" -}}
