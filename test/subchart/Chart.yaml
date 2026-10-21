@@ -1,0 +1,10 @@
+apiVersion: v2
+name: subchart-test
+description: Renders the gotenberg chart as a dependency of another chart
+type: application
+version: 0.0.0
+dependencies:
+  - name: gotenberg
+    version: ">=0.0.0-0"
+    repository: file://../../charts/gotenberg
+    condition: gotenberg.enabled

@@ -65,6 +65,12 @@ tests:
     asserts:
       - notFailedTemplate: {}
 
+  - it: accepts Helm's global values when used as a dependency
+    set:
+      global.imageRegistry: registry.example.com
+    asserts:
+      - notFailedTemplate: {}
+
   - it: rejects unknown top-level values
     set:
       replicaCont: 2

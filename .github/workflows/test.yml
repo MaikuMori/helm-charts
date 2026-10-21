@@ -100,6 +100,15 @@ jobs:
             exit 1
           fi
 
+      - name: Render as a subchart
+        run: |
+          helm dependency build test/subchart
+          for values in charts/gotenberg/ci/*.yaml charts/gotenberg/tests/values/*.yaml; do
+            echo "Rendering with $values"
+            yq '{"gotenberg": (. // {})}' "$values" > "$RUNNER_TEMP/subchart-values.yaml"
+            helm template test test/subchart -f "$RUNNER_TEMP/subchart-values.yaml" > /dev/null
+          done
+
   lint:
     runs-on: ubuntu-latest
     steps:
