@@ -25,6 +25,8 @@ CI pins `helm-docs`, `helm schema`, `helm-tool` and `actionlint` in `tools/*/go.
 
 `schema_test.yaml` checks what `values.schema.json` accepts and rejects.
 
+`test/subchart/` is a parent chart that depends on `charts/gotenberg` and sets Helm `global` values. CI renders it with each of the chart's `ci/` and `tests/values/` files nested under `gotenberg:`, so the chart keeps working as a dependency.
+
 ## Values schema
 
 `values.schema.json` is generated from `values.yaml` by [helm-values-schema-json](https://github.com/losisin/helm-values-schema-json), configured in `charts/gotenberg/.schema.yaml`. Descriptions come from the `# --` comments that `helm-docs` also uses. Types are inferred from the defaults; add a `# @schema` annotation at the end of a key's line when that isn't enough:

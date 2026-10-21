@@ -1,0 +1,5 @@
+global:
+  imageRegistry: registry.example.com
+  imagePullSecrets:
+    - name: registry
+  storageClass: standard
