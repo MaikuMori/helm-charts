@@ -65,6 +65,15 @@ cosign verify-blob gotenberg-<version>.tgz --bundle gotenberg-<version>.tgz.sigs
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```
 
+From chart 1.29.0, releases also carry [GitHub artifact attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations) recording the release workflow and source commit. Verify them with the GitHub CLI:
+
+```console
+gh attestation verify oci://ghcr.io/maikumori/helm-charts/gotenberg:<version> --repo MaikuMori/helm-charts \
+  --signer-workflow MaikuMori/helm-charts/.github/workflows/release.yml
+gh attestation verify gotenberg-<version>.tgz --repo MaikuMori/helm-charts \
+  --signer-workflow MaikuMori/helm-charts/.github/workflows/release.yml
+```
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `my-release` deployment:
@@ -109,6 +118,34 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
 ```
 
 `docker buildx imagetools inspect gotenberg/gotenberg:8.38.1` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
+
+## Resources
+
+The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit:
+
+```yaml
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    memory: 2Gi
+```
+
+## Hardening Example
+
+Outside OpenShift, the chart's default security contexts already meet the Pod Security `restricted` level; on OpenShift, the SCC decides. Containers and volumes you add, such as `initContainers`, have to meet it too. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service.
+
+The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium refuses a private address, and that the NetworkPolicy allows DNS and public HTTPS but not another release's Service:
+
+```yaml
+{{ .Files.Get "ci/hardened-values.yaml" }}```
+
+Also require authentication on the API, with `api.enableBasicAuth` or `api.enableOidcAuth`, and disable the routes you don't use, such as `chromium.disableRoutes` or `libreOffice.disableRoutes`. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
+
+## OpenShift
+
+OpenShift support is best effort. When the cluster serves the `security.openshift.io/v1` API, the default security context leaves the user, non-root check and seccomp profile to the SCC. CI installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, with the Kindnet CNI rather than OVN-Kubernetes, under the `restricted-v2` and `anyuid` SCCs; it isn't tested on OpenShift Container Platform. Detection needs Helm to see the cluster's APIs: when rendering without cluster access, such as `helm template`, pass `--api-versions security.openshift.io/v1`. Issues and pull requests from OpenShift users are welcome.
 
 {{ template "chart.requirementsSection" . }}
 

@@ -51,6 +51,28 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Labels for helm test pods. Their name differs from the selector labels, so the
+Service, PodDisruptionBudget and NetworkPolicy don't select them.
+*/}}
+{{- define "gotenberg.testLabels" -}}
+{{- $name := include "gotenberg.name" . -}}
+{{- $prefix := $name | trunc 58 | trimSuffix "-" -}}
+helm.sh/chart: {{ include "gotenberg.chart" . }}
+app.kubernetes.io/name: {{ ternary (printf "%s-hook" $prefix) (printf "%s-test" $prefix) (eq (printf "%s-test" $prefix) $name) }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: test
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Non-empty when a value is set, including to 0, which `if` treats as unset.
+Use as `{{ if include "gotenberg.isSet" .Values.x }}` for numeric flags.
+*/}}
+{{- define "gotenberg.isSet" -}}
+{{- if or . (eq (toString .) "0") }}true{{ end }}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "gotenberg.serviceAccountName" -}}
@@ -67,24 +89,30 @@ Create a security context
 If .Values.securityContext is set, use it. Otherwise, use the defaults.
 
 Defaults:
-If we detect OpenShift, we remove the "runAsUser", fsGroup, "runAsGroup" fields since they're not supported.
+On OpenShift, the user, non-root check and seccomp profile are left to the SCC, since the image's
+user isn't numeric and a pod that sets a seccomp profile can't be admitted under SCCs without
+seccompProfiles, such as anyuid.
+Elsewhere, the seccomp profile is left to the pod when podSecurityContext sets one.
 And apply recommended settings from upstream project.
 */}}
 {{- define "gotenberg.securityContext" -}}
 {{- if .Values.securityContext }}
 {{- toYaml .Values.securityContext }}
-{{- else}}
-{{- if .Capabilities.APIVersions.Has "security.openshift.io/v1" -}}
-privileged: false
-allowPrivilegeEscalation: false
-# Issue with Chromium, see: https://github.com/gotenberg/gotenberg/issues/949
-readOnlyRootFilesystem: false
 {{- else -}}
 privileged: false
+{{- if not (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
 runAsUser: 1001
+runAsNonRoot: true
+{{- end }}
 allowPrivilegeEscalation: false
+capabilities:
+  drop:
+    - ALL
+{{- if not (or .Values.podSecurityContext.seccompProfile (.Capabilities.APIVersions.Has "security.openshift.io/v1")) }}
+seccompProfile:
+  type: RuntimeDefault
+{{- end }}
 # Issue with Chromium, see: https://github.com/gotenberg/gotenberg/issues/949
 readOnlyRootFilesystem: false
-{{- end}}
-{{- end}}
-{{- end}}
+{{- end }}
+{{- end }}

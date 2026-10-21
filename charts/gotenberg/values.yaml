@@ -56,8 +56,8 @@ podSecurityContext:
   {}
   # fsGroup: 2000
 
-# -- Define the security context for the container. By default will use upstream recommended values.
-# @default -- `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set.
+# -- Define the security context for the container. Replaces the default entirely when set.
+# @default -- Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user, non-root check and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium.
 securityContext: {}
 
 service:  # @schema additionalProperties: false
@@ -306,7 +306,7 @@ api:  # @schema additionalProperties: false
 # https://gotenberg.dev/docs/configuration#chromium
 chromium:  # @schema additionalProperties: false
   # -- Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature (default 100)
-  restartAfter: ""
+  restartAfter: ""  # @schema type: [string, integer]
   # -- Maximum number of concurrent Chromium conversions (default 6)
   maxConcurrency: 0
   # -- Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion
@@ -358,7 +358,7 @@ chromium:  # @schema additionalProperties: false
 # https://gotenberg.dev/docs/configuration#libreoffice
 libreOffice:  # @schema additionalProperties: false
   # -- Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature (default 10)
-  restartAfter: ""
+  restartAfter: ""  # @schema type: [string, integer]
   # -- Automatically launch LibreOffce upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)
   autoStart: false
   # -- Maximum duration to wait for LibreOffice to start or restart (default 10s)
@@ -441,7 +441,7 @@ webhook:  # @schema additionalProperties: false
   # -- Deprecated: Set the denied URLs in case of an error for the webhook feature using a regular expression. Use `denyList` instead in Gotenberg 8.31.0+ — it now covers both regular and error webhooks.
   errorDenyList: ""  # @schema deprecated
   # -- Set the maximum number of retries for the webhook feature (default 4)
-  maxRetry: ""
+  maxRetry: ""  # @schema type: [string, integer]
   # -- Set the minimum duration to wait before trying to call the webhook again (default 1s)
   retryMinWait: ""
   # -- Set the maximum duration to wait before trying to call the webhook again (default 30s)

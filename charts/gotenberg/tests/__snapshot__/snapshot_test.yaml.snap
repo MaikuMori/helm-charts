@@ -49,9 +49,15 @@ matches with default values:
               resources: {}
               securityContext:
                 allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
                 privileged: false
                 readOnlyRootFilesystem: false
+                runAsNonRoot: true
                 runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
               startupProbe:
                 failureThreshold: 30
                 httpGet:
@@ -90,22 +96,25 @@ matches with default values:
       annotations:
         helm.sh/hook: test
       labels:
+        app.kubernetes.io/component: test
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: gotenberg
-        app.kubernetes.io/version: 0.0.0
+        app.kubernetes.io/name: gotenberg-test
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
       automountServiceAccountToken: false
       containers:
         - args:
-            - -q
-            - -O
-            - /dev/null
-            - RELEASE-NAME-gotenberg:80/health
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
           command:
-            - wget
+            - /bin/sh
+            - -c
           image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
           securityContext:
@@ -274,9 +283,15 @@ matches with every flag set:
               resources: {}
               securityContext:
                 allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
                 privileged: false
                 readOnlyRootFilesystem: false
+                runAsNonRoot: true
                 runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
               startupProbe:
                 failureThreshold: 30
                 httpGet:
@@ -315,22 +330,25 @@ matches with every flag set:
       annotations:
         helm.sh/hook: test
       labels:
+        app.kubernetes.io/component: test
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: gotenberg
-        app.kubernetes.io/version: 0.0.0
+        app.kubernetes.io/name: gotenberg-test
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
       automountServiceAccountToken: false
       containers:
         - args:
-            - -q
-            - -O
-            - /dev/null
-            - RELEASE-NAME-gotenberg:80/health
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
           command:
-            - wget
+            - /bin/sh
+            - -c
           image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
           securityContext:
@@ -396,9 +414,15 @@ matches with every optional resource enabled:
               resources: {}
               securityContext:
                 allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
                 privileged: false
                 readOnlyRootFilesystem: false
+                runAsNonRoot: true
                 runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
               startupProbe:
                 failureThreshold: 30
                 httpGet:
@@ -535,22 +559,25 @@ matches with every optional resource enabled:
       annotations:
         helm.sh/hook: test
       labels:
+        app.kubernetes.io/component: test
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: gotenberg
-        app.kubernetes.io/version: 0.0.0
+        app.kubernetes.io/name: gotenberg-test
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
       automountServiceAccountToken: false
       containers:
         - args:
-            - -q
-            - -O
-            - /dev/null
-            - RELEASE-NAME-gotenberg:80/health
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
           command:
-            - wget
+            - /bin/sh
+            - -c
           image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
           securityContext:
@@ -617,9 +644,15 @@ matches with the CRD-backed and policy resources enabled:
               resources: {}
               securityContext:
                 allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
                 privileged: false
                 readOnlyRootFilesystem: false
+                runAsNonRoot: true
                 runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
               startupProbe:
                 failureThreshold: 30
                 httpGet:
@@ -705,22 +738,25 @@ matches with the CRD-backed and policy resources enabled:
       annotations:
         helm.sh/hook: test
       labels:
+        app.kubernetes.io/component: test
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: gotenberg
-        app.kubernetes.io/version: 0.0.0
+        app.kubernetes.io/name: gotenberg-test
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg-test-connection
     spec:
       automountServiceAccountToken: false
       containers:
         - args:
-            - -q
-            - -O
-            - /dev/null
-            - RELEASE-NAME-gotenberg:80/health
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
           command:
-            - wget
+            - /bin/sh
+            - -c
           image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
           name: wget
           securityContext:
@@ -754,3 +790,198 @@ matches with the CRD-backed and policy resources enabled:
         name: RELEASE-NAME-gotenberg
       updatePolicy:
         updateMode: Auto
+matches with the documented hardened values:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: RELEASE-NAME-gotenberg
+    spec:
+      progressDeadlineSeconds: 120
+      replicas: 1
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: gotenberg
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: gotenberg
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - gotenberg
+                - --api-port=3000
+                - --api-download-from-deny-private-ips
+                - --api-download-from-max-retry=4
+                - --chromium-deny-private-ips
+                - --libreoffice-deny-private-ips
+                - --webhook-deny-private-ips
+                - --gotenberg-graceful-shutdown-duration=30s
+              env: null
+              image: gotenberg/gotenberg:0.0.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: http
+              name: gotenberg
+              ports:
+                - containerPort: 3000
+                  name: http
+                  protocol: TCP
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: http
+              resources: {}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                privileged: false
+                readOnlyRootFilesystem: false
+                runAsNonRoot: true
+                runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
+              startupProbe:
+                failureThreshold: 30
+                httpGet:
+                  path: /health
+                  port: http
+                periodSeconds: 10
+          enableServiceLinks: true
+          securityContext: {}
+          serviceAccountName: default
+          terminationGracePeriodSeconds: 30
+  2: |
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: RELEASE-NAME-gotenberg
+    spec:
+      egress:
+        - ports:
+            - port: 53
+              protocol: UDP
+            - port: 53
+              protocol: TCP
+          to:
+            - namespaceSelector: {}
+              podSelector:
+                matchLabels:
+                  k8s-app: kube-dns
+        - ports:
+            - port: 5353
+              protocol: UDP
+            - port: 5353
+              protocol: TCP
+          to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: openshift-dns
+              podSelector:
+                matchLabels:
+                  dns.operator.openshift.io/daemonset-dns: default
+        - ports:
+            - port: 80
+            - port: 443
+          to:
+            - ipBlock:
+                cidr: 0.0.0.0/0
+                except:
+                  - 10.0.0.0/8
+                  - 172.16.0.0/12
+                  - 192.168.0.0/16
+                  - 169.254.0.0/16
+                  - 100.64.0.0/10
+      ingress:
+        - from:
+            - podSelector: {}
+          ports:
+            - port: 3000
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: gotenberg
+      policyTypes:
+        - Ingress
+        - Egress
+  3: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: RELEASE-NAME-gotenberg
+    spec:
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: http
+      selector:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: gotenberg
+      type: ClusterIP
+  4: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      annotations:
+        helm.sh/hook: test
+      labels:
+        app.kubernetes.io/component: test
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg-test
+        helm.sh/chart: gotenberg-0.0.0
+      name: RELEASE-NAME-gotenberg-test-connection
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - args:
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
+          command:
+            - /bin/sh
+            - -c
+          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
+          name: wget
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+      restartPolicy: Never
+      securityContext:
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault

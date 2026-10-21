@@ -105,7 +105,7 @@ spec:
           {{- if .Values.api.downloadFromDenyPublicIps }}
           - --api-download-from-deny-public-ips
           {{- end }}
-          {{- if .Values.api.downloadFromMaxRetry }}
+          {{- if include "gotenberg.isSet" .Values.api.downloadFromMaxRetry }}
           - --api-download-from-max-retry={{ .Values.api.downloadFromMaxRetry }}
           {{- end }}
           {{- if not (kindIs "invalid" .Values.api.downloadFromMaxConcurrency) }}
@@ -130,7 +130,7 @@ spec:
           - --api-disable-version-route-telemetry
           {{- end }}
 
-          {{- if .Values.chromium.restartAfter }}
+          {{- if include "gotenberg.isSet" .Values.chromium.restartAfter }}
           - --chromium-restart-after={{ .Values.chromium.restartAfter }}
           {{- end }}
           {{- if .Values.chromium.autoStart }}
@@ -203,7 +203,7 @@ spec:
           - --chromium-idle-shutdown-timeout={{ .Values.chromium.idleShutdownTimeout }}
           {{- end }}
 
-          {{- if .Values.libreOffice.restartAfter }}
+          {{- if include "gotenberg.isSet" .Values.libreOffice.restartAfter }}
           - --libreoffice-restart-after={{ .Values.libreOffice.restartAfter }}
           {{- end }}
           {{- if .Values.libreOffice.autoStart }}
@@ -316,7 +316,7 @@ spec:
           {{- if .Values.webhook.errorDenyList }}
           - --webhook-error-deny-list={{ .Values.webhook.errorDenyList }}
           {{- end }}
-          {{- if .Values.webhook.maxRetry }}
+          {{- if include "gotenberg.isSet" .Values.webhook.maxRetry }}
           - --webhook-max-retry={{ .Values.webhook.maxRetry }}
           {{- end }}
           {{- if .Values.webhook.retryMinWait }}
@@ -371,7 +371,7 @@ spec:
           - --log-enable-gcp-severity
           {{- end }}
 
-          {{- if .Values.gotenberg.gracefulShutdownDurationSec }}
+          {{- if include "gotenberg.isSet" .Values.gotenberg.gracefulShutdownDurationSec }}
           - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s
           {{- end }}
           {{- if .Values.gotenberg.hideBanner }}

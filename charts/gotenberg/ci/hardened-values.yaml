@@ -1,0 +1,68 @@
+# Example hardening for untrusted callers: a starting point to adjust to your
+# cluster, not a complete setup.
+
+# Reject outbound requests to private, loopback and link-local addresses from
+# every module that fetches URLs.
+api:
+  downloadFromDenyPrivateIps: true
+chromium:
+  denyPrivateIps: true
+libreOffice:
+  denyPrivateIps: true
+webhook:
+  denyPrivateIps: true
+
+networkPolicy:
+  enabled: true
+  # Only accept API calls from pods in the release's namespace. Replace the
+  # rule with a selector for your clients. 3000 is api.port.
+  allowIngress: false
+  extraIngress:
+    - from:
+        - podSelector: {}
+      ports:
+        - port: 3000
+  # Only allow DNS, and HTTP(S) outside the private ranges below. Adapt the
+  # ranges to your cluster and check that your CNI enforces NetworkPolicies;
+  # this alone doesn't guarantee the cluster network is unreachable. Some
+  # CNIs don't apply NetworkPolicies to the node's own addresses, which can
+  # include the Kubernetes API (as on MicroShift). IPv4
+  # only: on dual-stack clusters, add ::/0 excepting fc00::/7 and fe80::/10.
+  # DNS pods are kube-dns, or openshift-dns listening on 5353 on OpenShift
+  # (not tested with OVN-Kubernetes).
+  allowEgress: false
+  extraEgress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+          podSelector:
+            matchLabels:
+              dns.operator.openshift.io/daemonset-dns: default
+      ports:
+        - port: 5353
+          protocol: UDP
+        - port: 5353
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+              - 169.254.0.0/16
+              - 100.64.0.0/10
+      ports:
+        - port: 80
+        - port: 443

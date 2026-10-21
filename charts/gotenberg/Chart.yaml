@@ -4,7 +4,7 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.28.0"
+version: "1.29.0"
 appVersion: "8.38.1"
 
 keywords:
@@ -37,11 +37,19 @@ annotations:
     fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
     url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
   artifacthub.io/changes: |
-    - kind: added
-      description: Sign the OCI chart and the release archive with keyless cosign, alongside the existing GPG provenance, and document how to verify both
-    - kind: added
-      description: Add image.digest and testImage.digest to pull images by digest
-    - kind: changed
-      description: Pin the helm test image to busybox 1.38.0 by digest instead of busybox:latest
     - kind: security
-      description: Run the helm test pod without a service account token, as a non-root user with a read-only root filesystem, no capabilities and the RuntimeDefault seccomp profile
+      description: Outside OpenShift, the default container security context now meets the Pod Security restricted level, adding runAsNonRoot, dropping all capabilities and using the RuntimeDefault seccomp profile. Experimental; see the changelog to revert it
+    - kind: added
+      description: Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations
+    - kind: added
+      description: Document resource recommendations and a hardening example to start from for untrusted input
+    - kind: fixed
+      description: Allow Helm's global values in the schema so the chart works as a dependency of another chart
+    - kind: fixed
+      description: Accept numbers again for chromium.restartAfter, libreOffice.restartAfter and webhook.maxRetry, rejected since 1.8.0
+    - kind: fixed
+      description: "Behaviour change: api.downloadFromMaxRetry and gotenberg.gracefulShutdownDurationSec set to 0 now pass 0 to Gotenberg instead of leaving its default"
+    - kind: fixed
+      description: helm test pods no longer match the chart's Service, PodDisruptionBudget and NetworkPolicy selectors
+    - kind: fixed
+      description: The helm test connection check retries instead of hanging when it starts right after an upgrade

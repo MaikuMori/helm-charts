@@ -1,5 +1,53 @@
 # Changelog
 
+## 1.29.0
+
+The stricter default security context is new and experimental. With the default values, the Gotenberg container's `securityContext` changes like this:
+
+```diff
+   privileged: false
+   runAsUser: 1001
++  runAsNonRoot: true
+   allowPrivilegeEscalation: false
++  capabilities:
++    drop:
++      - ALL
++  seccompProfile:
++    type: RuntimeDefault
+   readOnlyRootFilesystem: false
+```
+
+On OpenShift it only gains `capabilities.drop: [ALL]`. If it breaks your deployment, set `securityContext` to the 1.28.0 default, which replaces the new one entirely:
+
+```yaml
+securityContext:
+  privileged: false
+  runAsUser: 1001 # leave out on OpenShift
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+```
+
+Please also open an issue. If you use the chart as a dependency and need an older version, 1.27.0 is the last one before Helm's `global` values were rejected (1.27.1 to 1.28.0).
+
+**Behaviour change for values set to `0`:** `api.downloadFromMaxRetry: 0` and `gotenberg.gracefulShutdownDurationSec: 0` were dropped, so Gotenberg kept its default of 4 retries and a 30s shutdown. They now pass `0`: downloads aren't retried, and Gotenberg's shutdown matches the pod's `terminationGracePeriodSeconds: 0`, which already stopped the pod immediately. To keep the old behaviour, remove the value. `chromium.restartAfter`, `libreOffice.restartAfter` and `webhook.maxRetry` now accept numbers too, including `0`; the strings they took before render as they did. `pdb.minAvailable: 0` still leaves `minAvailable` out, so `pdb.maxUnavailable` can be used.
+
+With `api.downloadFromMaxRetry: 0` and `gotenberg.gracefulShutdownDurationSec: 0`, the Deployment's container args change like this:
+
+```diff
+   - gotenberg
+   - --api-port=3000
++  - --api-download-from-max-retry=0
++  - --gotenberg-graceful-shutdown-duration=0s
+```
+
+- Outside OpenShift, the default container security context now meets the Pod Security `restricted` level: it adds `runAsNonRoot: true`, drops all capabilities and uses the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, it only drops all capabilities and leaves the rest to the SCC. OpenShift is detected only when Helm can see the cluster: rendering offline (`helm template`, some GitOps setups) emits the non-OpenShift default, whose seccomp profile the `anyuid` SCC rejects, unless you pass `--api-versions security.openshift.io/v1`. OpenShift support is best effort, tested on MicroShift built from OKD. A custom `securityContext` still replaces the default entirely. CI converts real documents with Chromium and LibreOffice under these settings on the Kubernetes versions CI covers (1.34 to 1.37).
+- Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations, verifiable with `gh attestation verify`.
+- Document resource recommendations and a hardening example to start from for untrusted input (deny private addresses in every module that fetches URLs, plus a NetworkPolicy that allows DNS on Kubernetes and OpenShift). CI installs the example on the Kubernetes versions CI covers (1.34 to 1.37) and on MicroShift to catch regressions.
+- `helm test` pods get their own `app.kubernetes.io/name` (`gotenberg-test`), so the chart's Service, PodDisruptionBudget and NetworkPolicy no longer select them. Update any selectors or policies of your own that matched the test pod by its old labels. With `networkPolicy` egress rules, the policy applied to the test pod and blocked its connection to Gotenberg.
+- The `helm test` connection check retries for up to about a minute with a 5-second timeout per attempt. Right after an upgrade, the Service could still route its single attempt to the replaced pod, and it then hung for two minutes before failing.
+- Fix the chart failing as a dependency of another chart with `additional properties 'global' not allowed` since 1.27.1 ([#118](https://github.com/MaikuMori/helm-charts/issues/118)). The chart accepts `global` values but doesn't use them.
+- Accept numbers, not only strings, for `chromium.restartAfter`, `libreOffice.restartAfter` and `webhook.maxRetry` again. The schema added in 1.8.0 rejected them with `got number, want string`.
+
 ## 1.28.0
 
 - Sign the OCI chart and the release archive with keyless [cosign](https://github.com/sigstore/cosign), alongside the existing GPG provenance, and document how to verify both.

@@ -49,3 +49,25 @@ tests:
       - equal:
           path: spec.containers[0].image
           value: busybox:1.38.0
+
+  - it: isn't selected by the chart's Service, PodDisruptionBudget or NetworkPolicy
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: gotenberg-test
+
+  - it: keeps the test pod's name label valid with a long name override
+    set:
+      nameOverride: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-test
+
+  - it: keeps the test pod's name label distinct from a name override ending in -test
+    set:
+      nameOverride: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-test
+    asserts:
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-hook

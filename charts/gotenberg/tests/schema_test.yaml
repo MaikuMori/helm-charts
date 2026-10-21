@@ -65,6 +65,20 @@ tests:
     asserts:
       - notFailedTemplate: {}
 
+  - it: accepts Helm's global values when used as a dependency
+    set:
+      global.imageRegistry: registry.example.com
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: accepts numbers for restart and retry counts
+    set:
+      chromium.restartAfter: 50
+      libreOffice.restartAfter: 10
+      webhook.maxRetry: 4
+    asserts:
+      - notFailedTemplate: {}
+
   - it: rejects unknown top-level values
     set:
       replicaCont: 2

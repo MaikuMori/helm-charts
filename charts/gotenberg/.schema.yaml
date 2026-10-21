@@ -5,6 +5,5 @@ output: values.schema.json
 draft: 2020
 indent: 2
 useHelmDocs: true
-noDefaultGlobal: true
 schemaRoot:
   additionalProperties: false

@@ -127,14 +127,20 @@ tests:
       - isNullOrEmpty:
           path: spec.template.spec.containers[0].env
 
-  - it: runs as the image's gotenberg user by default
+  - it: runs as the image's gotenberg user with a restricted security context by default
     asserts:
       - equal:
           path: spec.template.spec.containers[0].securityContext
           value:
             privileged: false
             runAsUser: 1001
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
             readOnlyRootFilesystem: false
       - isNullOrEmpty:
           path: spec.template.spec.containers[0].env
@@ -146,11 +152,32 @@ tests:
     asserts:
       - notExists:
           path: spec.template.spec.containers[0].securityContext.runAsUser
+      - notExists:
+          path: spec.template.spec.containers[0].securityContext.runAsNonRoot
+      - notExists:
+          path: spec.template.spec.containers[0].securityContext.seccompProfile
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.capabilities.drop
+          value:
+            - ALL
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: HOME
             value: /home/gotenberg
+
+  - it: leaves the seccomp profile to the pod when it sets one
+    set:
+      podSecurityContext:
+        seccompProfile:
+          type: Localhost
+          localhostProfile: profiles/gotenberg.json
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].securityContext.seccompProfile
+      - equal:
+          path: spec.template.spec.securityContext.seccompProfile.type
+          value: Localhost
 
   - it: uses a custom securityContext as is and sets HOME for another user
     set:
@@ -191,3 +218,30 @@ tests:
           value:
             - name: HOME
               value: /tmp
+
+  - it: passes 0 for restart, retry and shutdown values
+    set:
+      chromium.restartAfter: 0
+      libreOffice.restartAfter: "0"
+      api.downloadFromMaxRetry: 0
+      webhook.maxRetry: 0
+      gotenberg.gracefulShutdownDurationSec: 0
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --chromium-restart-after=0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --libreoffice-restart-after=0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-download-from-max-retry=0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --webhook-max-retry=0
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --gotenberg-graceful-shutdown-duration=0s
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 0

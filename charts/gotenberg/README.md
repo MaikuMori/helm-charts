@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.28.0](https://img.shields.io/badge/Version-1.28.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.38.1](https://img.shields.io/badge/AppVersion-8.38.1-informational?style=flat-square)
+![Version: 1.29.0](https://img.shields.io/badge/Version-1.29.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.38.1](https://img.shields.io/badge/AppVersion-8.38.1-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -65,6 +65,15 @@ cosign verify-blob gotenberg-<version>.tgz --bundle gotenberg-<version>.tgz.sigs
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```
 
+From chart 1.29.0, releases also carry [GitHub artifact attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations) recording the release workflow and source commit. Verify them with the GitHub CLI:
+
+```console
+gh attestation verify oci://ghcr.io/maikumori/helm-charts/gotenberg:<version> --repo MaikuMori/helm-charts \
+  --signer-workflow MaikuMori/helm-charts/.github/workflows/release.yml
+gh attestation verify gotenberg-<version>.tgz --repo MaikuMori/helm-charts \
+  --signer-workflow MaikuMori/helm-charts/.github/workflows/release.yml
+```
+
 ## Uninstalling the Chart
 
 To uninstall/delete the `my-release` deployment:
@@ -109,6 +118,102 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
 ```
 
 `docker buildx imagetools inspect gotenberg/gotenberg:8.38.1` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
+
+## Resources
+
+The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit:
+
+```yaml
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+  limits:
+    memory: 2Gi
+```
+
+## Hardening Example
+
+Outside OpenShift, the chart's default security contexts already meet the Pod Security `restricted` level; on OpenShift, the SCC decides. Containers and volumes you add, such as `initContainers`, have to meet it too. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service.
+
+The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium refuses a private address, and that the NetworkPolicy allows DNS and public HTTPS but not another release's Service:
+
+```yaml
+# Example hardening for untrusted callers: a starting point to adjust to your
+# cluster, not a complete setup.
+
+# Reject outbound requests to private, loopback and link-local addresses from
+# every module that fetches URLs.
+api:
+  downloadFromDenyPrivateIps: true
+chromium:
+  denyPrivateIps: true
+libreOffice:
+  denyPrivateIps: true
+webhook:
+  denyPrivateIps: true
+
+networkPolicy:
+  enabled: true
+  # Only accept API calls from pods in the release's namespace. Replace the
+  # rule with a selector for your clients. 3000 is api.port.
+  allowIngress: false
+  extraIngress:
+    - from:
+        - podSelector: {}
+      ports:
+        - port: 3000
+  # Only allow DNS, and HTTP(S) outside the private ranges below. Adapt the
+  # ranges to your cluster and check that your CNI enforces NetworkPolicies;
+  # this alone doesn't guarantee the cluster network is unreachable. Some
+  # CNIs don't apply NetworkPolicies to the node's own addresses, which can
+  # include the Kubernetes API (as on MicroShift). IPv4
+  # only: on dual-stack clusters, add ::/0 excepting fc00::/7 and fe80::/10.
+  # DNS pods are kube-dns, or openshift-dns listening on 5353 on OpenShift
+  # (not tested with OVN-Kubernetes).
+  allowEgress: false
+  extraEgress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+          podSelector:
+            matchLabels:
+              dns.operator.openshift.io/daemonset-dns: default
+      ports:
+        - port: 5353
+          protocol: UDP
+        - port: 5353
+          protocol: TCP
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+              - 169.254.0.0/16
+              - 100.64.0.0/10
+      ports:
+        - port: 80
+        - port: 443
+```
+
+Also require authentication on the API, with `api.enableBasicAuth` or `api.enableOidcAuth`, and disable the routes you don't use, such as `chromium.disableRoutes` or `libreOffice.disableRoutes`. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
+
+## OpenShift
+
+OpenShift support is best effort. When the cluster serves the `security.openshift.io/v1` API, the default security context leaves the user, non-root check and seccomp profile to the SCC. CI installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, with the Kindnet CNI rather than OVN-Kubernetes, under the `restricted-v2` and `anyuid` SCCs; it isn't tested on OpenShift Container Platform. Detection needs Helm to see the cluster's APIs: when rendering without cluster access, such as `helm template`, pass `--api-versions security.openshift.io/v1`. Issues and pull requests from OpenShift users are welcome.
 
 ## Values
 
@@ -275,7 +380,7 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
 | readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | `{ privileged: false, runAsUser: 1001 }`, except in OpenShift where `runAsUser` is not set. | Define the security context for the container. By default will use upstream recommended values. |
+| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user, non-root check and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium. | Define the security context for the container. Replaces the default entirely when set. |
 | service.annotations | object | `{}` | Annotations to add to the service |
 | service.loadBalancerIP | string | `""` | Deprecated: Static IP address for LoadBalancer type service. Deprecated in Kubernetes 1.24, use provider-specific annotations instead. |
 | service.port | int | `80` |  |
