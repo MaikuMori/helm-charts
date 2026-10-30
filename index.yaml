@@ -4,6 +4,49 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: security
+          description: Bump Gotenberg to 8.39.0, which fixes an ExifTool code execution path, blocks privileged Chromium pages on the URL routes, applies deny rules to WebSocket handshakes and drops compromised root CAs
+        - kind: changed
+          description: "Upstream behaviour change: the Chromium URL routes return 400 for any scheme other than http and https"
+        - kind: changed
+          description: "Upstream behaviour change: the metadata keys j, addtagsfromfile and alltagsfromfile return 400, and ExifTool ignores ~/.ExifTool_config"
+        - kind: fixed
+          description: api.tlsSecretName works again with Gotenberg 8.39.0. Since 8.38.0, its absolute certificate and key paths left Gotenberg not accepting connections, affecting charts 1.26.0 to 1.29.0
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+      artifacthub.io/signKey: |
+        fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
+        url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
+    apiVersion: v2
+    appVersion: 8.39.0
+    created: "2026-10-30T19:00:58.00985787Z"
+    description: A Helm chart for Gotenberg
+    digest: 65994e10b11edfe6b6424fe472e4ba8f289aa0fdec0780c46247a028d61155e6
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.30.0/gotenberg-1.30.0.tgz
+    version: 1.30.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: security
           description: Outside OpenShift, the default container security context now meets the Pod Security restricted level, adding runAsNonRoot, dropping all capabilities and using the RuntimeDefault seccomp profile. Experimental; see the changelog to revert it
         - kind: added
           description: Attest the build provenance of the release archive and the OCI chart with GitHub artifact attestations
@@ -1742,4 +1785,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-21T23:49:11.96248898Z"
+generated: "2026-10-30T19:00:58.009961932Z"
