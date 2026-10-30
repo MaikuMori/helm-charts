@@ -44,4 +44,4 @@ annotations:
     - kind: changed
       description: "Upstream behaviour change: the metadata keys j, addtagsfromfile and alltagsfromfile return 400, and ExifTool ignores ~/.ExifTool_config"
     - kind: fixed
-      description: Gotenberg 8.39.0 accepts connections again with absolute paths in --api-tls-cert-file and --api-tls-key-file, broken since 8.38.0
+      description: api.tlsSecretName works again with Gotenberg 8.39.0. Since 8.38.0, its absolute certificate and key paths left Gotenberg not accepting connections, affecting charts 1.26.0 to 1.29.0
