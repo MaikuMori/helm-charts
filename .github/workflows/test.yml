@@ -33,7 +33,7 @@ jobs:
         with:
           inputs: .github/workflows/
           advanced-security: false
-          version: 1.30.1
+          version: 1.31.1
 
   helm-tools:
     runs-on: ubuntu-latest

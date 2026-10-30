@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 1.29.0](https://img.shields.io/badge/Version-1.29.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.38.1](https://img.shields.io/badge/AppVersion-8.38.1-informational?style=flat-square)
+![Version: 1.30.0](https://img.shields.io/badge/Version-1.30.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 8.39.0](https://img.shields.io/badge/AppVersion-8.39.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -114,10 +114,10 @@ Tags can be moved to point at a different image. To pull exactly the image you r
 
 ```console
 helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg \
-  --set image.tag="8.38.1" --set image.digest="sha256:<digest>"
+  --set image.tag="8.39.0" --set image.digest="sha256:<digest>"
 ```
 
-`docker buildx imagetools inspect gotenberg/gotenberg:8.38.1` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
+`docker buildx imagetools inspect gotenberg/gotenberg:8.39.0` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
 
 ## Resources
 
