@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.30.0
+
+- Bump `gotenberg` version `8.38.1` -> `8.39.0`, which includes security fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v8.39.0).
+- **Upstream behaviour change**: `/forms/chromium/convert/url` and `/forms/chromium/screenshot/url` return `400` for any scheme other than `http` and `https`, including `chrome://`, `devtools://` and `data:`.
+- **Upstream behaviour change**: the metadata keys `j`, `addtagsfromfile` and `alltagsfromfile` return `400`; prefix them with a group, such as `XMP:j`, to write a tag of that name. ExifTool ignores `~/.ExifTool_config`.
+- **Upstream fix**: `api.tlsSecretName` works again. Its absolute certificate and key paths left Gotenberg not accepting connections since 8.38.0, so charts 1.26.0 to 1.29.0 are affected. A missing or unreadable file now fails the startup.
+
 ## 1.29.0
 
 The stricter default security context is new and experimental. With the default values, the Gotenberg container's `securityContext` changes like this:
