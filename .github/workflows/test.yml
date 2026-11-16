@@ -33,7 +33,7 @@ jobs:
         with:
           inputs: .github/workflows/
           advanced-security: false
-          version: 1.31.1
+          version: 1.32.0
 
   helm-tools:
     runs-on: ubuntu-latest
@@ -195,7 +195,7 @@ jobs:
 
       - name: Install Gateway API CRDs
         if: steps.list-changed.outputs.changed == 'true'
-        run: kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.3/standard-install.yaml
+        run: kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.7.0/standard-install.yaml
 
       # Installs once per charts/<chart>/ci/*-values.yaml file and keeps the releases for the render test.
       - name: Run chart-testing (install)
