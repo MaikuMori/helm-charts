@@ -4,8 +4,8 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.30.0"
-appVersion: "8.39.0"
+version: "1.31.0"
+appVersion: "8.40.0"
 
 keywords:
   - gotenberg
@@ -38,10 +38,6 @@ annotations:
     url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
   artifacthub.io/changes: |
     - kind: security
-      description: Bump Gotenberg to 8.39.0, which fixes an ExifTool code execution path, blocks privileged Chromium pages on the URL routes, applies deny rules to WebSocket handshakes and drops compromised root CAs
+      description: Bump Gotenberg to 8.40.0, the final Gotenberg 8 release, which fixes a QPDF password argument injection that could embed any file the gotenberg user can read, refuses every special-purpose IP range in the private-IP checks, distrusts the compromised eMudhra roots in Chromium from the first request and keeps the pinning proxy on with host-resolver rules
     - kind: changed
-      description: "Upstream behaviour change: the Chromium URL routes return 400 for any scheme other than http and https"
-    - kind: changed
-      description: "Upstream behaviour change: the metadata keys j, addtagsfromfile and alltagsfromfile return 400, and ExifTool ignores ~/.ExifTool_config"
-    - kind: fixed
-      description: api.tlsSecretName works again with Gotenberg 8.39.0. Since 8.38.0, its absolute certificate and key paths left Gotenberg not accepting connections, affecting charts 1.26.0 to 1.29.0
+      description: "Upstream behaviour change: an invalid chromium.hostResolverRules stops Gotenberg at startup, and the deny-private-IPs checks refuse more ranges"
