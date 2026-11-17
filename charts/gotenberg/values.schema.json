@@ -349,7 +349,7 @@
           ]
         },
         "denyList": {
-          "description": "List of regular expressions for the denied Chromium URLs. Setting it replaces the upstream default, `^file:(?!//\\/tmp/).*`. An empty list clears Gotenberg's default.",
+          "description": "List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule.",
           "type": [
             "array",
             "null"

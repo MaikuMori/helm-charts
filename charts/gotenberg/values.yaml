@@ -324,8 +324,11 @@ chromium:  # @schema additionalProperties: false
   allowInsecureLocalhost:  # @schema type: [boolean, null]
   # -- (list) List of regular expressions for the allowed Chromium URLs. The page sent to the HTML and Markdown routes skips the lists, but the files uploaded with it load from `file:///tmp/`: include `^file:///tmp/` to keep them. Terminate the host, e.g. `^https://assets\.example\.com/`: a match skips the IP-class checks. An empty list clears Gotenberg's default.
   allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
-  # -- (list) List of regular expressions for the denied Chromium URLs. Setting it replaces the upstream default, `^file:(?!//\/tmp/).*`. An empty list clears Gotenberg's default.
+  # -- (list) List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule.
   denyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # denyList:
+  #   - ^file:(?!//\/tmp/).*
+  #   - ^https://ads\.example\.com/
   # -- (bool) Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. With `proxyServer`, a DNS rebinding can slip past it.
   denyPrivateIps:  # @schema type: [boolean, null]
   # -- (bool) Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.
