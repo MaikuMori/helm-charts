@@ -19,6 +19,7 @@ const { CHART, text, json } = require('./lib');
 const CHART_MANAGED = {
   'api-port': 'api.port, which the container port and the Service use too',
   'api-port-from-env': 'would move the port away from the container port and the Service',
+  'api-bind-ip': 'the Service and probes reach the pod IP, which Gotenberg already binds with every address',
   'api-tls-cert-file': 'api.tlsSecretName mounts the certificate',
   'api-tls-key-file': 'api.tlsSecretName mounts the key',
   'api-enable-basic-auth': 'api.basicAuth.enabled, which sets the credentials too',

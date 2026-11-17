@@ -239,12 +239,10 @@ gateway:  # @schema additionalProperties: false
 api:  # @schema additionalProperties: false
   # -- Set the port on which the API should listen, also the container's and the Service's target port
   port: 3000
-  # -- (string) Set the IP address the API binds to, e.g. "::" for IPv6 (default all addresses). The probes and the Service reach the pod IP, so keep it bound there.
-  bindIp:  # @schema type: [string, null]
   # -- Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key). Set `scheme: HTTPS` on the probes too.
   tlsSecretName: ""
   # -- (string) Set the time limit for requests (default 30s)
-  timeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  timeout:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   # -- (string) Set the request body limit for multipart/form-data (e.g., "100MB")
   bodyLimit:  # @schema type: [string, null]
   # -- (string) Set the root path of the API, e.g. "/gotenberg/" - for service discovery via URL paths (default "/"). `/health` moves under it: update the probe paths too.
@@ -262,7 +260,7 @@ api:  # @schema additionalProperties: false
   # -- (bool) Enable debug route for debugging purposes
   enableDebugRoute:  # @schema type: [boolean, null]
   # -- (string) Set the maximum duration to wait for the API to start
-  startTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  startTimeout:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   basicAuth:  # @schema additionalProperties: false
     # -- Enable basic authentication, with credentials from `existingSecret`, or `username` and `password`. Mutually exclusive with `enableOidcAuth`.
     enabled: false
@@ -317,7 +315,7 @@ chromium:  # @schema additionalProperties: false
   # -- (bool) Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion
   autoStart:  # @schema type: [boolean, null]
   # -- (string) Maximum duration to wait for Chromium to start or restart (default 20s)
-  startTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  startTimeout:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   # -- (bool) Allow file:// URIs to read other file:// URIs
   allowFileAccessFromFiles:  # @schema type: [boolean, null]
   # -- (bool) Ignore TLS/SSL errors on localhost
@@ -358,7 +356,7 @@ chromium:  # @schema additionalProperties: false
   # -- (int) Maximum request queue size for Chromium. Set to 0 to disable this feature. Leave unset for the upstream default (0).
   maxQueueSize:  # @schema type: [integer, null]; minimum: 0
   # -- (string) Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
-  idleShutdownTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  idleShutdownTimeout:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   # -- (string) Set the memory all Chromium processes together may hold while converting, e.g. "800MB". Over it, Gotenberg restarts Chromium and the conversions in flight answer 503. Chromium, LibreOffice and PDF processing share the container's memory: keep `maxMemory` here and in `libreOffice` together under its limit. Empty disables it. Added in Gotenberg 9.6.0.
   maxMemory:  # @schema type: [string, null]
   # -- (bool) Log every DevTools Protocol message at the debug log level. The messages carry URLs, cookies and header values, credentials included: enable it only to troubleshoot.
@@ -372,13 +370,13 @@ libreOffice:  # @schema additionalProperties: false
   # -- (bool) Automatically launch LibreOffice upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)
   autoStart:  # @schema type: [boolean, null]
   # -- (string) Maximum duration to wait for LibreOffice to start or restart (default 20s)
-  startTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  startTimeout:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   # -- (bool) Disable the routes
   disableRoutes:  # @schema type: [boolean, null]
   # -- (int) Maximum request queue size for LibreOffice. Set to 0 to disable this feature. Leave unset for the upstream default (0).
   maxQueueSize:  # @schema type: [integer, null]; minimum: 0
   # -- (string) Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
-  idleShutdownTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  idleShutdownTimeout:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   # -- (list) List of regular expressions for the allowed URLs LibreOffice requests: the style sheets an HTML document links, and the URLs macros open with `enableMacros`. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.
   allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
   # -- (list) List of regular expressions for the denied URLs LibreOffice requests An empty list clears Gotenberg's default.
@@ -439,11 +437,11 @@ webhook:  # @schema additionalProperties: false
   # -- (int) Set the maximum number of retries for the webhook feature. Leave unset for the upstream default (4).
   maxRetry:  # @schema type: [integer, null]; minimum: 0
   # -- (string) Set the minimum duration to wait before trying to call the webhook again (default 1s)
-  retryMinWait:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  retryMinWait:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   # -- (string) Set the maximum duration to wait before trying to call the webhook again (default 30s)
-  retryMaxWait:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  retryMaxWait:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   # -- (string) Set the time limit for requests to the webhook (default 30s)
-  clientTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  clientTimeout:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   # -- (bool) Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.
   enableEnvironmentProxy:  # @schema type: [boolean, null]
   # -- (bool) Disable the webhook feature

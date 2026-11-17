@@ -196,7 +196,6 @@ test/flags-test.js reads this table.
 */}}
 {{- define "gotenberg.flags" -}}
 {{- range list
-  (list "api-bind-ip" .Values.api.bindIp)
   (list "api-timeout" .Values.api.timeout)
   (list "api-body-limit" .Values.api.bodyLimit)
   (list "api-root-path" .Values.api.rootPath)

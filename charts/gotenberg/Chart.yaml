@@ -45,7 +45,7 @@ annotations:
     - kind: changed
       description: Metrics are off by default and served through Gotenberg's OpenTelemetry Prometheus exporter on a separate metrics Service when metrics.enabled or metrics.serviceMonitor.enabled is set
     - kind: changed
-      description: Every Gotenberg flag has a value, unset leaves Gotenberg's default and any set value is passed as is, with the schema refusing what Gotenberg refuses. Allow and deny lists are YAML lists
+      description: Every Gotenberg flag that works in a pod has a value, unset leaves Gotenberg's default and any set value is passed as is, with the schema refusing what Gotenberg refuses. Allow and deny lists are YAML lists
     - kind: changed
       description: networkPolicy.ingress and networkPolicy.egress take the rules directly, basic auth moves to api.basicAuth, the PDB takes numbers or percentages, and pdb.create and vpa.create become enabled
     - kind: changed

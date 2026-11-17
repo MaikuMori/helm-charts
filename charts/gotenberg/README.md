@@ -256,7 +256,6 @@ Kubernetes: `>=1.30.0-0`
 | api.basicAuth.passwordKey | string | `""` | Key in `existingSecret` for the password (default: password) |
 | api.basicAuth.username | string | `nil` | Set the username (ignored if existingSecret is set) |
 | api.basicAuth.usernameKey | string | `""` | Key in `existingSecret` for the username (default: username) |
-| api.bindIp | string | `nil` | Set the IP address the API binds to, e.g. "::" for IPv6 (default all addresses). The probes and the Service reach the pod IP, so keep it bound there. |
 | api.bodyLimit | string | `nil` | Set the request body limit for multipart/form-data (e.g., "100MB") |
 | api.correlationIdHeader | string | `nil` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
 | api.disableDebugRouteTelemetry | bool | `nil` | Disable telemetry on the debug route. Leave unset for the upstream default (true). |

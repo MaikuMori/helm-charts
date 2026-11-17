@@ -2,7 +2,6 @@
 # all of them and the render test still passes. test/flags-test.js checks it
 # covers the flag table, but for the values its EVERY_FLAG_EXCLUDED lists.
 api:
-  bindIp: 0.0.0.0
   timeout: 60s
   bodyLimit: 100MB
   correlationIdHeader: X-Request-Id
