@@ -1,5 +1,44 @@
 # Changelog
 
+## 2.0.0
+
+Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces change: read the [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) before upgrading. Upgrade with your values file rather than `--reuse-values`. To stay on Gotenberg 8, keep chart 1.31.0, which runs 8.40.0, the final Gotenberg 8 release.
+
+- Bump `gotenberg` version `8.39.0` -> `9.6.0`, which includes the security fixes of 8.40.0. Gotenberg 8 gets no further fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
+- **Upstream breaking change**: `/forms/pdfengines/*` routes answer `404`, replaced by `/forms/pdf/*`. Post-processing fields move to a `stages` list. The Webhook error URL and method headers are gone: errors reach `Gotenberg-Webhook-Events-Url`, now required with `Gotenberg-Webhook-Url`.
+- **Upstream breaking change**: Java, Python, unoconverter, QPDF, pdfcpu, pdftk and ExifTool leave the image, and `LOK_BIN_PATH` replaces `UNOCONVERTER_BIN_PATH`. Custom images, probes and hooks that call them break.
+- **Upstream breaking change**: `chromium.allowList` and `chromium.denyList` now apply to the page sent to the HTML and Markdown routes too.
+- **Metrics are off by default**: 1.x always served `/prometheus/metrics` on the API port. `metrics.enabled` serves Gotenberg's OpenTelemetry Prometheus exporter at `/metrics` on `metrics.port` (default `9464`), through a ClusterIP `<fullname>-metrics` Service. `metrics.serviceMonitor.enabled` turns it on too and scrapes it.
+- **Metric names change**, e.g. `gotenberg_chromium_requests_queue_size` is now `gotenberg_chromium_queue_size`, restarts become counters and the errors counter is gone: update dashboards, alerts, recording rules and `autoscaling.extraMetrics`. Gotenberg exports metrics to one exporter, so `metrics.enabled` and an `OTEL_METRICS_EXPORTER` in `extraEnv` now fail the install. A NetworkPolicy with `extraIngress` must allow the metrics port.
+- Allow and deny lists are YAML lists, one flag per entry: Gotenberg splits the old strings on commas, which broke patterns such as `[a-z]{1,10}` into two unsafe entries.
+- Numeric values default to `null`, which leaves Gotenberg's default, and render without an exponent. `api.downloadFromMaxRetry` no longer pins `4`.
+- `api.disableHealthCheckRouteTelemetry` and the root, debug and version route telemetry switches default to `null`, upstream's `true`; `false` now turns route telemetry on.
+- `enableServiceLinks` defaults to `false`: Gotenberg doesn't use service links, and a Service named `api` broke its startup.
+- Add `pdf.*` values for the new PDF module, and `api.archiveMaxEntries`, `api.archiveMaxRatio`, `chromium.maxMemory`, `chromium.debugProtocol`, `libreOffice.maxMemory` and `libreOffice.enableMacros`.
+- The hardening example sets `pdf.denyPrivateIps`: the `sign` and `timestamp` stages call caller-chosen timestamp authorities.
+- Refresh the `busybox:1.38.0` digest of the `helm test` image, which upstream rebuilt.
+
+### Values to update
+
+Gotenberg 9 refuses its removed flags, so their values are gone, and the values schema rejects them. Their environment variables, set through `extraEnv`, are ignored silently: remove them too.
+
+| 1.x value | 2.0.0 |
+| --- | --- |
+| `pdfEngines.maxConcurrency` | `pdf.maxConcurrency`, now per request |
+| `pdfEngines.disableRoutes` | `pdf.disableRoutes` |
+| `pdfEngines.*Engines`, `pdfEngines.engines` | Removed: one PDF engine does all the work |
+| `prometheus.*` | Removed: see `metrics.enabled`. The namespace, path and collect interval have no replacement |
+| `chromium.incognito` | Removed |
+| `webhook.errorAllowList`, `webhook.errorDenyList` | Removed with the error URL: `webhook.allowList` and `webhook.denyList` cover every webhook URL |
+| `logging.enableGcpSeverity` | Removed: Gotenberg 8.39.0 already refused its flag |
+| `api.traceHeader` | `api.correlationIdHeader` |
+| `api.disableHealthCheckLogging` | `api.disableHealthCheckRouteTelemetry` |
+| `logging.format` | `logging.stdFormat` |
+| `logging.enableGcpFields` | `logging.stdEnableGcpFields` |
+| `service.loadBalancerIP` | Removed: use your provider's Service annotations |
+| `*.allowList`, `*.denyList`, `api.downloadFrom*List` strings | Lists of regular expressions, e.g. `allowList: ["^https://a\\.example\\.com/"]` |
+| `chromium.restartAfter`, `libreOffice.restartAfter`, `webhook.maxRetry` strings | Integers |
+
 ## 1.31.0
 
 The last 1.x release. Chart 2.0.0 moves to Gotenberg 9.

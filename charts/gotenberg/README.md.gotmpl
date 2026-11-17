@@ -90,23 +90,29 @@ The command removes all the Kubernetes components associated with the chart and 
 helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --install
 ```
 
+### Upgrading to 2.0.0
+
+Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and metrics. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) and the chart's [CHANGELOG](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#200), which maps every 1.x value that changed. Upgrade with your values file rather than `--reuse-values`, which carries removed 1.x defaults that the values schema rejects, and drop any `image.tag` or `image.digest` that pins Gotenberg 8.
+
+To stay on Gotenberg 8, keep chart 1.31.0, which runs 8.40.0, the final Gotenberg 8 release.
+
 ### Using a Newer Gotenberg Version
 
-Chart releases are typically published when new features or breaking changes are added to Gotenberg that require chart modifications. However, you can use any version of Gotenberg by overriding the `image.tag` value.
+Chart releases are typically published when new features or breaking changes are added to Gotenberg that require chart modifications. However, you can use any Gotenberg 9 version by overriding the `image.tag` value.
 
 To use a specific version of Gotenberg:
 
 ```console
-helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="8.23.0"
+helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.5.1"
 ```
 
 Or with the `--atomic` flag for automatic rollback on failure:
 
 ```console
-helm upgrade --install --atomic my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="8.23.0"
+helm upgrade --install --atomic my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.5.1"
 ```
 
-This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes between versions.
+This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes within a major version. A newer flag the chart maps needs a Gotenberg version that has it.
 
 ### Pinning Images by Digest
 
@@ -114,14 +120,14 @@ Tags can be moved to point at a different image. To pull exactly the image you r
 
 ```console
 helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg \
-  --set image.tag="8.40.0" --set image.digest="sha256:<digest>"
+  --set image.tag="9.6.0" --set image.digest="sha256:<digest>"
 ```
 
-`docker buildx imagetools inspect gotenberg/gotenberg:8.40.0` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
+`docker buildx imagetools inspect gotenberg/gotenberg:9.6.0` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
 
 ## Resources
 
-The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit:
+The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit. Chromium, LibreOffice and PDF processing share it: `chromium.maxMemory` and `libreOffice.maxMemory` restart the process that runs over its budget instead of letting the container get OOM-killed. Keep them together under the limit, with room for Gotenberg's own PDF work, and cap that with `GOMEMLIMIT` in `extraEnv`:
 
 ```yaml
 resources:
@@ -130,18 +136,27 @@ resources:
     memory: 512Mi
   limits:
     memory: 2Gi
+chromium:
+  maxMemory: 800MB
+libreOffice:
+  maxMemory: 900MB
+extraEnv:
+  - name: GOMEMLIMIT
+    value: 1500MiB
 ```
+
+See [Limits](https://gotenberg.dev/docs/operate/limits) for these and the PDF module's limits.
 
 ## Hardening Example
 
-Outside OpenShift, the chart's default security contexts already meet the Pod Security `restricted` level; on OpenShift, the SCC decides. Containers and volumes you add, such as `initContainers`, have to meet it too. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom` and webhooks can reach internal addresses such as the cloud metadata service.
+Outside OpenShift, the chart's default security contexts already meet the Pod Security `restricted` level; on OpenShift, the SCC decides. Containers and volumes you add, such as `initContainers`, have to meet it too. Gotenberg's own defaults are permissive about outbound requests: it assumes it runs on a trusted network, so Chromium, LibreOffice, `downloadFrom`, webhooks and the PDF timestamp authority can reach internal addresses such as the cloud metadata service.
 
-The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium refuses a private address, and that the NetworkPolicy allows DNS and public HTTPS but not another release's Service:
+The values below are an example to start from if callers or their documents aren't trusted, not a complete or guaranteed setup: review them against your cluster and threat model, and adjust the NetworkPolicy to your clients, DNS and network ranges. They deny private addresses and limit the pod's network access. CI installs them to catch regressions, checking that documents still convert, that Chromium and the PDF `timestamp` stage refuse a private address, and that the NetworkPolicy allows DNS and public HTTPS but not another release's Service:
 
 ```yaml
 {{ .Files.Get "ci/hardened-values.yaml" }}```
 
-Also require authentication on the API, with `api.enableBasicAuth` or `api.enableOidcAuth`, and disable the routes you don't use, such as `chromium.disableRoutes` or `libreOffice.disableRoutes`. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
+Also require authentication on the API, with `api.enableBasicAuth` or `api.enableOidcAuth`, and disable what you don't use, such as `chromium.disableRoutes`, `libreOffice.disableRoutes`, or `pdf.disableRoutes` with `pdf.disableStages` for all PDF processing. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
 
 ## OpenShift
 

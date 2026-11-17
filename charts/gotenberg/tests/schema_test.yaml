@@ -58,6 +58,9 @@ tests:
       api.basicAuthUsername: user
       api.basicAuthPassword: pass
       api.downloadFromMaxConcurrency: 3
+      api.archiveMaxEntries: 5000
+      api.archiveMaxRatio: 50
+      api.disableRootRouteTelemetry: false
       autoscaling.targetMemoryUtilizationPercentage: 70
       pdb.unhealthyPodEvictionPolicy: AlwaysAllow
       metrics.serviceMonitor.namespace: monitoring
@@ -113,3 +116,31 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "/image/digest"
+
+  - it: rejects a string for an allow or deny list
+    set:
+      chromium.allowList: ^https://example\.com/
+    asserts:
+      - failedTemplate:
+          errorPattern: "/chromium/allowList"
+
+  - it: rejects archive limits below 1
+    set:
+      api.archiveMaxEntries: 0
+    asserts:
+      - failedTemplate:
+          errorPattern: "/api/archiveMaxEntries"
+
+  - it: rejects values removed in 2.0.0
+    set:
+      prometheus.namespace: gotenberg
+    asserts:
+      - failedTemplate:
+          errorPattern: "additional properties 'prometheus' not allowed"
+
+  - it: rejects removed values in a section
+    set:
+      chromium.incognito: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "additional properties 'incognito' not allowed"

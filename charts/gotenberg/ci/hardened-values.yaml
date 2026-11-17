@@ -9,6 +9,8 @@ chromium:
   denyPrivateIps: true
 libreOffice:
   denyPrivateIps: true
+pdf:
+  denyPrivateIps: true
 webhook:
   denyPrivateIps: true
 

@@ -65,12 +65,11 @@ spec:
           {{- if .Values.api.rootPath }}
           - --api-root-path={{ .Values.api.rootPath }}
           {{- end }}
-          {{- $correlationIdHeader := .Values.api.correlationIdHeader | default .Values.api.traceHeader }}
-          {{- if $correlationIdHeader }}
-          - --api-correlation-id-header={{ $correlationIdHeader }}
+          {{- if .Values.api.correlationIdHeader }}
+          - --api-correlation-id-header={{ .Values.api.correlationIdHeader }}
           {{- end }}
-          {{- if or .Values.api.disableHealthCheckRouteTelemetry .Values.api.disableHealthCheckLogging }}
-          - --api-disable-health-check-route-telemetry
+          {{- if not (kindIs "invalid" .Values.api.disableHealthCheckRouteTelemetry) }}
+          - --api-disable-health-check-route-telemetry={{ .Values.api.disableHealthCheckRouteTelemetry }}
           {{- end }}
           {{- if .Values.api.enableDebugRoute }}
           - --api-enable-debug-route
@@ -93,11 +92,11 @@ spec:
           {{- if .Values.api.oidcJwksUrl }}
           - --api-oidc-jwks-url={{ .Values.api.oidcJwksUrl }}
           {{- end }}
-          {{- if .Values.api.downloadFromAllowList }}
-          - --api-download-from-allow-list={{ .Values.api.downloadFromAllowList }}
+          {{- range .Values.api.downloadFromAllowList }}
+          - {{ printf "--api-download-from-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- if .Values.api.downloadFromDenyList }}
-          - --api-download-from-deny-list={{ .Values.api.downloadFromDenyList }}
+          {{- range .Values.api.downloadFromDenyList }}
+          - {{ printf "--api-download-from-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
           {{- if .Values.api.downloadFromDenyPrivateIps }}
           - --api-download-from-deny-private-ips
@@ -105,14 +104,14 @@ spec:
           {{- if .Values.api.downloadFromDenyPublicIps }}
           - --api-download-from-deny-public-ips
           {{- end }}
-          {{- if include "gotenberg.isSet" .Values.api.downloadFromMaxRetry }}
-          - --api-download-from-max-retry={{ .Values.api.downloadFromMaxRetry }}
+          {{- if not (kindIs "invalid" .Values.api.downloadFromMaxRetry) }}
+          - --api-download-from-max-retry={{ .Values.api.downloadFromMaxRetry | int64 }}
           {{- end }}
           {{- if not (kindIs "invalid" .Values.api.downloadFromMaxConcurrency) }}
-          - --api-download-from-max-concurrency={{ .Values.api.downloadFromMaxConcurrency }}
+          - --api-download-from-max-concurrency={{ .Values.api.downloadFromMaxConcurrency | int64 }}
           {{- end }}
-          {{- if .Values.api.downloadFromMaxEntries }}
-          - --api-download-from-max-entries={{ .Values.api.downloadFromMaxEntries }}
+          {{- if not (kindIs "invalid" .Values.api.downloadFromMaxEntries) }}
+          - --api-download-from-max-entries={{ .Values.api.downloadFromMaxEntries | int64 }}
           {{- end }}
           {{- if .Values.api.downloadFromEnableEnvironmentProxy }}
           - --api-download-from-enable-environment-proxy
@@ -120,18 +119,24 @@ spec:
           {{- if .Values.api.disableDownloadFrom }}
           - --api-disable-download-from
           {{- end }}
-          {{- if .Values.api.disableRootRouteTelemetry }}
-          - --api-disable-root-route-telemetry
+          {{- if not (kindIs "invalid" .Values.api.archiveMaxEntries) }}
+          - --api-archive-max-entries={{ .Values.api.archiveMaxEntries | int64 }}
           {{- end }}
-          {{- if .Values.api.disableDebugRouteTelemetry }}
-          - --api-disable-debug-route-telemetry
+          {{- if not (kindIs "invalid" .Values.api.archiveMaxRatio) }}
+          - --api-archive-max-ratio={{ .Values.api.archiveMaxRatio | int64 }}
           {{- end }}
-          {{- if .Values.api.disableVersionRouteTelemetry }}
-          - --api-disable-version-route-telemetry
+          {{- if not (kindIs "invalid" .Values.api.disableRootRouteTelemetry) }}
+          - --api-disable-root-route-telemetry={{ .Values.api.disableRootRouteTelemetry }}
+          {{- end }}
+          {{- if not (kindIs "invalid" .Values.api.disableDebugRouteTelemetry) }}
+          - --api-disable-debug-route-telemetry={{ .Values.api.disableDebugRouteTelemetry }}
+          {{- end }}
+          {{- if not (kindIs "invalid" .Values.api.disableVersionRouteTelemetry) }}
+          - --api-disable-version-route-telemetry={{ .Values.api.disableVersionRouteTelemetry }}
           {{- end }}
 
-          {{- if include "gotenberg.isSet" .Values.chromium.restartAfter }}
-          - --chromium-restart-after={{ .Values.chromium.restartAfter }}
+          {{- if not (kindIs "invalid" .Values.chromium.restartAfter) }}
+          - --chromium-restart-after={{ .Values.chromium.restartAfter | int64 }}
           {{- end }}
           {{- if .Values.chromium.autoStart }}
           - --chromium-auto-start
@@ -145,11 +150,11 @@ spec:
           {{- if .Values.chromium.allowInsecureLocalhost }}
           - --chromium-allow-insecure-localhost
           {{- end }}
-          {{- if .Values.chromium.allowList }}
-          - --chromium-allow-list={{ .Values.chromium.allowList }}
+          {{- range .Values.chromium.allowList }}
+          - {{ printf "--chromium-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- if .Values.chromium.denyList }}
-          - --chromium-deny-list={{ .Values.chromium.denyList }}
+          {{- range .Values.chromium.denyList }}
+          - {{ printf "--chromium-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
           {{- if .Values.chromium.denyPrivateIps }}
           - --chromium-deny-private-ips
@@ -162,9 +167,6 @@ spec:
           {{- end }}
           {{- if .Values.chromium.disableWebSecurity }}
           - --chromium-disable-web-security
-          {{- end }}
-          {{- if .Values.chromium.incognito }}
-          - --chromium-incognito
           {{- end }}
           {{- if .Values.chromium.hostResolverRules }}
           - --chromium-host-resolver-rules={{ .Values.chromium.hostResolverRules }}
@@ -193,18 +195,24 @@ spec:
           {{- if .Values.chromium.clearStorage }}
           - --chromium-clear-storage
           {{- end }}
-          {{- if .Values.chromium.maxQueueSize }}
-          - --chromium-max-queue-size={{ .Values.chromium.maxQueueSize }}
+          {{- if not (kindIs "invalid" .Values.chromium.maxQueueSize) }}
+          - --chromium-max-queue-size={{ .Values.chromium.maxQueueSize | int64 }}
           {{- end }}
-          {{- if .Values.chromium.maxConcurrency }}
-          - --chromium-max-concurrency={{ .Values.chromium.maxConcurrency }}
+          {{- if not (kindIs "invalid" .Values.chromium.maxConcurrency) }}
+          - --chromium-max-concurrency={{ .Values.chromium.maxConcurrency | int64 }}
           {{- end }}
           {{- if .Values.chromium.idleShutdownTimeout }}
           - --chromium-idle-shutdown-timeout={{ .Values.chromium.idleShutdownTimeout }}
           {{- end }}
+          {{- if .Values.chromium.maxMemory }}
+          - --chromium-max-memory={{ .Values.chromium.maxMemory }}
+          {{- end }}
+          {{- if .Values.chromium.debugProtocol }}
+          - --chromium-debug-protocol
+          {{- end }}
 
-          {{- if include "gotenberg.isSet" .Values.libreOffice.restartAfter }}
-          - --libreoffice-restart-after={{ .Values.libreOffice.restartAfter }}
+          {{- if not (kindIs "invalid" .Values.libreOffice.restartAfter) }}
+          - --libreoffice-restart-after={{ .Values.libreOffice.restartAfter | int64 }}
           {{- end }}
           {{- if .Values.libreOffice.autoStart }}
           - --libreoffice-auto-start
@@ -215,17 +223,17 @@ spec:
           {{- if .Values.libreOffice.disableRoutes }}
           - --libreoffice-disable-routes
           {{- end }}
-          {{- if .Values.libreOffice.maxQueueSize }}
-          - --libreoffice-max-queue-size={{ .Values.libreOffice.maxQueueSize }}
+          {{- if not (kindIs "invalid" .Values.libreOffice.maxQueueSize) }}
+          - --libreoffice-max-queue-size={{ .Values.libreOffice.maxQueueSize | int64 }}
           {{- end }}
           {{- if .Values.libreOffice.idleShutdownTimeout }}
           - --libreoffice-idle-shutdown-timeout={{ .Values.libreOffice.idleShutdownTimeout }}
           {{- end }}
-          {{- if .Values.libreOffice.allowList }}
-          - --libreoffice-allow-list={{ .Values.libreOffice.allowList }}
+          {{- range .Values.libreOffice.allowList }}
+          - {{ printf "--libreoffice-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- if .Values.libreOffice.denyList }}
-          - --libreoffice-deny-list={{ .Values.libreOffice.denyList }}
+          {{- range .Values.libreOffice.denyList }}
+          - {{ printf "--libreoffice-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
           {{- if .Values.libreOffice.denyPrivateIps }}
           - --libreoffice-deny-private-ips
@@ -236,73 +244,58 @@ spec:
           {{- if .Values.libreOffice.enableEnvironmentProxy }}
           - --libreoffice-enable-environment-proxy
           {{- end }}
+          {{- if .Values.libreOffice.maxMemory }}
+          - --libreoffice-max-memory={{ .Values.libreOffice.maxMemory }}
+          {{- end }}
+          {{- if .Values.libreOffice.enableMacros }}
+          - --libreoffice-enable-macros
+          {{- end }}
 
-          {{- if .Values.pdfEngines.engines }}
-          - --pdfengines-engines={{ .Values.pdfEngines.engines }}
+          {{- if not (kindIs "invalid" .Values.pdf.maxConcurrency) }}
+          - --pdf-max-concurrency={{ .Values.pdf.maxConcurrency | int64 }}
           {{- end }}
-          {{- if .Values.pdfEngines.mergeEngines }}
-          - --pdfengines-merge-engines={{ .Values.pdfEngines.mergeEngines }}
+          {{- if .Values.pdf.disableRoutes }}
+          - --pdf-disable-routes
           {{- end }}
-          {{- if .Values.pdfEngines.splitEngines }}
-          - --pdfengines-split-engines={{ .Values.pdfEngines.splitEngines }}
+          {{- if .Values.pdf.disableStages }}
+          - --pdf-disable-stages
           {{- end }}
-          {{- if .Values.pdfEngines.flattenEngines }}
-          - --pdfengines-flatten-engines={{ .Values.pdfEngines.flattenEngines }}
+          {{- if .Values.pdf.maxStreamBytes }}
+          - --pdf-max-stream-bytes={{ .Values.pdf.maxStreamBytes }}
           {{- end }}
-          {{- if .Values.pdfEngines.convertEngines }}
-          - --pdfengines-convert-engines={{ .Values.pdfEngines.convertEngines }}
+          {{- if .Values.pdf.maxEmbeddedFileBytes }}
+          - --pdf-max-embedded-file-bytes={{ .Values.pdf.maxEmbeddedFileBytes }}
           {{- end }}
-          {{- if .Values.pdfEngines.readMetadataEngines }}
-          - --pdfengines-read-metadata-engines={{ .Values.pdfEngines.readMetadataEngines }}
+          {{- if not (kindIs "invalid" .Values.pdf.maxImagePixels) }}
+          - --pdf-max-image-pixels={{ .Values.pdf.maxImagePixels | int64 }}
           {{- end }}
-          {{- if .Values.pdfEngines.writeMetadataEngines }}
-          - --pdfengines-write-metadata-engines={{ .Values.pdfEngines.writeMetadataEngines }}
+          {{- if not (kindIs "invalid" .Values.pdf.maxRenderPixels) }}
+          - --pdf-max-render-pixels={{ .Values.pdf.maxRenderPixels | int64 }}
           {{- end }}
-          {{- if .Values.pdfEngines.encryptEngines }}
-          - --pdfengines-encrypt-engines={{ .Values.pdfEngines.encryptEngines }}
+          {{- range .Values.pdf.allowList }}
+          - {{ printf "--pdf-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- if .Values.pdfEngines.embedEngines }}
-          - --pdfengines-embed-engines={{ .Values.pdfEngines.embedEngines }}
+          {{- range .Values.pdf.denyList }}
+          - {{ printf "--pdf-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- if .Values.pdfEngines.embedMetadataEngines }}
-          - --pdfengines-embed-metadata-engines={{ .Values.pdfEngines.embedMetadataEngines }}
+          {{- if .Values.pdf.denyPrivateIps }}
+          - --pdf-deny-private-ips
           {{- end }}
-          {{- if .Values.pdfEngines.watermarkEngines }}
-          - --pdfengines-watermark-engines={{ .Values.pdfEngines.watermarkEngines }}
+          {{- if .Values.pdf.denyPublicIps }}
+          - --pdf-deny-public-ips
           {{- end }}
-          {{- if .Values.pdfEngines.stampEngines }}
-          - --pdfengines-stamp-engines={{ .Values.pdfEngines.stampEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.rotateEngines }}
-          - --pdfengines-rotate-engines={{ .Values.pdfEngines.rotateEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.readBookmarksEngines }}
-          - --pdfengines-read-bookmarks-engines={{ .Values.pdfEngines.readBookmarksEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.writeBookmarksEngines }}
-          - --pdfengines-write-bookmarks-engines={{ .Values.pdfEngines.writeBookmarksEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.facturXEngines }}
-          - --pdfengines-factur-x-engines={{ .Values.pdfEngines.facturXEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.optimizeImagesEngines }}
-          - --pdfengines-optimize-images-engines={{ .Values.pdfEngines.optimizeImagesEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.maxConcurrency }}
-          - --pdfengines-max-concurrency={{ .Values.pdfEngines.maxConcurrency }}
-          {{- end }}
-          {{- if .Values.pdfEngines.disableRoutes }}
-          - --pdfengines-disable-routes
+          {{- if .Values.pdf.enableEnvironmentProxy }}
+          - --pdf-enable-environment-proxy
           {{- end }}
 
           {{- if .Values.webhook.enableSyncMode }}
           - --webhook-enable-sync-mode
           {{- end }}
-          {{- if .Values.webhook.allowList }}
-          - --webhook-allow-list={{ .Values.webhook.allowList }}
+          {{- range .Values.webhook.allowList }}
+          - {{ printf "--webhook-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- if .Values.webhook.denyList }}
-          - --webhook-deny-list={{ .Values.webhook.denyList }}
+          {{- range .Values.webhook.denyList }}
+          - {{ printf "--webhook-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
           {{- if .Values.webhook.denyPrivateIps }}
           - --webhook-deny-private-ips
@@ -310,14 +303,8 @@ spec:
           {{- if .Values.webhook.denyPublicIps }}
           - --webhook-deny-public-ips
           {{- end }}
-          {{- if .Values.webhook.errorAllowList }}
-          - --webhook-error-allow-list={{ .Values.webhook.errorAllowList }}
-          {{- end }}
-          {{- if .Values.webhook.errorDenyList }}
-          - --webhook-error-deny-list={{ .Values.webhook.errorDenyList }}
-          {{- end }}
-          {{- if include "gotenberg.isSet" .Values.webhook.maxRetry }}
-          - --webhook-max-retry={{ .Values.webhook.maxRetry }}
+          {{- if not (kindIs "invalid" .Values.webhook.maxRetry) }}
+          - --webhook-max-retry={{ .Values.webhook.maxRetry | int64 }}
           {{- end }}
           {{- if .Values.webhook.retryMinWait }}
           - --webhook-retry-min-wait={{ .Values.webhook.retryMinWait }}
@@ -335,25 +322,8 @@ spec:
           - --webhook-disable
           {{- end }}
 
-          {{- if .Values.prometheus.collectInterval }}
-          - --prometheus-collect-interval={{ .Values.prometheus.collectInterval }}
-          {{- end }}
-          {{- if .Values.prometheus.namespace }}
-          - --prometheus-namespace={{ .Values.prometheus.namespace }}
-          {{- end }}
-          {{- if .Values.prometheus.metricsPath }}
-          - --prometheus-metrics-path={{ .Values.prometheus.metricsPath }}
-          {{- end }}
-          {{- if .Values.prometheus.disableCollect  }}
-          - --prometheus-disable-collect
-          {{- end }}
-          {{- if or .Values.prometheus.disableRouteTelemetry .Values.prometheus.disableRouterLogging }}
-          - --prometheus-disable-route-telemetry
-          {{- end }}
-
-          {{- $logStdFormat := .Values.logging.stdFormat | default .Values.logging.format }}
-          {{- if $logStdFormat }}
-          - --log-std-format={{ $logStdFormat }}
+          {{- if .Values.logging.stdFormat }}
+          - --log-std-format={{ .Values.logging.stdFormat }}
           {{- end }}
           {{- if .Values.logging.stdLevelCase }}
           - --log-std-level-case={{ .Values.logging.stdLevelCase }}
@@ -364,16 +334,11 @@ spec:
           {{- if .Values.logging.fieldsPrefix }}
           - --log-fields-prefix={{ .Values.logging.fieldsPrefix }}
           {{- end }}
-          {{- if or .Values.logging.stdEnableGcpFields .Values.logging.enableGcpFields }}
+          {{- if .Values.logging.stdEnableGcpFields }}
           - --log-std-enable-gcp-fields
           {{- end }}
-          {{- if .Values.logging.enableGcpSeverity }}
-          - --log-enable-gcp-severity
-          {{- end }}
 
-          {{- if include "gotenberg.isSet" .Values.gotenberg.gracefulShutdownDurationSec }}
-          - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s
-          {{- end }}
+          - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec | int64 }}s
           {{- if .Values.gotenberg.hideBanner }}
           - --gotenberg-hide-banner
           {{- end }}
@@ -396,6 +361,15 @@ spec:
             - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
               value: {{ .Values.api.basicAuthPassword }}
             {{- end }}
+          {{- end }}
+          {{- if include "gotenberg.metricsEnabled" . }}
+            {{- include "gotenberg.validateMetrics" . }}
+            - name: OTEL_METRICS_EXPORTER
+              value: prometheus
+            - name: OTEL_EXPORTER_PROMETHEUS_HOST
+              value: "0.0.0.0"
+            - name: OTEL_EXPORTER_PROMETHEUS_PORT
+              value: {{ .Values.metrics.port | quote }}
           {{- end }}
           {{- $runAsUser := 1001 }}
           {{- if .Values.securityContext.runAsUser }}
@@ -422,6 +396,11 @@ spec:
             - name: http
               containerPort: {{ .Values.api.port }}
               protocol: TCP
+            {{- if include "gotenberg.metricsEnabled" . }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+            {{- end }}
           {{- with .Values.startupProbe }}
           startupProbe:
             {{- toYaml . | nindent 12 }}

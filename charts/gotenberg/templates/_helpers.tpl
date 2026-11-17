@@ -65,14 +65,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Non-empty when a value is set, including to 0, which `if` treats as unset.
-Use as `{{ if include "gotenberg.isSet" .Values.x }}` for numeric flags.
-*/}}
-{{- define "gotenberg.isSet" -}}
-{{- if or . (eq (toString .) "0") }}true{{ end }}
-{{- end }}
-
-{{/*
 Create the name of the service account to use
 */}}
 {{- define "gotenberg.serviceAccountName" -}}
@@ -114,5 +106,37 @@ seccompProfile:
 {{- end }}
 # Issue with Chromium, see: https://github.com/gotenberg/gotenberg/issues/949
 readOnlyRootFilesystem: false
+{{- end }}
+{{- end }}
+
+{{/*
+Whether the Prometheus metrics endpoint is served.
+*/}}
+{{- define "gotenberg.metricsEnabled" -}}
+{{- if and .Values.metrics (or .Values.metrics.enabled (and .Values.metrics.serviceMonitor .Values.metrics.serviceMonitor.enabled)) }}true{{ end }}
+{{- end }}
+
+{{/*
+Fails on settings that conflict with the chart's metrics endpoint.
+*/}}
+{{- define "gotenberg.validateMetrics" -}}
+{{- if eq (int .Values.metrics.port) (int .Values.api.port) }}
+{{- fail "metrics.port must differ from api.port" }}
+{{- end }}
+{{- range .Values.extraEnv }}
+{{- if has .name (list "OTEL_METRICS_EXPORTER" "OTEL_EXPORTER_PROMETHEUS_HOST" "OTEL_EXPORTER_PROMETHEUS_PORT") }}
+{{- fail (printf "extraEnv sets %s, which the chart sets for metrics.enabled: use metrics.port, or turn metrics off to configure the exporter yourself" .name) }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+A list entry as one CSV field: Gotenberg splits list flags on commas.
+*/}}
+{{- define "gotenberg.csvField" -}}
+{{- if regexMatch "[,\"\n\r]|^\\s|\\s$" . }}
+{{- printf "\"%s\"" (replace "\"" "\"\"" .) }}
+{{- else }}
+{{- . }}
 {{- end }}
 {{- end }}

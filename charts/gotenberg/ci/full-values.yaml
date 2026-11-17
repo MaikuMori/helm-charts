@@ -26,3 +26,6 @@ gateway:
       namespace: default
   hostnames:
     - gotenberg.test.local
+
+metrics:
+  enabled: true
