@@ -92,7 +92,7 @@ helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --install
 
 ### Upgrading to 2.0.0
 
-Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and metrics. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) and the chart's [CHANGELOG](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#200), which maps every 1.x value that changed. Upgrade with your values file rather than `--reuse-values`, which carries removed 1.x defaults that the values schema rejects, and drop any `image.tag` or `image.digest` that pins Gotenberg 8.
+Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and metrics. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) and the chart's [CHANGELOG](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#200), which maps every 1.x value that changed. Upgrade with your values file rather than `--reuse-values`, which carries removed 1.x defaults that the values schema rejects, and drop any `image.tag` or `image.digest` that pins Gotenberg 8. If your values file is a copy of the 1.x defaults, delete the four `api.disable*RouteTelemetry: false` entries: in 2.0.0, `false` turns telemetry on for the health check, root, debug and version routes.
 
 To stay on Gotenberg 8, keep chart 1.31.0, which runs 8.40.0, the final Gotenberg 8 release.
 
