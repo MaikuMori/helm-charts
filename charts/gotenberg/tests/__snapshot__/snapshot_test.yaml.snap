@@ -28,7 +28,6 @@ matches with default values:
             - args:
                 - gotenberg
                 - --api-port=3000
-                - --gotenberg-graceful-shutdown-duration=30s
               env: null
               image: gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
@@ -163,14 +162,16 @@ matches with every flag set:
             - args:
                 - gotenberg
                 - --api-port=3007
-                - --api-timeout=timeout-value
+                - --api-enable-basic-auth
+                - --api-bind-ip=bindIp-value
+                - --api-timeout=7s
                 - --api-body-limit=bodyLimit-value
-                - --api-root-path=rootPath-value
+                - --api-root-path=/rootPath-value/
                 - --api-correlation-id-header=correlationIdHeader-value
                 - --api-disable-health-check-route-telemetry=false
-                - --api-enable-debug-route
-                - --api-start-timeout=startTimeout-value
-                - --api-enable-basic-auth
+                - --api-enable-debug-route=true
+                - --api-start-timeout=7s
+                - --api-enable-oidc-auth=false
                 - --api-oidc-issuer=oidcIssuer-value
                 - --api-oidc-audience=oidcAudience-value
                 - --api-oidc-jwks-url=oidcJwksUrl-value
@@ -178,63 +179,63 @@ matches with every flag set:
                 - --api-download-from-allow-list=^https://downloadFromAllowList\.example\.com/
                 - --api-download-from-deny-list="^https://[a-z]{1,10}\.downloadFromDenyList\.example\.com(:|/|$)"
                 - --api-download-from-deny-list=^https://downloadFromDenyList\.example\.com/
-                - --api-download-from-deny-private-ips
-                - --api-download-from-deny-public-ips
+                - --api-download-from-deny-private-ips=true
+                - --api-download-from-deny-public-ips=true
                 - --api-download-from-max-retry=11
                 - --api-download-from-max-concurrency=7
                 - --api-download-from-max-entries=7
-                - --api-download-from-enable-environment-proxy
-                - --api-disable-download-from
+                - --api-download-from-enable-environment-proxy=true
+                - --api-disable-download-from=true
                 - --api-archive-max-entries=20000000
                 - --api-archive-max-ratio=7
                 - --api-disable-root-route-telemetry=true
                 - --api-disable-debug-route-telemetry=true
                 - --api-disable-version-route-telemetry=true
                 - --chromium-restart-after=7
-                - --chromium-auto-start
-                - --chromium-start-timeout=startTimeout-value
-                - --chromium-allow-file-access-from-files
-                - --chromium-allow-insecure-localhost
+                - --chromium-auto-start=true
+                - --chromium-start-timeout=7s
+                - --chromium-allow-file-access-from-files=true
+                - --chromium-allow-insecure-localhost=true
                 - --chromium-allow-list="^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)"
                 - --chromium-allow-list=^https://allowList\.example\.com/
                 - --chromium-deny-list="^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)"
                 - --chromium-deny-list=^https://denyList\.example\.com/
-                - --chromium-deny-private-ips
-                - --chromium-deny-public-ips
-                - --chromium-ignore-certificate-errors
-                - --chromium-disable-web-security
+                - --chromium-deny-private-ips=true
+                - --chromium-deny-public-ips=true
+                - --chromium-ignore-certificate-errors=true
+                - --chromium-disable-web-security=true
                 - --chromium-host-resolver-rules=hostResolverRules-value
                 - --chromium-proxy-server=proxyServer-value
-                - --chromium-enable-environment-proxy
-                - --chromium-disable-javascript
-                - --chromium-disable-routes
-                - --chromium-shared-browser-context
-                - --chromium-clear-cache
-                - --chromium-clear-cookies
-                - --chromium-clear-storage
+                - --chromium-enable-environment-proxy=true
+                - --chromium-disable-javascript=true
+                - --chromium-disable-routes=true
+                - --chromium-shared-browser-context=true
+                - --chromium-clear-cache=true
+                - --chromium-clear-cookies=true
+                - --chromium-clear-storage=true
                 - --chromium-max-queue-size=7
                 - --chromium-max-concurrency=4
-                - --chromium-idle-shutdown-timeout=idleShutdownTimeout-value
+                - --chromium-idle-shutdown-timeout=7s
                 - --chromium-max-memory=maxMemory-value
-                - --chromium-debug-protocol
+                - --chromium-debug-protocol=true
                 - --libreoffice-restart-after=7
-                - --libreoffice-auto-start
-                - --libreoffice-start-timeout=startTimeout-value
-                - --libreoffice-disable-routes
+                - --libreoffice-auto-start=true
+                - --libreoffice-start-timeout=7s
+                - --libreoffice-disable-routes=true
                 - --libreoffice-max-queue-size=7
-                - --libreoffice-idle-shutdown-timeout=idleShutdownTimeout-value
+                - --libreoffice-idle-shutdown-timeout=7s
                 - --libreoffice-allow-list="^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)"
                 - --libreoffice-allow-list=^https://allowList\.example\.com/
                 - --libreoffice-deny-list="^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)"
                 - --libreoffice-deny-list=^https://denyList\.example\.com/
-                - --libreoffice-deny-private-ips
-                - --libreoffice-deny-public-ips
-                - --libreoffice-enable-environment-proxy
+                - --libreoffice-deny-private-ips=true
+                - --libreoffice-deny-public-ips=true
+                - --libreoffice-enable-environment-proxy=true
                 - --libreoffice-max-memory=maxMemory-value
-                - --libreoffice-enable-macros
+                - --libreoffice-enable-macros=true
                 - --pdf-max-concurrency=7
-                - --pdf-disable-routes
-                - --pdf-disable-stages
+                - --pdf-disable-routes=true
+                - --pdf-disable-stages=true
                 - --pdf-max-stream-bytes=maxStreamBytes-value
                 - --pdf-max-embedded-file-bytes=maxEmbeddedFileBytes-value
                 - --pdf-max-image-pixels=200000000
@@ -243,27 +244,29 @@ matches with every flag set:
                 - --pdf-allow-list=^https://allowList\.example\.com/
                 - --pdf-deny-list="^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)"
                 - --pdf-deny-list=^https://denyList\.example\.com/
-                - --pdf-deny-private-ips
-                - --pdf-deny-public-ips
-                - --pdf-enable-environment-proxy
-                - --webhook-enable-sync-mode
+                - --pdf-deny-private-ips=true
+                - --pdf-deny-public-ips=true
+                - --pdf-enable-environment-proxy=true
+                - --webhook-enable-sync-mode=true
                 - --webhook-allow-list="^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)"
                 - --webhook-allow-list=^https://allowList\.example\.com/
                 - --webhook-deny-list="^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)"
                 - --webhook-deny-list=^https://denyList\.example\.com/
-                - --webhook-deny-private-ips
-                - --webhook-deny-public-ips
+                - --webhook-deny-private-ips=true
+                - --webhook-deny-public-ips=true
                 - --webhook-max-retry=7
-                - --webhook-retry-min-wait=retryMinWait-value
-                - --webhook-retry-max-wait=retryMaxWait-value
-                - --webhook-client-timeout=clientTimeout-value
-                - --webhook-enable-environment-proxy
-                - --webhook-disable
-                - --log-std-format=stdFormat-value
-                - --log-std-level-case=stdLevelCase-value
-                - --log-level=level-value
+                - --webhook-retry-min-wait=7s
+                - --webhook-retry-max-wait=7s
+                - --webhook-client-timeout=7s
+                - --webhook-enable-environment-proxy=true
+                - --webhook-disable=true
+                - --log-std-format=json
+                - --log-std-level-case=upper
+                - --log-level=debug
                 - --log-fields-prefix=fieldsPrefix-value
-                - --log-std-enable-gcp-fields
+                - --log-std-enable-gcp-fields=true
+                - --gotenberg-hide-banner=true
+                - --gotenberg-build-debug-data=false
                 - --gotenberg-graceful-shutdown-duration=37s
               env:
                 - name: GOTENBERG_API_BASIC_AUTH_USERNAME
@@ -351,7 +354,7 @@ matches with every flag set:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80rootPath-value/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/rootPath-value/health' && exit 0
                 sleep 3
               done
               exit 1
@@ -402,7 +405,6 @@ matches with every optional resource enabled:
             - args:
                 - gotenberg
                 - --api-port=3000
-                - --gotenberg-graceful-shutdown-duration=30s
               env:
                 - name: OTEL_METRICS_EXPORTER
                   value: prometheus
@@ -666,7 +668,6 @@ matches with the CRD-backed and policy resources enabled:
             - args:
                 - gotenberg
                 - --api-port=3000
-                - --gotenberg-graceful-shutdown-duration=30s
               env:
                 - name: OTEL_METRICS_EXPORTER
                   value: prometheus
@@ -898,12 +899,11 @@ matches with the documented hardened values:
             - args:
                 - gotenberg
                 - --api-port=3000
-                - --api-download-from-deny-private-ips
-                - --chromium-deny-private-ips
-                - --libreoffice-deny-private-ips
-                - --pdf-deny-private-ips
-                - --webhook-deny-private-ips
-                - --gotenberg-graceful-shutdown-duration=30s
+                - --api-download-from-deny-private-ips=true
+                - --chromium-deny-private-ips=true
+                - --libreoffice-deny-private-ips=true
+                - --pdf-deny-private-ips=true
+                - --webhook-deny-private-ips=true
               env: null
               image: gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent

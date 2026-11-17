@@ -100,8 +100,8 @@ jobs:
             exit 1
           fi
 
-      - name: Check that numeric values set to 0 are rendered
-        run: npm run test:zero
+      - name: Check the flag table against Gotenberg's flags
+        run: npm run test:flags
 
       - name: Render as a subchart
         run: |

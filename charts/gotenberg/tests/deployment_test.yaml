@@ -133,7 +133,7 @@ tests:
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
-          content: --api-enable-oidc-auth
+          content: --api-enable-oidc-auth=true
       - contains:
           path: spec.template.spec.containers[0].args
           content: --api-oidc-issuer=https://issuer.example.com/
@@ -307,7 +307,6 @@ tests:
           value:
             - gotenberg
             - --api-port=3000
-            - --gotenberg-graceful-shutdown-duration=30s
 
   - it: rejects empty list entries, which would clear Chromium's default deny list
     set:
@@ -351,3 +350,11 @@ tests:
             preStop:
               sleep:
                 seconds: 5
+
+  - it: clears a list's upstream default with an empty list
+    set:
+      chromium.denyList: []
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --chromium-deny-list=

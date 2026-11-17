@@ -9,13 +9,13 @@ Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces c
 - **Upstream breaking change**: PDF processing has limits by default, and a stream, image or rendered page over them answers `400` (see the `pdf.max*` values). A stage that rewrites a signed PDF answers `400` unless the request sets `dropSignatures`, and `remediate` can return a PDF with violations left, counted in `Gotenberg-Remediation-Residual`.
 - **Upstream breaking change**: Java, Python, unoconverter, QPDF, pdfcpu, pdftk and ExifTool leave the image, and `LOK_BIN_PATH` replaces `UNOCONVERTER_BIN_PATH`. Rebuild images based on `gotenberg/gotenberg:8`; probes and hooks that call those tools break.
 - **Upstream change**: the page sent to the Chromium HTML and Markdown routes skips `chromium.allowList` and `chromium.denyList`, which 8.x applied to it. Its uploaded files still load from `file:///tmp/`: an allow-list without `^file:///tmp/` drops them.
-- **Upstream change**: Gotenberg logs to stderr, and prints no banner without a terminal, so `gotenberg.hideBanner` is gone.
+- **Upstream change**: Gotenberg logs to stderr, and prints its banner only to a terminal.
 - **Metrics are off by default**: 1.x served `/prometheus/metrics` on the API port by default. `metrics.enabled` serves Gotenberg's OpenTelemetry Prometheus exporter at `/metrics` on `metrics.port` (default `9464`), through a ClusterIP `<fullname>-metrics` Service. `metrics.serviceMonitor.enabled` turns it on too and scrapes it.
 - **Metric names change**, e.g. `gotenberg_chromium_requests_queue_size` is now `gotenberg_chromium_queue_size`, restarts become counters and the errors counter is gone, and the ServiceMonitor's `job`, `service` and `endpoint` labels change with the new Service: update dashboards, alerts, recording rules and `autoscaling.extraMetrics`. Gotenberg exports metrics to one exporter, so `metrics.enabled` and an `OTEL_METRICS_EXPORTER` in `extraEnv` now fail the install. A NetworkPolicy with custom `ingress` rules must allow the metrics port.
 - **Check your values**: `api.disableHealthCheckRouteTelemetry` and the root, debug and version route telemetry switches default to `null`, upstream's `true`. An explicit `false`, which 1.x ignored, now turns telemetry on for that route, so every health probe gets logged and traced. Delete these four keys if you copied the 1.x defaults.
 - **Check your values**: 1.x's `chromium.maxConcurrency: 0` and `pdfEngines.maxConcurrency: 0` defaults meant "upstream default". 0 now reaches Gotenberg, which refuses it, so the schema does too: delete them.
-- Allow and deny lists are YAML lists, one flag per entry: Gotenberg splits the old strings on commas, which broke patterns such as `[a-z]{1,10}` into two unsafe entries. Empty entries are rejected: one cleared Chromium's default deny list.
-- Numeric values default to `null`, which leaves Gotenberg's default, render without an exponent, and are bounded where Gotenberg would refuse them. `api.downloadFromMaxRetry` no longer pins `4`.
+- **Every Gotenberg flag has a value, and one rule**: an unset value leaves Gotenberg's default, and a set value is passed as is, `0`, `false`, `""` and `[]` included. All flag values default to unset, so a default install passes only `--api-port`; `api.downloadFromMaxRetry` no longer pins `4`, nor `gotenberg.gracefulShutdownDurationSec` 30. The schema refuses what Gotenberg refuses at startup, such as an empty duration or log level: delete those if you copied the 1.x defaults. `api.bindIp` and `gotenberg.buildDebugData` are new.
+- Allow and deny lists are YAML lists, one flag per entry: Gotenberg splits the old strings on commas, which broke patterns such as `[a-z]{1,10}` into two unsafe entries. `[]` clears a list's default, such as Chromium's `file://` deny rule; empty entries are rejected.
 - `networkPolicy.ingress` and `networkPolicy.egress` take the rules directly, defaulting to allow all, and `[]` denies all. 1.x ignored `extraIngress` and `extraEgress` while `allowIngress` or `allowEgress` was true, and couldn't render deny-all.
 - Basic authentication moves to `api.basicAuth.*`, quotes inline credentials, and fails the install without credentials or together with OIDC, which Gotenberg refuses at startup.
 - `pdb.minAvailable` and `pdb.maxUnavailable` take a number or a percentage and default to `null`, which keeps 1 available; setting both fails. `pdb.create` and `vpa.create` become `pdb.enabled` and `vpa.enabled`.
@@ -41,7 +41,6 @@ Gotenberg 9 refuses its removed flags, so their values are gone, and the values 
 | `chromium.maxConcurrency: 0` | Delete it: Gotenberg allows 1 to 6 |
 | `webhook.errorAllowList`, `webhook.errorDenyList` | Removed with the error URL: `webhook.allowList` and `webhook.denyList` cover every webhook URL |
 | `logging.enableGcpSeverity` | Removed: Gotenberg 8.39.0 already refused its flag |
-| `gotenberg.hideBanner` | Removed |
 | `api.traceHeader` | `api.correlationIdHeader` |
 | `api.disableHealthCheckLogging` | `api.disableHealthCheckRouteTelemetry` |
 | `api.disableHealthCheckRouteTelemetry`, `api.disableRootRouteTelemetry`, `api.disableDebugRouteTelemetry`, `api.disableVersionRouteTelemetry` set to `false` | Delete them: `false` now turns route telemetry on |
@@ -57,6 +56,7 @@ Gotenberg 9 refuses its removed flags, so their values are gone, and the values 
 | `pdb.maxUnavailable: ""` | Delete it, or set `pdb.minAvailable: null` with a `maxUnavailable` |
 | `*.allowList`, `*.denyList`, `api.downloadFrom*List` strings | Lists of regular expressions, e.g. `allowList: ["^https://a\\.example\\.com/"]` |
 | `chromium.restartAfter`, `libreOffice.restartAfter`, `webhook.maxRetry` strings | Integers |
+| `""` for a duration, `logging.*`, `api.rootPath` or `api.correlationIdHeader`, and `[]` you didn't mean to clear a default with | Delete them: unset leaves Gotenberg's default, and these are now passed |
 
 ## 1.31.0
 

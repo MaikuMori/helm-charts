@@ -1,11 +1,8 @@
 # Sets a valid value for every flag the chart maps, so CI boots Gotenberg with
-# all of them and the render test still passes. Left out, because they would
-# stop that test: the disableRoutes, disableStages, disableDownloadFrom,
-# webhook.disable and chromium.disableJavaScript switches, basic and OIDC
-# authentication, api.tlsSecretName, api.rootPath, chromium.proxyServer and
-# chromium.hostResolverRules (which the environment proxy excludes), and the
-# denyPublicIps switches.
+# all of them and the render test still passes. test/flags-test.js checks it
+# covers the flag table, but for the values its EVERY_FLAG_EXCLUDED lists.
 api:
+  bindIp: 0.0.0.0
   timeout: 60s
   bodyLimit: 100MB
   correlationIdHeader: X-Request-Id
@@ -96,6 +93,8 @@ logging:
   stdEnableGcpFields: true
 gotenberg:
   gracefulShutdownDurationSec: 20
+  hideBanner: true
+  buildDebugData: true
 metrics:
   enabled: true
   port: 9465
