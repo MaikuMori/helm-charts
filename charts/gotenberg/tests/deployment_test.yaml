@@ -12,34 +12,6 @@ tests:
           path: spec.template.spec.containers[0].image
           value: gotenberg/gotenberg:1.2.3@sha256:1111111111111111111111111111111111111111111111111111111111111111
 
-  - it: falls back to the deprecated traceHeader for the correlation ID header
-    set:
-      api.traceHeader: X-Trace
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].args
-          content: --api-correlation-id-header=X-Trace
-
-  - it: prefers correlationIdHeader over traceHeader
-    set:
-      api.traceHeader: X-Trace
-      api.correlationIdHeader: X-Correlation
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].args
-          content: --api-correlation-id-header=X-Correlation
-      - notContains:
-          path: spec.template.spec.containers[0].args
-          content: --api-correlation-id-header=X-Trace
-
-  - it: falls back to the deprecated logging.format for the log format
-    set:
-      logging.format: json
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].args
-          content: --log-std-format=json
-
   - it: mounts the TLS secret and points the API at it
     set:
       api.tlsSecretName: gotenberg-tls
@@ -222,7 +194,7 @@ tests:
   - it: passes 0 for restart, retry and shutdown values
     set:
       chromium.restartAfter: 0
-      libreOffice.restartAfter: "0"
+      libreOffice.restartAfter: 0
       api.downloadFromMaxRetry: 0
       webhook.maxRetry: 0
       gotenberg.gracefulShutdownDurationSec: 0
@@ -245,3 +217,41 @@ tests:
       - equal:
           path: spec.template.spec.terminationGracePeriodSeconds
           value: 0
+
+  - it: passes each list entry as its own flag, quoting entries with commas
+    set:
+      chromium.allowList:
+        - ^https://[a-z]{1,10}\.example\.com(:|/|$)
+        - ^https://other\.example\.com/
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --chromium-allow-list="^https://[a-z]{1,10}\.example\.com(:|/|$)"
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --chromium-allow-list=^https://other\.example\.com/
+
+  - it: renders large integers without an exponent
+    set:
+      pdf.maxImagePixels: 200000000
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --pdf-max-image-pixels=200000000
+
+  - it: passes false for route telemetry switches that default to true upstream
+    set:
+      api.disableHealthCheckRouteTelemetry: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-disable-health-check-route-telemetry=false
+
+  - it: leaves upstream defaults to Gotenberg
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - gotenberg
+            - --api-port=3000
+            - --gotenberg-graceful-shutdown-duration=30s

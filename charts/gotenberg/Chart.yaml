@@ -4,8 +4,8 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.31.0"
-appVersion: "8.40.0"
+version: "2.0.0"
+appVersion: "9.6.0"
 
 keywords:
   - gotenberg
@@ -38,6 +38,14 @@ annotations:
     url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
   artifacthub.io/changes: |
     - kind: security
-      description: Bump Gotenberg to 8.40.0, the final Gotenberg 8 release, which fixes a QPDF password argument injection that could embed any file the gotenberg user can read, refuses every special-purpose IP range in the private-IP checks, distrusts the compromised eMudhra roots in Chromium from the first request and keeps the pinning proxy on with host-resolver rules
+      description: Bump Gotenberg to 9.6.0, a major release that includes the 8.40.0 security fixes. Routes, form fields, flags and metrics change, so read Gotenberg's upgrade guide and the chart's CHANGELOG before upgrading
+    - kind: removed
+      description: Remove the values for flags Gotenberg 9 removed, the deprecated aliases and service.loadBalancerIP
     - kind: changed
-      description: "Upstream behaviour change: an invalid chromium.hostResolverRules stops Gotenberg at startup, and the deny-private-IPs checks refuse more ranges"
+      description: Metrics are off by default and served through Gotenberg's OpenTelemetry Prometheus exporter on a separate metrics Service when metrics.enabled or metrics.serviceMonitor.enabled is set
+    - kind: changed
+      description: Allow and deny lists are YAML lists, numeric values default to null, route telemetry switches are tri-state and enableServiceLinks defaults to false
+    - kind: added
+      description: Add the pdf values for Gotenberg 9's PDF module, and values for the new archive, memory limit, macro and DevTools debug flags
+    - kind: changed
+      description: The hardening example also denies private timestamp authority URLs, and the helm test busybox digest is refreshed
