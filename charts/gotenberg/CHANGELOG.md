@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.31.0
+
+The last 1.x release. Chart 2.0.0 moves to Gotenberg 9.
+
+- Bump `gotenberg` version `8.39.0` -> `8.40.0`, the final Gotenberg 8 release, which includes security fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v8.40.0).
+- **Upstream behaviour change**: an invalid `chromium.hostResolverRules` stops Gotenberg at startup, and the `denyPrivateIps` checks refuse every IANA special-purpose range, such as `0.0.0.0/8` and `2001::/23`.
+
 ## 1.30.0
 
 - Bump `gotenberg` version `8.38.1` -> `8.39.0`, which includes security fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v8.39.0).
