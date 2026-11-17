@@ -21,7 +21,7 @@ spec:
       type: RuntimeDefault
   containers:
     - name: wget
-      image: "{{ .Values.testImage.repository }}:{{ .Values.testImage.tag }}{{ with .Values.testImage.digest }}@{{ . }}{{ end }}"
+      image: {{ include "gotenberg.testImage" . | quote }}
       # Retries because the Service can briefly route to a pod that's gone when the test starts right after a rollout.
       command: ['/bin/sh', '-c']
       args:

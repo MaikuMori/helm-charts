@@ -17,12 +17,15 @@ Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces c
 - **Every Gotenberg flag has a value, and one rule**: an unset value leaves Gotenberg's default, and a set value is passed as is, `0`, `false`, `""` and `[]` included. All flag values default to unset, so a default install passes only `--api-port`; `api.downloadFromMaxRetry` no longer pins `4`, nor `gotenberg.gracefulShutdownDurationSec` 30. The schema refuses what Gotenberg refuses at startup, such as an empty duration or log level: delete those if you copied the 1.x defaults. `api.bindIp` and `gotenberg.buildDebugData` are new.
 - Allow and deny lists are YAML lists, one flag per entry: Gotenberg splits the old strings on commas, which broke patterns such as `[a-z]{1,10}` into two unsafe entries. `[]` clears a list's default; empty entries are rejected.
 - **Check your values**: setting `chromium.denyList`, `[]` included, replaces Gotenberg's default `^file:(?!//\/tmp/).*`, which stops pages reading local files. Keep that entry when you add your own; the install notes now warn when the list has none.
-- The install notes give the in-cluster URL, a port-forward with a health check and a conversion, and the metrics URL, and warn about an exposed release without authentication and a deny list without a `file:` rule.
+- The install notes give the in-cluster URL, a port-forward with a health check and a conversion, and the metrics URL, and warn about an exposed release without authentication, the debug route without it, `chromium.debugProtocol`, `libreOffice.enableMacros`, `chromium.proxyServer`, and a deny list without a `file:` rule.
 - `networkPolicy.ingress` and `networkPolicy.egress` take the rules directly, defaulting to allow all, and `[]` denies all. 1.x ignored `extraIngress` and `extraEgress` while `allowIngress` or `allowEgress` was true, and couldn't render deny-all.
-- Basic authentication moves to `api.basicAuth.*`, quotes inline credentials, and fails the install without credentials or together with OIDC, which Gotenberg refuses at startup.
+- Basic authentication moves to `api.basicAuth.*` and quotes inline credentials. The install fails on authentication Gotenberg refuses at startup: basic auth without credentials or together with OIDC, and OIDC without `api.oidcIssuer` and `api.oidcAudience`.
+- **Check your values**: keys set in `securityContext` now override the restricted default instead of replacing it, so setting `runAsUser` alone keeps the rest. Loosen a default by setting its key.
+- A probe with an `exec`, `tcpSocket` or `grpc` handler drops the default `httpGet`, which Kubernetes refused next to it, and the default `/health` check follows `api.tlsSecretName` and `api.rootPath`.
+- `testImage.tag` and `testImage.digest` default to unset, which pulls the chart's pinned busybox. Setting only the tag pulls that tag, rather than the pinned digest under a new name.
 - `pdb.minAvailable` and `pdb.maxUnavailable` take a number or a percentage and default to `null`, which keeps 1 available; setting both fails. `pdb.create` and `vpa.create` become `pdb.enabled` and `vpa.enabled`.
 - The chart requires Kubernetes 1.30 or later, for the `preStop` sleep action below: Helm refuses to install it on older clusters.
-- Rollouts keep connections: `lifecycle` defaults to a 5s `preStop` sleep, and `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s. `progressDeadlineSeconds` defaults to `600`, Kubernetes' own default, so pulling the new image doesn't fail the rollout.
+- Rollouts keep connections: `lifecycle` defaults to a 5s `preStop` sleep, which `lifecycle.preStop: null` drops, and `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s. `progressDeadlineSeconds` defaults to `600`, Kubernetes' own default, so pulling the new image doesn't fail the rollout.
 - `enableServiceLinks` defaults to `false`: Gotenberg doesn't use service links, and a Service named `api` broke its startup.
 - `helm test` checks `/health` over HTTPS with `api.tlsSecretName`, and under `api.rootPath`.
 - Add `pdf.*` values for the new PDF module, `metrics.service.annotations` and `metrics.service.labels`, and `api.archiveMaxEntries`, `api.archiveMaxRatio`, `chromium.maxMemory`, `chromium.debugProtocol`, `libreOffice.maxMemory` and `libreOffice.enableMacros`.
@@ -58,6 +61,8 @@ Gotenberg 9 refuses its removed flags, so their values are gone, and the values 
 | `pdb.maxUnavailable: ""` | Delete it, or set `pdb.minAvailable: null` with a `maxUnavailable` |
 | `*.allowList`, `*.denyList`, `api.downloadFrom*List` strings | Lists of regular expressions, e.g. `allowList: ["^https://a\\.example\\.com/"]` |
 | `chromium.restartAfter`, `libreOffice.restartAfter`, `webhook.maxRetry` strings | Integers |
+| `securityContext` set to the 1.28.0 default, to opt out of 1.29.0's | Its keys now merge onto the restricted default: also set `runAsNonRoot: false`, `capabilities: {drop: []}` and `seccompProfile: {type: Unconfined}` |
+| `testImage.tag: "1.38.0"` and `testImage.digest` copied from 1.x | Delete them to keep the chart's pin |
 | `""` for a duration, `logging.*`, `api.rootPath` or `api.correlationIdHeader`, and `[]` you didn't mean to clear a default with | Delete them: unset leaves Gotenberg's default, and these are now passed |
 
 ## 1.31.0

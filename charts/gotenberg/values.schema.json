@@ -360,7 +360,7 @@
           }
         },
         "denyPrivateIps": {
-          "description": "Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. With `proxyServer`, a DNS rebinding can slip past it.",
+          "description": "Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Weakened by `proxyServer`, see there.",
           "type": [
             "boolean",
             "null"
@@ -448,7 +448,7 @@
           "minimum": 0
         },
         "proxyServer": {
-          "description": "Set the outbound proxy server; this switch only affects HTTP and HTTPS requests",
+          "description": "Set the outbound proxy server; this switch only affects HTTP and HTTPS requests. It replaces Gotenberg's pinning proxy: a DNS rebinding can slip past the deny lists and IP checks, and a Web Worker's WebSocket reaches the proxy unchecked, so enforce the outbound policy there too.",
           "type": [
             "string",
             "null"
@@ -725,7 +725,7 @@
       "additionalProperties": false
     },
     "lifecycle": {
-      "description": "Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM.",
+      "description": "Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. Helm merges this with your value, so set `lifecycle.preStop: null` to drop the sleep.",
       "type": "object",
       "properties": {
         "preStop": {
@@ -1120,7 +1120,7 @@
       "type": "object"
     },
     "securityContext": {
-      "description": "Define the security context for the container. Replaces the default entirely when set.",
+      "description": "Define the security context for the container. Keys set here override the default's, e.g. `runAsUser`, and the rest stays; set a key to loosen it, e.g. `allowPrivilegeEscalation: true`.",
       "type": "object"
     },
     "service": {
@@ -1203,8 +1203,11 @@
       "type": "object",
       "properties": {
         "digest": {
-          "description": "Digest for the test image. Set to \"\" to pull by tag only.",
-          "type": "string",
+          "description": "Digest for the test image, e.g. `sha256:...`. Unset pulls the chart's pinned digest when `tag` is unset too, and pulls by tag otherwise.",
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^(sha256:[a-f0-9]{64})?$"
         },
         "repository": {
@@ -1212,8 +1215,11 @@
           "type": "string"
         },
         "tag": {
-          "description": "Tag for the test image",
-          "type": "string"
+          "description": "Tag for the test image. Leave unset, with `digest`, for the chart's pinned busybox image.",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": false

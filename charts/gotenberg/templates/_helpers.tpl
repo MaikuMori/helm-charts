@@ -78,35 +78,24 @@ Create the name of the service account to use
 {{/*
 Create a security context
 
-If .Values.securityContext is set, use it. Otherwise, use the defaults.
-
-Defaults:
+Restricted by default, with the keys .Values.securityContext sets on top.
 On OpenShift, the user, non-root check and seccomp profile are left to the SCC, since the image's
 user isn't numeric and a pod that sets a seccomp profile can't be admitted under SCCs without
 seccompProfiles, such as anyuid.
 Elsewhere, the seccomp profile is left to the pod when podSecurityContext sets one.
-And apply recommended settings from upstream project.
+The root filesystem stays writable for Chromium (gotenberg/gotenberg#949).
 */}}
 {{- define "gotenberg.securityContext" -}}
-{{- if .Values.securityContext }}
-{{- toYaml .Values.securityContext }}
-{{- else -}}
-privileged: false
-{{- if not (.Capabilities.APIVersions.Has "security.openshift.io/v1") }}
-runAsUser: 1001
-runAsNonRoot: true
+{{- $openshift := .Capabilities.APIVersions.Has "security.openshift.io/v1" }}
+{{- $default := dict "privileged" false "allowPrivilegeEscalation" false "capabilities" (dict "drop" (list "ALL")) "readOnlyRootFilesystem" false }}
+{{- if not $openshift }}
+{{- $_ := set $default "runAsUser" 1001 }}
+{{- $_ := set $default "runAsNonRoot" true }}
 {{- end }}
-allowPrivilegeEscalation: false
-capabilities:
-  drop:
-    - ALL
-{{- if not (or .Values.podSecurityContext.seccompProfile (.Capabilities.APIVersions.Has "security.openshift.io/v1")) }}
-seccompProfile:
-  type: RuntimeDefault
+{{- if not (or .Values.podSecurityContext.seccompProfile $openshift) }}
+{{- $_ := set $default "seccompProfile" (dict "type" "RuntimeDefault") }}
 {{- end }}
-# Issue with Chromium, see: https://github.com/gotenberg/gotenberg/issues/949
-readOnlyRootFilesystem: false
-{{- end }}
+{{- mergeOverwrite $default (deepCopy (.Values.securityContext | default dict)) | toYaml }}
 {{- end }}
 
 {{/*
@@ -148,6 +137,32 @@ Fails on authentication settings Gotenberg refuses at startup.
 {{- fail "api.basicAuth.enabled needs api.basicAuth.existingSecret, or api.basicAuth.username and password" }}
 {{- end }}
 {{- end }}
+{{- if and .Values.api.enableOidcAuth (not (and .Values.api.oidcIssuer .Values.api.oidcAudience)) }}
+{{- fail "api.enableOidcAuth needs api.oidcIssuer and api.oidcAudience" }}
+{{- end }}
+{{- end }}
+
+{{/*
+A probe as set in values, with the default HTTP check following
+api.tlsSecretName and api.rootPath. A probe with another handler drops the
+default httpGet, which Kubernetes refuses next to it.
+*/}}
+{{- define "gotenberg.probe" -}}
+{{- $probe := deepCopy (index . 0) }}
+{{- $tls := index . 1 }}
+{{- $rootPath := index . 2 }}
+{{- if or (hasKey $probe "exec") (hasKey $probe "tcpSocket") (hasKey $probe "grpc") }}
+{{- $_ := unset $probe "httpGet" }}
+{{- else if hasKey $probe "httpGet" }}
+{{- $http := get $probe "httpGet" }}
+{{- if and $tls (not (hasKey $http "scheme")) }}
+{{- $_ := set $http "scheme" "HTTPS" }}
+{{- end }}
+{{- if and $rootPath (eq (toString (get $http "path")) "/health") }}
+{{- $_ := set $http "path" (printf "%s/health" ($rootPath | trimSuffix "/")) }}
+{{- end }}
+{{- end }}
+{{- toYaml $probe }}
 {{- end }}
 
 {{/*
@@ -296,4 +311,22 @@ test/flags-test.js reads this table.
 - {{ printf "--%s=%v" $name $value | toJson }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+{{/*
+The helm test image. With testImage.tag and testImage.digest unset, the chart's
+pin; .github/scripts/check-pinned-tools.js keeps it current.
+*/}}
+{{- define "gotenberg.testImage" -}}
+{{- $pinnedTag := "1.38.0" }}
+{{- $pinnedDigest := "sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4" }}
+{{- $image := .Values.testImage }}
+{{- $tag := ternary $pinnedTag $image.tag (kindIs "invalid" $image.tag) }}
+{{- $digest := "" }}
+{{- if not (kindIs "invalid" $image.digest) }}
+{{- $digest = $image.digest }}
+{{- else if kindIs "invalid" $image.tag }}
+{{- $digest = $pinnedDigest }}
+{{- end }}
+{{- printf "%s:%s" $image.repository $tag }}{{ with $digest }}@{{ . }}{{ end }}
 {{- end }}

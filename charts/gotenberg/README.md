@@ -132,7 +132,7 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
   --set image.tag="9.6.0" --set image.digest="sha256:<digest>"
 ```
 
-`docker buildx imagetools inspect gotenberg/gotenberg:9.6.0` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
+`docker buildx imagetools inspect gotenberg/gotenberg:9.6.0` prints the digest. The `helm test` image is pinned by digest unless you set `testImage.tag` or `testImage.digest`.
 
 ## Resources
 
@@ -298,7 +298,7 @@ Kubernetes: `>=1.30.0-0`
 | chromium.clearStorage | bool | `nil` | Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext`. |
 | chromium.debugProtocol | bool | `nil` | Log every DevTools Protocol message at the debug log level. The messages carry URLs, cookies and header values, credentials included: enable it only to troubleshoot. |
 | chromium.denyList | list | `nil` | List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule. |
-| chromium.denyPrivateIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. With `proxyServer`, a DNS rebinding can slip past it. |
+| chromium.denyPrivateIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Weakened by `proxyServer`, see there. |
 | chromium.denyPublicIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
 | chromium.disableJavaScript | bool | `nil` | Disable JavaScript |
 | chromium.disableRoutes | bool | `nil` | Disable the routes |
@@ -310,7 +310,7 @@ Kubernetes: `>=1.30.0-0`
 | chromium.maxConcurrency | int | `nil` | Maximum number of concurrent Chromium conversions, from 1 to 6. Leave unset for the upstream default (6). |
 | chromium.maxMemory | string | `nil` | Set the memory all Chromium processes together may hold while converting, e.g. "800MB". Over it, Gotenberg restarts Chromium and the conversions in flight answer 503. Chromium, LibreOffice and PDF processing share the container's memory: keep `maxMemory` here and in `libreOffice` together under its limit. Empty disables it. Added in Gotenberg 9.6.0. |
 | chromium.maxQueueSize | int | `nil` | Maximum request queue size for Chromium. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
-| chromium.proxyServer | string | `nil` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
+| chromium.proxyServer | string | `nil` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests. It replaces Gotenberg's pinning proxy: a DNS rebinding can slip past the deny lists and IP checks, and a Web Worker's WebSocket reaches the proxy unchecked, so enforce the outbound policy there too. |
 | chromium.restartAfter | int | `nil` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (100). |
 | chromium.sharedBrowserContext | bool | `nil` | Share one browser context, with its cookies, cache and storage, across all conversions. Each conversion gets its own isolated context by default; enable this only when all callers trust each other. |
 | chromium.startTimeout | string | `nil` | Maximum duration to wait for Chromium to start or restart (default 20s) |
@@ -350,7 +350,7 @@ Kubernetes: `>=1.30.0-0`
 | libreOffice.maxQueueSize | int | `nil` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
 | libreOffice.restartAfter | int | `nil` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (10). |
 | libreOffice.startTimeout | string | `nil` | Maximum duration to wait for LibreOffice to start or restart (default 20s) |
-| lifecycle | object | `{"preStop":{"sleep":{"seconds":5}}}` | Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. |
+| lifecycle | object | `{"preStop":{"sleep":{"seconds":5}}}` | Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. Helm merges this with your value, so set `lifecycle.preStop: null` to drop the sleep. |
 | livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. |
 | logging.fieldsPrefix | string | `nil` | Prepend a specified prefix to each field in the logs |
 | logging.level | string | `nil` | Set the log level - error, warn, info, or debug (default "info") |
@@ -399,7 +399,7 @@ Kubernetes: `>=1.30.0-0`
 | readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user, non-root check and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium. | Define the security context for the container. Replaces the default entirely when set. |
+| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user, non-root check and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium. | Define the security context for the container. Keys set here override the default's, e.g. `runAsUser`, and the rest stays; set a key to loosen it, e.g. `allowPrivilegeEscalation: true`. |
 | service.annotations | object | `{}` | Annotations to add to the service |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
@@ -410,10 +410,10 @@ Kubernetes: `>=1.30.0-0`
 | startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. |
 | strategy | object | `{}` |  |
 | terminationGracePeriodSeconds | int | `nil` | Seconds Kubernetes waits for the pod to stop. Leave unset for `gotenberg.gracefulShutdownDurationSec` plus 10, which covers the `preStop` sleep. |
-| testImage | object | `{"digest":"sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4","repository":"busybox","tag":"1.38.0"}` | Image configuration for the helm test pod |
-| testImage.digest | string | `"sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4"` | Digest for the test image. Set to "" to pull by tag only. |
+| testImage | object | `{"digest":null,"repository":"busybox","tag":null}` | Image configuration for the helm test pod |
+| testImage.digest | string | `nil` | Digest for the test image, e.g. `sha256:...`. Unset pulls the chart's pinned digest when `tag` is unset too, and pulls by tag otherwise. |
 | testImage.repository | string | `"busybox"` | Repository for the test image |
-| testImage.tag | string | `"1.38.0"` | Tag for the test image |
+| testImage.tag | string | `nil` | Tag for the test image. Leave unset, with `digest`, for the chart's pinned busybox image. |
 | testPodAnnotations | object | `{}` | Set annotations for the helm test pods (for example to disable certain kube-score checks) |
 | tolerations | list | `[]` |  |
 | topologySpreadConstraints | list | `[]` |  |

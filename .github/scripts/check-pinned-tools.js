@@ -9,6 +9,7 @@ const path = require('path');
 const WORKFLOWS = '.github/workflows';
 const TEST_WORKFLOW = `${WORKFLOWS}/test.yml`;
 const VALUES = 'charts/gotenberg/values.yaml';
+const HELPERS = 'charts/gotenberg/templates/_helpers.tpl';
 const TITLE = 'Update pinned test tools';
 const LABEL = 'dependencies';
 const COOLDOWN_DAYS = 7;
@@ -104,13 +105,12 @@ const compareVersions = (a, b) => {
 // pinned tag was rebuilt under a different digest.
 async function findTestImageUpdate() {
   const values = fs.readFileSync(VALUES, 'utf8');
-  const block = values.match(/^testImage:.*\n((?:[ #].*\n|\n)*)/m)?.[1];
-  const field = key => block?.match(new RegExp(`^  ${key}: *"?([^"\\s]+)"?`, 'm'))?.[1];
-  const repository = field('repository');
-  const tag = field('tag');
-  const digest = field('digest');
+  const helpers = fs.readFileSync(HELPERS, 'utf8');
+  const repository = values.match(/^testImage:.*\n(?:[ #].*\n)*?  repository: *"?([^"\s]+)"?/m)?.[1];
+  const tag = helpers.match(/\$pinnedTag := "([^"]+)"/)?.[1];
+  const digest = helpers.match(/\$pinnedDigest := "([^"]+)"/)?.[1];
   if (!repository || !tag || !digest) {
-    throw new Error(`No testImage repository, tag and digest in ${VALUES}`);
+    throw new Error(`No testImage repository in ${VALUES}, or no pinned tag and digest in ${HELPERS}`);
   }
 
   const hubRepository = repository.includes('/') ? repository : `library/${repository}`;
@@ -136,7 +136,7 @@ async function findTestImageUpdate() {
   if (!target) return null;
 
   const url = `https://hub.docker.com/_/${repository}/tags?name=${target.name}`;
-  return `- **helm test image** (\`testImage\` in \`${VALUES}\`) \`${repository}:${tag}@${digest.slice(0, 19)}…\` → [\`${target.name}\`](${url}): \`tag: "${target.name}"\`, \`digest: "${target.digest}"\``;
+  return `- **helm test image** (\`gotenberg.testImage\` in \`${HELPERS}\`) \`${repository}:${tag}@${digest.slice(0, 19)}…\` → [\`${target.name}\`](${url}): \`$pinnedTag := "${target.name}"\`, \`$pinnedDigest := "${target.digest}"\``;
 }
 
 module.exports = async ({ github, context, core }) => {

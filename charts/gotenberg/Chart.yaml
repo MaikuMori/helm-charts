@@ -55,7 +55,11 @@ annotations:
     - kind: added
       description: Add the pdf values for Gotenberg 9's PDF module, metrics Service metadata, and values for the new archive, memory limit, macro and DevTools debug flags
     - kind: fixed
-      description: Quote inline basic auth credentials, fail early on auth settings Gotenberg refuses, and run helm test over HTTPS and under api.rootPath
+      description: Quote inline basic auth credentials, fail early on auth settings Gotenberg refuses, drop the default httpGet from probes with another handler, and run helm test over HTTPS and under api.rootPath
+    - kind: changed
+      description: securityContext keys merge onto the restricted default, the default probes follow api.tlsSecretName and api.rootPath, and testImage.tag alone pulls that tag
+    - kind: added
+      description: The install notes give the in-cluster URL, try-it commands and the metrics URL, and warn about risky settings
     - kind: security
       description: The hardening example also denies private timestamp authority URLs
     - kind: changed

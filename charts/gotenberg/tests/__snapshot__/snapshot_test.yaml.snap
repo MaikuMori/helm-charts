@@ -281,7 +281,7 @@ matches with every flag set:
                     seconds: 5
               livenessProbe:
                 httpGet:
-                  path: /health
+                  path: /rootPath-value/health
                   port: http
               name: gotenberg
               ports:
@@ -290,7 +290,7 @@ matches with every flag set:
                   protocol: TCP
               readinessProbe:
                 httpGet:
-                  path: /health
+                  path: /rootPath-value/health
                   port: http
               resources: {}
               securityContext:
@@ -307,7 +307,7 @@ matches with every flag set:
               startupProbe:
                 failureThreshold: 30
                 httpGet:
-                  path: /health
+                  path: /rootPath-value/health
                   port: http
                 periodSeconds: 10
           enableServiceLinks: false

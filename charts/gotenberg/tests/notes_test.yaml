@@ -65,3 +65,23 @@ tests:
     asserts:
       - notMatchRegexRaw:
           pattern: "WARNING"
+
+  - it: warns about the debug route without authentication
+    set:
+      api.enableDebugRoute: true
+    asserts:
+      - matchRegexRaw:
+          pattern: "api.enableDebugRoute serves Gotenberg's configuration without authentication"
+
+  - it: warns about the risky Chromium and LibreOffice options
+    set:
+      chromium.debugProtocol: true
+      libreOffice.enableMacros: true
+      chromium.proxyServer: http://proxy.example.com:3128
+    asserts:
+      - matchRegexRaw:
+          pattern: "chromium.debugProtocol logs every DevTools message"
+      - matchRegexRaw:
+          pattern: "libreOffice.enableMacros runs the macros"
+      - matchRegexRaw:
+          pattern: "chromium.proxyServer replaces Gotenberg's pinning proxy"

@@ -41,10 +41,10 @@ testPodAnnotations: {}
 testImage:  # @schema additionalProperties: false
   # -- Repository for the test image
   repository: busybox
-  # -- Tag for the test image
-  tag: "1.38.0"
-  # -- Digest for the test image. Set to "" to pull by tag only.
-  digest: "sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4"  # @schema pattern: ^(sha256:[a-f0-9]{64})?$
+  # -- (string) Tag for the test image. Leave unset, with `digest`, for the chart's pinned busybox image.
+  tag:  # @schema type: [string, null]
+  # -- (string) Digest for the test image, e.g. `sha256:...`. Unset pulls the chart's pinned digest when `tag` is unset too, and pulls by tag otherwise.
+  digest:  # @schema type: [string, null]; pattern: ^(sha256:[a-f0-9]{64})?$
 
 # -- List of additional pod labels
 podLabels: {}
@@ -56,7 +56,7 @@ podSecurityContext:
   {}
   # fsGroup: 2000
 
-# -- Define the security context for the container. Replaces the default entirely when set.
+# -- Define the security context for the container. Keys set here override the default's, e.g. `runAsUser`, and the rest stays; set a key to loosen it, e.g. `allowPrivilegeEscalation: true`.
 # @default -- Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user, non-root check and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium.
 securityContext: {}
 
@@ -86,7 +86,7 @@ resources:
   #   cpu: 100m
   #   memory: 128Mi
 
-# -- Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM.
+# -- Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. Helm merges this with your value, so set `lifecycle.preStop: null` to drop the sleep.
 lifecycle:
   preStop:
     sleep:
@@ -329,7 +329,7 @@ chromium:  # @schema additionalProperties: false
   # denyList:
   #   - ^file:(?!//\/tmp/).*
   #   - ^https://ads\.example\.com/
-  # -- (bool) Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. With `proxyServer`, a DNS rebinding can slip past it.
+  # -- (bool) Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Weakened by `proxyServer`, see there.
   denyPrivateIps:  # @schema type: [boolean, null]
   # -- (bool) Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.
   denyPublicIps:  # @schema type: [boolean, null]
@@ -339,7 +339,7 @@ chromium:  # @schema additionalProperties: false
   disableWebSecurity:  # @schema type: [boolean, null]
   # -- (string) Set custom mappings to the host resolver, e.g. `MAP intranet.local 10.0.0.5`. The IP-class checks still apply to the mapped address.
   hostResolverRules:  # @schema type: [string, null]
-  # -- (string) Set the outbound proxy server; this switch only affects HTTP and HTTPS requests
+  # -- (string) Set the outbound proxy server; this switch only affects HTTP and HTTPS requests. It replaces Gotenberg's pinning proxy: a DNS rebinding can slip past the deny lists and IP checks, and a Web Worker's WebSocket reaches the proxy unchecked, so enforce the outbound policy there too.
   proxyServer:  # @schema type: [string, null]
   # -- (bool) Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset.
   enableEnvironmentProxy:  # @schema type: [boolean, null]

@@ -132,7 +132,7 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
   --set image.tag="9.6.0" --set image.digest="sha256:<digest>"
 ```
 
-`docker buildx imagetools inspect gotenberg/gotenberg:9.6.0` prints the digest. The `helm test` image is pinned by digest by default (`testImage.digest`).
+`docker buildx imagetools inspect gotenberg/gotenberg:9.6.0` prints the digest. The `helm test` image is pinned by digest unless you set `testImage.tag` or `testImage.digest`.
 
 ## Resources
 
