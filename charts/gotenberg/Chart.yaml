@@ -6,6 +6,7 @@ description: A Helm chart for Gotenberg
 type: application
 version: "2.0.0"
 appVersion: "9.6.0"
+kubeVersion: ">=1.30.0-0"
 
 keywords:
   - gotenberg
@@ -47,6 +48,8 @@ annotations:
       description: Allow and deny lists are YAML lists, numeric values default to null with bounds, and route telemetry switches are tri-state
     - kind: changed
       description: networkPolicy.ingress and networkPolicy.egress take the rules directly, basic auth moves to api.basicAuth, the PDB takes numbers or percentages, and pdb.create and vpa.create become enabled
+    - kind: changed
+      description: The chart requires Kubernetes 1.30 or later
     - kind: changed
       description: Rollouts keep connections with a default preStop sleep and a longer grace period, progressDeadlineSeconds defaults to 600, and enableServiceLinks defaults to false
     - kind: added

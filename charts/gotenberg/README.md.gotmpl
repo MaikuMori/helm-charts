@@ -98,6 +98,7 @@ Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and m
 helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --version 2.0.0 --reset-values -f values.yaml
 ```
 
+- Chart 2.0.0 needs Kubernetes 1.30 or later.
 - Drop any `image.tag` or `image.digest` that pins Gotenberg 8, and rebuild custom images based on `gotenberg/gotenberg:8`.
 - If your values file is a copy of the 1.x defaults, delete the four `api.disable*RouteTelemetry: false` entries, which now turn telemetry on for the health check, root, debug and version routes, and `chromium.maxConcurrency: 0`, which Gotenberg 9 refuses.
 - During the rollout, Gotenberg 8 and 9 pods serve behind one Service, and clients of the removed routes and fields fail on the 9 pods. Migrate the clients first, set `strategy.type: Recreate` for the upgrade, or install 2.0.0 as a separate release and switch clients over.

@@ -98,6 +98,7 @@ Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and m
 helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --version 2.0.0 --reset-values -f values.yaml
 ```
 
+- Chart 2.0.0 needs Kubernetes 1.30 or later.
 - Drop any `image.tag` or `image.digest` that pins Gotenberg 8, and rebuild custom images based on `gotenberg/gotenberg:8`.
 - If your values file is a copy of the 1.x defaults, delete the four `api.disable*RouteTelemetry: false` entries, which now turn telemetry on for the health check, root, debug and version routes, and `chromium.maxConcurrency: 0`, which Gotenberg 9 refuses.
 - During the rollout, Gotenberg 8 and 9 pods serve behind one Service, and clients of the removed routes and fields fail on the 9 pods. Migrate the clients first, set `strategy.type: Recreate` for the upgrade, or install 2.0.0 as a separate release and switch clients over.
@@ -238,6 +239,10 @@ Also require authentication on the API, with `api.basicAuth.enabled` or `api.ena
 
 OpenShift support is best effort. When the cluster serves the `security.openshift.io/v1` API, the default security context leaves the user, non-root check and seccomp profile to the SCC. CI installs the chart on [MicroShift](https://github.com/microshift-io/microshift) built from OKD, with the Kindnet CNI rather than OVN-Kubernetes, under the `restricted-v2` and `anyuid` SCCs; it isn't tested on OpenShift Container Platform. Detection needs Helm to see the cluster's APIs: when rendering without cluster access, such as `helm template`, pass `--api-versions security.openshift.io/v1`. Issues and pull requests from OpenShift users are welcome.
 
+## Requirements
+
+Kubernetes: `>=1.30.0-0`
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -342,7 +347,7 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | libreOffice.maxQueueSize | int | `nil` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
 | libreOffice.restartAfter | int | `nil` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (10). |
 | libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 20s) |
-| lifecycle | object | `{"preStop":{"sleep":{"seconds":5}}}` | Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. The `sleep` action needs Kubernetes 1.30; set `lifecycle: {}` on older clusters. |
+| lifecycle | object | `{"preStop":{"sleep":{"seconds":5}}}` | Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. |
 | livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. |
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |

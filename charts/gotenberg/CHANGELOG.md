@@ -19,7 +19,8 @@ Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces c
 - `networkPolicy.ingress` and `networkPolicy.egress` take the rules directly, defaulting to allow all, and `[]` denies all. 1.x ignored `extraIngress` and `extraEgress` while `allowIngress` or `allowEgress` was true, and couldn't render deny-all.
 - Basic authentication moves to `api.basicAuth.*`, quotes inline credentials, and fails the install without credentials or together with OIDC, which Gotenberg refuses at startup.
 - `pdb.minAvailable` and `pdb.maxUnavailable` take a number or a percentage and default to `null`, which keeps 1 available; setting both fails. `pdb.create` and `vpa.create` become `pdb.enabled` and `vpa.enabled`.
-- Rollouts keep connections: `lifecycle` defaults to a 5s `preStop` sleep (Kubernetes 1.30+), and `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s. `progressDeadlineSeconds` defaults to `600`, Kubernetes' own default, so pulling the new image doesn't fail the rollout.
+- The chart requires Kubernetes 1.30 or later, for the `preStop` sleep action below: Helm refuses to install it on older clusters.
+- Rollouts keep connections: `lifecycle` defaults to a 5s `preStop` sleep, and `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s. `progressDeadlineSeconds` defaults to `600`, Kubernetes' own default, so pulling the new image doesn't fail the rollout.
 - `enableServiceLinks` defaults to `false`: Gotenberg doesn't use service links, and a Service named `api` broke its startup.
 - `helm test` checks `/health` over HTTPS with `api.tlsSecretName`, and under `api.rootPath`.
 - Add `pdf.*` values for the new PDF module, `metrics.service.annotations` and `metrics.service.labels`, and `api.archiveMaxEntries`, `api.archiveMaxRatio`, `chromium.maxMemory`, `chromium.debugProtocol`, `libreOffice.maxMemory` and `libreOffice.enableMacros`.

@@ -86,7 +86,7 @@ resources:
   #   cpu: 100m
   #   memory: 128Mi
 
-# -- Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. The `sleep` action needs Kubernetes 1.30; set `lifecycle: {}` on older clusters.
+# -- Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM.
 lifecycle:
   preStop:
     sleep:
