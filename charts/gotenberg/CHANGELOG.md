@@ -2,7 +2,7 @@
 
 ## 2.0.0
 
-Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces change: read the [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) before upgrading, and the README's [Upgrading to 2.0.0](https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg#upgrading-to-200). To stay on Gotenberg 8, keep chart 1.31.0, which runs 8.40.0, the final Gotenberg 8 release.
+Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces change: read the [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) before upgrading, and the README's [Upgrading to 2.0.0](https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg#upgrading-to-200).
 
 - Bump `gotenberg` version `8.40.0` -> `9.6.0`. Gotenberg 8 gets no further fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
 - Refresh the `busybox:1.38.0` digest of the `helm test` image, which upstream rebuilt.
@@ -45,6 +45,7 @@ Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces c
 > - `helm test` checks `/health` over HTTPS with `api.tlsSecretName`, and under `api.rootPath`.
 > - `testImage.tag` and `testImage.digest` default to unset, which pulls the chart's pinned busybox. Setting only the tag pulls that tag, rather than the pinned digest under a new name.
 > - The hardening example sets `pdf.denyPrivateIps`: the `sign` and `timestamp` stages call caller-chosen timestamp authorities.
+> - **Chart 1.31.0 (Gotenberg 8.40.0, the final 8.x) is out for anyone staying on Gotenberg 8.**
 
 ### Values to update
 
