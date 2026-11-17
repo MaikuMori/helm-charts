@@ -131,6 +131,26 @@ Fails on settings that conflict with the chart's metrics endpoint.
 {{- end }}
 
 {{/*
+Fails on authentication settings Gotenberg refuses at startup.
+*/}}
+{{- define "gotenberg.validateAuth" -}}
+{{- $auth := .Values.api.basicAuth }}
+{{- if $auth.enabled }}
+{{- if .Values.api.enableOidcAuth }}
+{{- fail "api.basicAuth.enabled and api.enableOidcAuth are mutually exclusive" }}
+{{- end }}
+{{- $fromEnv := list }}
+{{- range .Values.extraEnv }}
+{{- $fromEnv = append $fromEnv .name }}
+{{- end }}
+{{- $inEnv := and (has "GOTENBERG_API_BASIC_AUTH_USERNAME" $fromEnv) (has "GOTENBERG_API_BASIC_AUTH_PASSWORD" $fromEnv) }}
+{{- if not (or $auth.existingSecret (and $auth.username $auth.password) $inEnv) }}
+{{- fail "api.basicAuth.enabled needs api.basicAuth.existingSecret, or api.basicAuth.username and password" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
 A list entry as one CSV field: Gotenberg splits list flags on commas.
 */}}
 {{- define "gotenberg.csvField" -}}
@@ -139,4 +159,16 @@ A list entry as one CSV field: Gotenberg splits list flags on commas.
 {{- else }}
 {{- . }}
 {{- end }}
+{{- end }}
+
+{{/*
+Name of the metrics Service, never the same as the API Service's.
+*/}}
+{{- define "gotenberg.metricsServiceName" -}}
+{{- $fullname := include "gotenberg.fullname" . }}
+{{- $name := printf "%s-metrics" ($fullname | trunc 55 | trimSuffix "-") }}
+{{- if eq $name $fullname }}
+{{- $name = printf "%s-metrics" ($fullname | trunc 54 | trimSuffix "-") }}
+{{- end }}
+{{- $name }}
 {{- end }}

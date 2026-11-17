@@ -11,7 +11,7 @@ matches with default values:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       replicas: 1
       selector:
         matchLabels:
@@ -32,6 +32,10 @@ matches with default values:
               env: null
               image: gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
                   path: /health
@@ -66,7 +70,7 @@ matches with default values:
           enableServiceLinks: false
           securityContext: {}
           serviceAccountName: default
-          terminationGracePeriodSeconds: 30
+          terminationGracePeriodSeconds: 40
   2: |
     apiVersion: v1
     kind: Service
@@ -107,7 +111,7 @@ matches with default values:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/health' && exit 0
                 sleep 3
               done
               exit 1
@@ -142,7 +146,7 @@ matches with every flag set:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       replicas: 1
       selector:
         matchLabels:
@@ -167,7 +171,6 @@ matches with every flag set:
                 - --api-enable-debug-route
                 - --api-start-timeout=startTimeout-value
                 - --api-enable-basic-auth
-                - --api-enable-oidc-auth
                 - --api-oidc-issuer=oidcIssuer-value
                 - --api-oidc-audience=oidcAudience-value
                 - --api-oidc-jwks-url=oidcJwksUrl-value
@@ -210,7 +213,7 @@ matches with every flag set:
                 - --chromium-clear-cookies
                 - --chromium-clear-storage
                 - --chromium-max-queue-size=7
-                - --chromium-max-concurrency=7
+                - --chromium-max-concurrency=4
                 - --chromium-idle-shutdown-timeout=idleShutdownTimeout-value
                 - --chromium-max-memory=maxMemory-value
                 - --chromium-debug-protocol
@@ -262,10 +265,17 @@ matches with every flag set:
                 - --log-fields-prefix=fieldsPrefix-value
                 - --log-std-enable-gcp-fields
                 - --gotenberg-graceful-shutdown-duration=37s
-                - --gotenberg-hide-banner
-              env: null
+              env:
+                - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+                  value: username-value
+                - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+                  value: password-value
               image: gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
                   path: /health
@@ -300,7 +310,7 @@ matches with every flag set:
           enableServiceLinks: false
           securityContext: {}
           serviceAccountName: default
-          terminationGracePeriodSeconds: 37
+          terminationGracePeriodSeconds: 47
   2: |
     apiVersion: v1
     kind: Service
@@ -341,7 +351,7 @@ matches with every flag set:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80rootPath-value/health' && exit 0
                 sleep 3
               done
               exit 1
@@ -376,7 +386,7 @@ matches with every optional resource enabled:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       selector:
         matchLabels:
           app.kubernetes.io/instance: RELEASE-NAME
@@ -402,6 +412,10 @@ matches with every optional resource enabled:
                   value: "9464"
               image: gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
                   path: /health
@@ -439,7 +453,7 @@ matches with every optional resource enabled:
           enableServiceLinks: false
           securityContext: {}
           serviceAccountName: RELEASE-NAME-gotenberg
-          terminationGracePeriodSeconds: 30
+          terminationGracePeriodSeconds: 40
   2: |
     apiVersion: autoscaling/v2
     kind: HorizontalPodAutoscaler
@@ -600,7 +614,7 @@ matches with every optional resource enabled:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/health' && exit 0
                 sleep 3
               done
               exit 1
@@ -635,7 +649,7 @@ matches with the CRD-backed and policy resources enabled:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       replicas: 1
       selector:
         matchLabels:
@@ -662,6 +676,10 @@ matches with the CRD-backed and policy resources enabled:
                   value: "9464"
               image: gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
                   path: /health
@@ -699,7 +717,7 @@ matches with the CRD-backed and policy resources enabled:
           enableServiceLinks: false
           securityContext: {}
           serviceAccountName: default
-          terminationGracePeriodSeconds: 30
+          terminationGracePeriodSeconds: 40
   2: |
     apiVersion: v1
     kind: Service
@@ -810,7 +828,7 @@ matches with the CRD-backed and policy resources enabled:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/health' && exit 0
                 sleep 3
               done
               exit 1
@@ -863,7 +881,7 @@ matches with the documented hardened values:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       replicas: 1
       selector:
         matchLabels:
@@ -889,6 +907,10 @@ matches with the documented hardened values:
               env: null
               image: gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
                   path: /health
@@ -923,7 +945,7 @@ matches with the documented hardened values:
           enableServiceLinks: false
           securityContext: {}
           serviceAccountName: default
-          terminationGracePeriodSeconds: 30
+          terminationGracePeriodSeconds: 40
   2: |
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
@@ -1023,7 +1045,7 @@ matches with the documented hardened values:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/health' && exit 0
                 sleep 3
               done
               exit 1

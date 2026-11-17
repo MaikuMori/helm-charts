@@ -71,3 +71,12 @@ tests:
       - equal:
           path: metadata.labels["app.kubernetes.io/name"]
           value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-hook
+
+  - it: checks health over HTTPS under the root path
+    set:
+      api.tlsSecretName: gotenberg-tls
+      api.rootPath: /gotenberg/
+    asserts:
+      - matchRegex:
+          path: spec.containers[0].args[0]
+          pattern: "'https://RELEASE-NAME-gotenberg:80/gotenberg/health'"

@@ -37,15 +37,23 @@ annotations:
     fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
     url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
   artifacthub.io/changes: |
-    - kind: security
-      description: Bump Gotenberg to 9.6.0, a major release that includes the 8.40.0 security fixes. Routes, form fields, flags and metrics change, so read Gotenberg's upgrade guide and the chart's CHANGELOG before upgrading
+    - kind: changed
+      description: Bump Gotenberg to 9.6.0, a major release. Routes, form fields, flags and metrics change, so read Gotenberg's upgrade guide and the chart's CHANGELOG before upgrading
     - kind: removed
-      description: Remove the values for flags Gotenberg 9 removed, the deprecated aliases and service.loadBalancerIP
+      description: Remove the values for flags Gotenberg 9 removed, the deprecated aliases, gotenberg.hideBanner and service.loadBalancerIP
     - kind: changed
       description: Metrics are off by default and served through Gotenberg's OpenTelemetry Prometheus exporter on a separate metrics Service when metrics.enabled or metrics.serviceMonitor.enabled is set
     - kind: changed
-      description: Allow and deny lists are YAML lists, numeric values default to null, route telemetry switches are tri-state and enableServiceLinks defaults to false
-    - kind: added
-      description: Add the pdf values for Gotenberg 9's PDF module, and values for the new archive, memory limit, macro and DevTools debug flags
+      description: Allow and deny lists are YAML lists, numeric values default to null with bounds, and route telemetry switches are tri-state
     - kind: changed
-      description: The hardening example also denies private timestamp authority URLs, and the helm test busybox digest is refreshed
+      description: networkPolicy.ingress and networkPolicy.egress take the rules directly, basic auth moves to api.basicAuth, the PDB takes numbers or percentages, and pdb.create and vpa.create become enabled
+    - kind: changed
+      description: Rollouts keep connections with a default preStop sleep and a longer grace period, progressDeadlineSeconds defaults to 600, and enableServiceLinks defaults to false
+    - kind: added
+      description: Add the pdf values for Gotenberg 9's PDF module, metrics Service metadata, and values for the new archive, memory limit, macro and DevTools debug flags
+    - kind: fixed
+      description: Quote inline basic auth credentials, fail early on auth settings Gotenberg refuses, and run helm test over HTTPS and under api.rootPath
+    - kind: security
+      description: The hardening example also denies private timestamp authority URLs
+    - kind: changed
+      description: Refresh the helm test busybox 1.38.0 image digest

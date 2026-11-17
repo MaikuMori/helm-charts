@@ -92,7 +92,15 @@ helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --install
 
 ### Upgrading to 2.0.0
 
-Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and metrics. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) and the chart's [CHANGELOG](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#200), which maps every 1.x value that changed. Upgrade with your values file rather than `--reuse-values`, which carries removed 1.x defaults that the values schema rejects, and drop any `image.tag` or `image.digest` that pins Gotenberg 8. If your values file is a copy of the 1.x defaults, delete the four `api.disable*RouteTelemetry: false` entries: in 2.0.0, `false` turns telemetry on for the health check, root, debug and version routes.
+Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and metrics. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) and the chart's [CHANGELOG](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#200), which maps every 1.x value that changed. Migrate your values file with that table, then upgrade with it and `--reset-values`: without it, Helm can reuse the release's 1.x values, which the values schema rejects.
+
+```console
+helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --version 2.0.0 --reset-values -f values.yaml
+```
+
+- Drop any `image.tag` or `image.digest` that pins Gotenberg 8, and rebuild custom images based on `gotenberg/gotenberg:8`.
+- If your values file is a copy of the 1.x defaults, delete the four `api.disable*RouteTelemetry: false` entries, which now turn telemetry on for the health check, root, debug and version routes, and `chromium.maxConcurrency: 0`, which Gotenberg 9 refuses.
+- During the rollout, Gotenberg 8 and 9 pods serve behind one Service, and clients of the removed routes and fields fail on the 9 pods. Migrate the clients first, set `strategy.type: Recreate` for the upgrade, or install 2.0.0 as a separate release and switch clients over.
 
 To stay on Gotenberg 8, keep chart 1.31.0, which runs 8.40.0, the final Gotenberg 8 release.
 
@@ -103,13 +111,13 @@ Chart releases are typically published when new features or breaking changes are
 To use a specific version of Gotenberg:
 
 ```console
-helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.5.1"
+helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.6.0"
 ```
 
-Or with the `--atomic` flag for automatic rollback on failure:
+Or with `--rollback-on-failure` (`--atomic` on Helm 3) for automatic rollback on failure:
 
 ```console
-helm upgrade --install --atomic my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.5.1"
+helm upgrade --install --rollback-on-failure my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.6.0"
 ```
 
 This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes within a major version. A newer flag the chart maps needs a Gotenberg version that has it.
@@ -127,7 +135,7 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
 
 ## Resources
 
-The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit. Chromium, LibreOffice and PDF processing share it: `chromium.maxMemory` and `libreOffice.maxMemory` restart the process that runs over its budget instead of letting the container get OOM-killed. Keep them together under the limit, with room for Gotenberg's own PDF work, and cap that with `GOMEMLIMIT` in `extraEnv`:
+The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit. Chromium, LibreOffice and Gotenberg itself, which does the PDF processing, share it. `chromium.maxMemory` and `libreOffice.maxMemory` fail the conversion that runs over its budget and restart that engine, instead of letting the container get OOM-killed. `GOMEMLIMIT`, set through `extraEnv`, makes Gotenberg's Go runtime collect garbage before it reaches its share; it's a soft limit, not a cap. Keep the three together under the container's limit:
 
 ```yaml
 resources:
@@ -135,14 +143,14 @@ resources:
     cpu: 200m
     memory: 512Mi
   limits:
-    memory: 2Gi
+    memory: 3Gi
 chromium:
   maxMemory: 800MB
 libreOffice:
   maxMemory: 900MB
 extraEnv:
   - name: GOMEMLIMIT
-    value: 1500MiB
+    value: 1000MiB
 ```
 
 See [Limits](https://gotenberg.dev/docs/operate/limits) for these and the PDF module's limits.
@@ -156,7 +164,7 @@ The values below are an example to start from if callers or their documents aren
 ```yaml
 {{ .Files.Get "ci/hardened-values.yaml" }}```
 
-Also require authentication on the API, with `api.enableBasicAuth` or `api.enableOidcAuth`, and disable what you don't use, such as `chromium.disableRoutes`, `libreOffice.disableRoutes`, or `pdf.disableRoutes` with `pdf.disableStages` for all PDF processing. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
+Also require authentication on the API, with `api.basicAuth.enabled` or `api.enableOidcAuth`, and disable what you don't use, such as `chromium.disableRoutes`, `libreOffice.disableRoutes`, or `pdf.disableRoutes` with `pdf.disableStages` for all PDF processing. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
 
 ## OpenShift
 

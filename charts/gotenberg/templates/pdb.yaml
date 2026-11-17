@@ -1,4 +1,9 @@
-{{- if .Values.pdb.create -}}
+{{- if .Values.pdb.enabled -}}
+{{- $min := .Values.pdb.minAvailable }}
+{{- $max := .Values.pdb.maxUnavailable }}
+{{- if and (not (kindIs "invalid" $min)) (not (kindIs "invalid" $max)) }}
+{{- fail "set pdb.minAvailable or pdb.maxUnavailable, not both" }}
+{{- end }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -9,13 +14,12 @@ spec:
   selector:
     matchLabels:
       {{- include "gotenberg.selectorLabels" . | nindent 6 }}
-  {{- if .Values.pdb.minAvailable }}
-  minAvailable: {{ .Values.pdb.minAvailable }}
+  {{- if not (kindIs "invalid" $max) }}
+  maxUnavailable: {{ $max }}
+  {{- else }}
+  minAvailable: {{ ternary 1 $min (kindIs "invalid" $min) }}
   {{- end }}
-  {{- if .Values.pdb.maxUnavailable }}
-  maxUnavailable: {{ .Values.pdb.maxUnavailable }}
-  {{- end }}
-  {{- if .Values.pdb.unhealthyPodEvictionPolicy }}
-  unhealthyPodEvictionPolicy: {{ .Values.pdb.unhealthyPodEvictionPolicy }}
+  {{- with .Values.pdb.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . }}
   {{- end }}
 {{- end }}

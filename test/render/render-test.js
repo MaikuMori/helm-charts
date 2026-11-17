@@ -48,6 +48,7 @@ async function post(baseUrl, route, files, fields = {}) {
       const response = await fetch(`${baseUrl}${route}`, { method: 'POST', body: form });
       const body = Buffer.from(await response.arrayBuffer());
       if (!response.ok) throw new Error(`HTTP ${response.status}: ${body.toString('utf8', 0, 300)}`);
+      body.headers = response.headers;
       return body;
     } catch (e) {
       if (attempt === 5) throw e;
@@ -129,6 +130,9 @@ const STEPS = [
   }],
   ['PDF routes remediate to PDF/A-2b', async (api, out) => {
     const pdf = await api('/forms/pdf/remediate', [{ name: 'in.pdf', data: out.libreoffice }], { profile: 'PDF/A-2b' });
+    for (const header of ['Gotenberg-Remediation-Residual', 'Gotenberg-Remediation-Rolled-Back']) {
+      if (pdf.headers.get(header) !== '0') throw new Error(`${header} is ${pdf.headers.get(header)}, want 0`);
+    }
     const xmp = poppler('pdfinfo', pdf, ['-meta']);
     if (!/<pdfaid:part>2<\/pdfaid:part>/.test(xmp)) throw new Error('PDF has no PDF/A-2 identification');
     return expectPdf(pdf, ['LibreOffice render test']);

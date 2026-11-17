@@ -55,8 +55,10 @@ tests:
 
   - it: accepts values that default to null
     set:
-      api.basicAuthUsername: user
-      api.basicAuthPassword: pass
+      api.basicAuth.username: user
+      api.basicAuth.password: pass
+      pdb.maxUnavailable: "25%"
+      terminationGracePeriodSeconds: 60
       api.downloadFromMaxConcurrency: 3
       api.archiveMaxEntries: 5000
       api.archiveMaxRatio: 50
@@ -144,3 +146,24 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "additional properties 'incognito' not allowed"
+
+  - it: rejects a Chromium concurrency Gotenberg refuses
+    set:
+      chromium.maxConcurrency: 0
+    asserts:
+      - failedTemplate:
+          errorPattern: "/chromium/maxConcurrency"
+
+  - it: rejects a PDF concurrency of 0
+    set:
+      pdf.maxConcurrency: 0
+    asserts:
+      - failedTemplate:
+          errorPattern: "/pdf/maxConcurrency"
+
+  - it: rejects negative limits
+    set:
+      api.downloadFromMaxEntries: -1
+    asserts:
+      - failedTemplate:
+          errorPattern: "/api/downloadFromMaxEntries"

@@ -1,0 +1,101 @@
+# Sets a valid value for every flag the chart maps, so CI boots Gotenberg with
+# all of them and the render test still passes. Left out, because they would
+# stop that test: the disableRoutes, disableStages, disableDownloadFrom,
+# webhook.disable and chromium.disableJavaScript switches, basic and OIDC
+# authentication, api.tlsSecretName, api.rootPath, chromium.proxyServer and
+# chromium.hostResolverRules (which the environment proxy excludes), and the
+# denyPublicIps switches.
+api:
+  timeout: 60s
+  bodyLimit: 100MB
+  correlationIdHeader: X-Request-Id
+  disableHealthCheckRouteTelemetry: true
+  disableRootRouteTelemetry: false
+  disableDebugRouteTelemetry: false
+  disableVersionRouteTelemetry: false
+  enableDebugRoute: true
+  startTimeout: 60s
+  downloadFromAllowList:
+    - ^https://[a-z]{1,10}\.example\.com(:|/|$)
+  downloadFromDenyList:
+    - ^https://blocked\.example\.com/
+  downloadFromDenyPrivateIps: true
+  downloadFromMaxRetry: 3
+  downloadFromMaxConcurrency: 5
+  downloadFromMaxEntries: 10
+  downloadFromEnableEnvironmentProxy: true
+  archiveMaxEntries: 5000
+  archiveMaxRatio: 50
+chromium:
+  restartAfter: 50
+  maxConcurrency: 4
+  autoStart: true
+  startTimeout: 30s
+  allowFileAccessFromFiles: true
+  allowInsecureLocalhost: true
+  allowList:
+    - ^file:///tmp/
+    - ^https://[a-z]{1,10}\.example\.com(:|/|$)
+  denyList:
+    - ^file:///etc/
+  denyPrivateIps: true
+  ignoreCertificateErrors: true
+  disableWebSecurity: true
+  enableEnvironmentProxy: true
+  sharedBrowserContext: true
+  clearCache: true
+  clearCookies: true
+  clearStorage: true
+  maxQueueSize: 20
+  idleShutdownTimeout: 300s
+  maxMemory: 1500MB
+  debugProtocol: true
+libreOffice:
+  restartAfter: 5
+  autoStart: true
+  startTimeout: 30s
+  maxQueueSize: 20
+  idleShutdownTimeout: 300s
+  allowList:
+    - ^https://[a-z]{1,10}\.example\.com(:|/|$)
+  denyList:
+    - ^https://blocked\.example\.com/
+  denyPrivateIps: true
+  enableEnvironmentProxy: true
+  maxMemory: 1500MB
+  enableMacros: true
+pdf:
+  maxConcurrency: 2
+  maxStreamBytes: 512MB
+  maxEmbeddedFileBytes: 100MB
+  maxImagePixels: 200000000
+  maxRenderPixels: 60000000
+  allowList:
+    - ^https://tsa\.example\.com/
+  denyList:
+    - ^https://blocked\.example\.com/
+  denyPrivateIps: true
+  enableEnvironmentProxy: true
+webhook:
+  enableSyncMode: true
+  allowList:
+    - ^https://[a-z]{1,10}\.example\.com(:|/|$)
+  denyList:
+    - ^https://blocked\.example\.com/
+  denyPrivateIps: true
+  maxRetry: 2
+  retryMinWait: 1s
+  retryMaxWait: 10s
+  clientTimeout: 20s
+  enableEnvironmentProxy: true
+logging:
+  stdFormat: json
+  stdLevelCase: upper
+  level: debug
+  fieldsPrefix: gotenberg
+  stdEnableGcpFields: true
+gotenberg:
+  gracefulShutdownDurationSec: 20
+metrics:
+  enabled: true
+  port: 9465

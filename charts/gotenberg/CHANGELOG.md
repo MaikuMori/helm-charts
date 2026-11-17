@@ -2,19 +2,27 @@
 
 ## 2.0.0
 
-Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces change: read the [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) before upgrading. Upgrade with your values file rather than `--reuse-values`. To stay on Gotenberg 8, keep chart 1.31.0, which runs 8.40.0, the final Gotenberg 8 release.
+Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces change: read the [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) before upgrading, and the README's [Upgrading to 2.0.0](https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg#upgrading-to-200). To stay on Gotenberg 8, keep chart 1.31.0, which runs 8.40.0, the final Gotenberg 8 release.
 
-- Bump `gotenberg` version `8.39.0` -> `9.6.0`, which includes the security fixes of 8.40.0. Gotenberg 8 gets no further fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
+- Bump `gotenberg` version `8.40.0` -> `9.6.0`. Gotenberg 8 gets no further fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
 - **Upstream breaking change**: `/forms/pdfengines/*` routes answer `404`, replaced by `/forms/pdf/*`. Post-processing fields move to a `stages` list. The Webhook error URL and method headers are gone: errors reach `Gotenberg-Webhook-Events-Url`, now required with `Gotenberg-Webhook-Url`.
-- **Upstream breaking change**: Java, Python, unoconverter, QPDF, pdfcpu, pdftk and ExifTool leave the image, and `LOK_BIN_PATH` replaces `UNOCONVERTER_BIN_PATH`. Custom images, probes and hooks that call them break.
-- **Upstream breaking change**: `chromium.allowList` and `chromium.denyList` now apply to the page sent to the HTML and Markdown routes too.
-- **Metrics are off by default**: 1.x always served `/prometheus/metrics` on the API port. `metrics.enabled` serves Gotenberg's OpenTelemetry Prometheus exporter at `/metrics` on `metrics.port` (default `9464`), through a ClusterIP `<fullname>-metrics` Service. `metrics.serviceMonitor.enabled` turns it on too and scrapes it.
-- **Metric names change**, e.g. `gotenberg_chromium_requests_queue_size` is now `gotenberg_chromium_queue_size`, restarts become counters and the errors counter is gone: update dashboards, alerts, recording rules and `autoscaling.extraMetrics`. Gotenberg exports metrics to one exporter, so `metrics.enabled` and an `OTEL_METRICS_EXPORTER` in `extraEnv` now fail the install. A NetworkPolicy with `extraIngress` must allow the metrics port.
-- Allow and deny lists are YAML lists, one flag per entry: Gotenberg splits the old strings on commas, which broke patterns such as `[a-z]{1,10}` into two unsafe entries.
-- Numeric values default to `null`, which leaves Gotenberg's default, and render without an exponent. `api.downloadFromMaxRetry` no longer pins `4`.
+- **Upstream breaking change**: PDF processing has limits by default, and a stream, image or rendered page over them answers `400` (see the `pdf.max*` values). A stage that rewrites a signed PDF answers `400` unless the request sets `dropSignatures`, and `remediate` can return a PDF with violations left, counted in `Gotenberg-Remediation-Residual`.
+- **Upstream breaking change**: Java, Python, unoconverter, QPDF, pdfcpu, pdftk and ExifTool leave the image, and `LOK_BIN_PATH` replaces `UNOCONVERTER_BIN_PATH`. Rebuild images based on `gotenberg/gotenberg:8`; probes and hooks that call those tools break.
+- **Upstream change**: the page sent to the Chromium HTML and Markdown routes skips `chromium.allowList` and `chromium.denyList`, which 8.x applied to it. Its uploaded files still load from `file:///tmp/`: an allow-list without `^file:///tmp/` drops them.
+- **Upstream change**: Gotenberg logs to stderr, and prints no banner without a terminal, so `gotenberg.hideBanner` is gone.
+- **Metrics are off by default**: 1.x served `/prometheus/metrics` on the API port by default. `metrics.enabled` serves Gotenberg's OpenTelemetry Prometheus exporter at `/metrics` on `metrics.port` (default `9464`), through a ClusterIP `<fullname>-metrics` Service. `metrics.serviceMonitor.enabled` turns it on too and scrapes it.
+- **Metric names change**, e.g. `gotenberg_chromium_requests_queue_size` is now `gotenberg_chromium_queue_size`, restarts become counters and the errors counter is gone, and the ServiceMonitor's `job`, `service` and `endpoint` labels change with the new Service: update dashboards, alerts, recording rules and `autoscaling.extraMetrics`. Gotenberg exports metrics to one exporter, so `metrics.enabled` and an `OTEL_METRICS_EXPORTER` in `extraEnv` now fail the install. A NetworkPolicy with custom `ingress` rules must allow the metrics port.
 - **Check your values**: `api.disableHealthCheckRouteTelemetry` and the root, debug and version route telemetry switches default to `null`, upstream's `true`. An explicit `false`, which 1.x ignored, now turns telemetry on for that route, so every health probe gets logged and traced. Delete these four keys if you copied the 1.x defaults.
+- **Check your values**: 1.x's `chromium.maxConcurrency: 0` and `pdfEngines.maxConcurrency: 0` defaults meant "upstream default". 0 now reaches Gotenberg, which refuses it, so the schema does too: delete them.
+- Allow and deny lists are YAML lists, one flag per entry: Gotenberg splits the old strings on commas, which broke patterns such as `[a-z]{1,10}` into two unsafe entries. Empty entries are rejected: one cleared Chromium's default deny list.
+- Numeric values default to `null`, which leaves Gotenberg's default, render without an exponent, and are bounded where Gotenberg would refuse them. `api.downloadFromMaxRetry` no longer pins `4`.
+- `networkPolicy.ingress` and `networkPolicy.egress` take the rules directly, defaulting to allow all, and `[]` denies all. 1.x ignored `extraIngress` and `extraEgress` while `allowIngress` or `allowEgress` was true, and couldn't render deny-all.
+- Basic authentication moves to `api.basicAuth.*`, quotes inline credentials, and fails the install without credentials or together with OIDC, which Gotenberg refuses at startup.
+- `pdb.minAvailable` and `pdb.maxUnavailable` take a number or a percentage and default to `null`, which keeps 1 available; setting both fails. `pdb.create` and `vpa.create` become `pdb.enabled` and `vpa.enabled`.
+- Rollouts keep connections: `lifecycle` defaults to a 5s `preStop` sleep (Kubernetes 1.30+), and `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s. `progressDeadlineSeconds` defaults to `600`, Kubernetes' own default, so pulling the new image doesn't fail the rollout.
 - `enableServiceLinks` defaults to `false`: Gotenberg doesn't use service links, and a Service named `api` broke its startup.
-- Add `pdf.*` values for the new PDF module, and `api.archiveMaxEntries`, `api.archiveMaxRatio`, `chromium.maxMemory`, `chromium.debugProtocol`, `libreOffice.maxMemory` and `libreOffice.enableMacros`.
+- `helm test` checks `/health` over HTTPS with `api.tlsSecretName`, and under `api.rootPath`.
+- Add `pdf.*` values for the new PDF module, `metrics.service.annotations` and `metrics.service.labels`, and `api.archiveMaxEntries`, `api.archiveMaxRatio`, `chromium.maxMemory`, `chromium.debugProtocol`, `libreOffice.maxMemory` and `libreOffice.enableMacros`.
 - The hardening example sets `pdf.denyPrivateIps`: the `sign` and `timestamp` stages call caller-chosen timestamp authorities.
 - Refresh the `busybox:1.38.0` digest of the `helm test` image, which upstream rebuilt.
 
@@ -24,21 +32,30 @@ Gotenberg 9 refuses its removed flags, so their values are gone, and the values 
 
 | 1.x value | 2.0.0 |
 | --- | --- |
-| `pdfEngines.maxConcurrency` | `pdf.maxConcurrency`, now per request |
+| `pdfEngines.maxConcurrency` | `pdf.maxConcurrency`, now per request. Delete a `0` |
 | `pdfEngines.disableRoutes` | `pdf.disableRoutes` |
 | `pdfEngines.*Engines`, `pdfEngines.engines` | Removed: one PDF engine does all the work |
 | `prometheus.*` | Removed: see `metrics.enabled`. The namespace, path and collect interval have no replacement |
 | `chromium.incognito` | Removed |
+| `chromium.maxConcurrency: 0` | Delete it: Gotenberg allows 1 to 6 |
 | `webhook.errorAllowList`, `webhook.errorDenyList` | Removed with the error URL: `webhook.allowList` and `webhook.denyList` cover every webhook URL |
 | `logging.enableGcpSeverity` | Removed: Gotenberg 8.39.0 already refused its flag |
+| `gotenberg.hideBanner` | Removed |
 | `api.traceHeader` | `api.correlationIdHeader` |
 | `api.disableHealthCheckLogging` | `api.disableHealthCheckRouteTelemetry` |
+| `api.disableHealthCheckRouteTelemetry`, `api.disableRootRouteTelemetry`, `api.disableDebugRouteTelemetry`, `api.disableVersionRouteTelemetry` set to `false` | Delete them: `false` now turns route telemetry on |
+| `api.enableBasicAuth` | `api.basicAuth.enabled` |
+| `api.basicAuthUsername`, `api.basicAuthPassword` | `api.basicAuth.username`, `api.basicAuth.password` |
+| `api.existingSecret`, `api.existingSecretUsernameKey`, `api.existingSecretPasswordKey` | `api.basicAuth.existingSecret`, `api.basicAuth.usernameKey`, `api.basicAuth.passwordKey` |
 | `logging.format` | `logging.stdFormat` |
 | `logging.enableGcpFields` | `logging.stdEnableGcpFields` |
 | `service.loadBalancerIP` | Removed: use your provider's Service annotations |
+| `networkPolicy.allowIngress: false` with `extraIngress` | `networkPolicy.ingress`, the rules alone |
+| `networkPolicy.allowEgress: false` with `extraEgress` | `networkPolicy.egress`, the rules alone |
+| `pdb.create`, `vpa.create` | `pdb.enabled`, `vpa.enabled` |
+| `pdb.maxUnavailable: ""` | Delete it, or set `pdb.minAvailable: null` with a `maxUnavailable` |
 | `*.allowList`, `*.denyList`, `api.downloadFrom*List` strings | Lists of regular expressions, e.g. `allowList: ["^https://a\\.example\\.com/"]` |
 | `chromium.restartAfter`, `libreOffice.restartAfter`, `webhook.maxRetry` strings | Integers |
-| `api.disableHealthCheckRouteTelemetry`, `api.disableRootRouteTelemetry`, `api.disableDebugRouteTelemetry`, `api.disableVersionRouteTelemetry` set to `false` | Delete them: `false` now turns route telemetry on |
 
 ## 1.31.0
 

@@ -77,7 +77,7 @@ spec:
           {{- if .Values.api.startTimeout }}
           - --api-start-timeout={{ .Values.api.startTimeout }}
           {{- end }}
-          {{- if .Values.api.enableBasicAuth }}
+          {{- if .Values.api.basicAuth.enabled }}
           - --api-enable-basic-auth
           {{- end }}
           {{- if .Values.api.enableOidcAuth }}
@@ -92,10 +92,10 @@ spec:
           {{- if .Values.api.oidcJwksUrl }}
           - --api-oidc-jwks-url={{ .Values.api.oidcJwksUrl }}
           {{- end }}
-          {{- range .Values.api.downloadFromAllowList }}
+          {{- range compact .Values.api.downloadFromAllowList }}
           - {{ printf "--api-download-from-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- range .Values.api.downloadFromDenyList }}
+          {{- range compact .Values.api.downloadFromDenyList }}
           - {{ printf "--api-download-from-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
           {{- if .Values.api.downloadFromDenyPrivateIps }}
@@ -150,10 +150,10 @@ spec:
           {{- if .Values.chromium.allowInsecureLocalhost }}
           - --chromium-allow-insecure-localhost
           {{- end }}
-          {{- range .Values.chromium.allowList }}
+          {{- range compact .Values.chromium.allowList }}
           - {{ printf "--chromium-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- range .Values.chromium.denyList }}
+          {{- range compact .Values.chromium.denyList }}
           - {{ printf "--chromium-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
           {{- if .Values.chromium.denyPrivateIps }}
@@ -229,10 +229,10 @@ spec:
           {{- if .Values.libreOffice.idleShutdownTimeout }}
           - --libreoffice-idle-shutdown-timeout={{ .Values.libreOffice.idleShutdownTimeout }}
           {{- end }}
-          {{- range .Values.libreOffice.allowList }}
+          {{- range compact .Values.libreOffice.allowList }}
           - {{ printf "--libreoffice-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- range .Values.libreOffice.denyList }}
+          {{- range compact .Values.libreOffice.denyList }}
           - {{ printf "--libreoffice-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
           {{- if .Values.libreOffice.denyPrivateIps }}
@@ -272,10 +272,10 @@ spec:
           {{- if not (kindIs "invalid" .Values.pdf.maxRenderPixels) }}
           - --pdf-max-render-pixels={{ .Values.pdf.maxRenderPixels | int64 }}
           {{- end }}
-          {{- range .Values.pdf.allowList }}
+          {{- range compact .Values.pdf.allowList }}
           - {{ printf "--pdf-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- range .Values.pdf.denyList }}
+          {{- range compact .Values.pdf.denyList }}
           - {{ printf "--pdf-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
           {{- if .Values.pdf.denyPrivateIps }}
@@ -291,10 +291,10 @@ spec:
           {{- if .Values.webhook.enableSyncMode }}
           - --webhook-enable-sync-mode
           {{- end }}
-          {{- range .Values.webhook.allowList }}
+          {{- range compact .Values.webhook.allowList }}
           - {{ printf "--webhook-allow-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
-          {{- range .Values.webhook.denyList }}
+          {{- range compact .Values.webhook.denyList }}
           - {{ printf "--webhook-deny-list=%s" (include "gotenberg.csvField" .) | toJson }}
           {{- end }}
           {{- if .Values.webhook.denyPrivateIps }}
@@ -338,29 +338,31 @@ spec:
           - --log-std-enable-gcp-fields
           {{- end }}
 
+          {{- if not (kindIs "invalid" .Values.gotenberg.gracefulShutdownDurationSec) }}
           - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec | int64 }}s
-          {{- if .Values.gotenberg.hideBanner }}
-          - --gotenberg-hide-banner
           {{- end }}
+          {{- include "gotenberg.validateAuth" . }}
           env:
-          {{- if .Values.api.enableBasicAuth }}
-            {{- if .Values.api.existingSecret }}
+          {{- with .Values.api.basicAuth }}
+          {{- if .enabled }}
+            {{- if .existingSecret }}
             - name: GOTENBERG_API_BASIC_AUTH_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.api.existingSecret }}
-                  key: {{ .Values.api.existingSecretUsernameKey | default "username" }}
+                  name: {{ .existingSecret }}
+                  key: {{ .usernameKey | default "username" }}
             - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.api.existingSecret }}
-                  key: {{ .Values.api.existingSecretPasswordKey | default "password" }}
-            {{- else if and .Values.api.basicAuthUsername .Values.api.basicAuthPassword }}
+                  name: {{ .existingSecret }}
+                  key: {{ .passwordKey | default "password" }}
+            {{- else if and .username .password }}
             - name: GOTENBERG_API_BASIC_AUTH_USERNAME
-              value: {{ .Values.api.basicAuthUsername }}
+              value: {{ .username | toString | toJson }}
             - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
-              value: {{ .Values.api.basicAuthPassword }}
+              value: {{ .password | toString | toJson }}
             {{- end }}
+          {{- end }}
           {{- end }}
           {{- if include "gotenberg.metricsEnabled" . }}
             {{- include "gotenberg.validateMetrics" . }}
@@ -426,7 +428,11 @@ spec:
               readOnly: true
             {{- end }}
           {{- end }}
-      terminationGracePeriodSeconds: {{ .Values.gotenberg.gracefulShutdownDurationSec }}
+      {{- $shutdown := 30 }}
+      {{- if not (kindIs "invalid" .Values.gotenberg.gracefulShutdownDurationSec) }}
+        {{- $shutdown = int .Values.gotenberg.gracefulShutdownDurationSec }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ ternary (add $shutdown 10) .Values.terminationGracePeriodSeconds (kindIs "invalid" .Values.terminationGracePeriodSeconds) | int64 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
