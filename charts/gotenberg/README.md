@@ -297,7 +297,7 @@ Kubernetes: `>=1.30.0-0`
 | chromium.clearCookies | bool | `nil` | Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext`. |
 | chromium.clearStorage | bool | `nil` | Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext`. |
 | chromium.debugProtocol | bool | `nil` | Log every DevTools Protocol message at the debug log level. The messages carry URLs, cookies and header values, credentials included: enable it only to troubleshoot. |
-| chromium.denyList | list | `nil` | List of regular expressions for the denied Chromium URLs. Setting it replaces the upstream default, `^file:(?!//\/tmp/).*`. An empty list clears Gotenberg's default. |
+| chromium.denyList | list | `nil` | List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule. |
 | chromium.denyPrivateIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. With `proxyServer`, a DNS rebinding can slip past it. |
 | chromium.denyPublicIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
 | chromium.disableJavaScript | bool | `nil` | Disable JavaScript |

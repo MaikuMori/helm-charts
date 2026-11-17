@@ -1,0 +1,67 @@
+suite: install notes
+templates:
+  - templates/NOTES.txt
+tests:
+  - it: gives the in-cluster URL and commands to try it, without warnings
+    asserts:
+      - matchRegexRaw:
+          pattern: "http://RELEASE-NAME-gotenberg\\.NAMESPACE\\.svc:80/\n"
+      - matchRegexRaw:
+          pattern: "curl http://127\\.0\\.0\\.1:3000/health"
+      - notMatchRegexRaw:
+          pattern: "WARNING|metrics"
+
+  - it: follows TLS and the root path
+    set:
+      api.tlsSecretName: gotenberg-tls
+      api.rootPath: /gotenberg/
+    asserts:
+      - matchRegexRaw:
+          pattern: "curl --insecure https://127\\.0\\.0\\.1:3000/gotenberg/health"
+
+  - it: gives the metrics URL
+    set:
+      metrics.enabled: true
+    asserts:
+      - matchRegexRaw:
+          pattern: "http://RELEASE-NAME-gotenberg-metrics\\.NAMESPACE\\.svc:9464/metrics"
+
+  - it: warns about an exposed release without authentication
+    set:
+      gateway.enabled: true
+    asserts:
+      - matchRegexRaw:
+          pattern: "exposed through an HTTPRoute without authentication"
+
+  - it: doesn't warn about an exposed release with authentication
+    set:
+      ingress.enabled: true
+      api.basicAuth.enabled: true
+      api.basicAuth.existingSecret: credentials
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING"
+
+  - it: warns about a Chromium deny list without a file rule
+    set:
+      chromium.denyList:
+        - ^https://ads\.example\.com/
+    asserts:
+      - matchRegexRaw:
+          pattern: "has no file: rule"
+
+  - it: warns about an empty Chromium deny list
+    set:
+      chromium.denyList: []
+    asserts:
+      - matchRegexRaw:
+          pattern: "chromium.denyList is empty"
+
+  - it: doesn't warn about a Chromium deny list that keeps the file rule
+    set:
+      chromium.denyList:
+        - ^file:(?!//\/tmp/).*
+        - ^https://ads\.example\.com/
+    asserts:
+      - notMatchRegexRaw:
+          pattern: "WARNING"
