@@ -4,6 +4,45 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: security
+          description: Bump Gotenberg to 8.40.0, the final Gotenberg 8 release, which fixes a QPDF password argument injection that could embed any file the gotenberg user can read, refuses every special-purpose IP range in the private-IP checks, distrusts the compromised eMudhra roots in Chromium from the first request and keeps the pinning proxy on with host-resolver rules
+        - kind: changed
+          description: "Upstream behaviour change: an invalid chromium.hostResolverRules stops Gotenberg at startup, and the deny-private-IPs checks refuse more ranges"
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+      artifacthub.io/signKey: |
+        fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
+        url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
+    apiVersion: v2
+    appVersion: 8.40.0
+    created: "2026-11-17T00:11:00.716913933Z"
+    description: A Helm chart for Gotenberg
+    digest: 1eb85784aa6217c15e5bc446552b45a298bca82a798d3f3879120e5560785936
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-1.31.0/gotenberg-1.31.0.tgz
+    version: 1.31.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: security
           description: Bump Gotenberg to 8.39.0, which fixes an ExifTool code execution path, blocks privileged Chromium pages on the URL routes, applies deny rules to WebSocket handshakes and drops compromised root CAs
         - kind: changed
           description: "Upstream behaviour change: the Chromium URL routes return 400 for any scheme other than http and https"
@@ -1785,4 +1824,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-30T19:00:58.009961932Z"
+generated: "2026-11-17T00:11:00.717037428Z"
