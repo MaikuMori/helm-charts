@@ -41,11 +41,11 @@ annotations:
     - kind: changed
       description: Bump Gotenberg to 9.6.0, a major release. Routes, form fields, flags and metrics change, so read Gotenberg's upgrade guide and the chart's CHANGELOG before upgrading
     - kind: removed
-      description: Remove the values for flags Gotenberg 9 removed, the deprecated aliases, gotenberg.hideBanner and service.loadBalancerIP
+      description: Remove the values for flags Gotenberg 9 removed, the deprecated aliases and service.loadBalancerIP
     - kind: changed
       description: Metrics are off by default and served through Gotenberg's OpenTelemetry Prometheus exporter on a separate metrics Service when metrics.enabled or metrics.serviceMonitor.enabled is set
     - kind: changed
-      description: Allow and deny lists are YAML lists, numeric values default to null with bounds, and route telemetry switches are tri-state
+      description: Every Gotenberg flag has a value, unset leaves Gotenberg's default and any set value is passed as is, with the schema refusing what Gotenberg refuses. Allow and deny lists are YAML lists
     - kind: changed
       description: networkPolicy.ingress and networkPolicy.egress take the rules directly, basic auth moves to api.basicAuth, the PDB takes numbers or percentages, and pdb.create and vpa.create become enabled
     - kind: changed

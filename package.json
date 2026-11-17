@@ -1,11 +1,11 @@
 {
   "name": "maikumori-helm-charts",
   "private": true,
-  "description": "Test entry points for the charts. No dependencies; needs helm, kubectl, yq and node.",
+  "description": "Test entry points for the charts. No dependencies; needs helm, kubectl, yq, docker and node.",
   "scripts": {
-    "test": "npm run test:unit && npm run test:zero",
+    "test": "npm run test:unit && npm run test:flags",
     "test:unit": "helm unittest --strict charts/*",
-    "test:zero": "node test/zero-values-test.js",
+    "test:flags": "node test/flags-test.js",
     "test:cluster": "kind create cluster --config test/kind/cluster.yaml",
     "test:render": "node test/render/render-test.js",
     "test:upgrade": "node test/upgrade-test.js"

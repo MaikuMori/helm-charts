@@ -237,18 +237,20 @@ gateway:  # @schema additionalProperties: false
 # The API module is an HTTP/1 and HTTP/2 (H2C) server. Other modules may add routes, middlewares, and health checks.
 # https://gotenberg.dev/docs/configuration#api
 api:  # @schema additionalProperties: false
-  # -- Set the port on which the API should listen (default 3000)
+  # -- Set the port on which the API should listen, also the container's and the Service's target port
   port: 3000
+  # -- (string) Set the IP address the API binds to, e.g. "::" for IPv6 (default all addresses). The probes and the Service reach the pod IP, so keep it bound there.
+  bindIp:  # @schema type: [string, null]
   # -- Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key). Set `scheme: HTTPS` on the probes too.
   tlsSecretName: ""
-  # -- Set the time limit for requests (default 30s)
-  timeout: ""
-  # -- Set the request body limit for multipart/form-data (e.g., "100MB")
-  bodyLimit: ""
-  # -- Set the root path of the API, e.g. "/gotenberg/" - for service discovery via URL paths (default "/"). `/health` moves under it: update the probe paths too.
-  rootPath: ""
-  # -- Set the header name to use for identifying requests (default "Gotenberg-Trace")
-  correlationIdHeader: ""
+  # -- (string) Set the time limit for requests (default 30s)
+  timeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  # -- (string) Set the request body limit for multipart/form-data (e.g., "100MB")
+  bodyLimit:  # @schema type: [string, null]
+  # -- (string) Set the root path of the API, e.g. "/gotenberg/" - for service discovery via URL paths (default "/"). `/health` moves under it: update the probe paths too.
+  rootPath:  # @schema type: [string, null]; pattern: ^/(.*/)?$
+  # -- (string) Set the header name to use for identifying requests (default "Gotenberg-Trace")
+  correlationIdHeader:  # @schema type: [string, null]; minLength: 1
   # -- (bool) Disable health check route telemetry. Leave unset for the upstream default (true).
   disableHealthCheckRouteTelemetry:  # @schema type: [boolean, null]
   # -- (bool) Disable telemetry on the root route. Leave unset for the upstream default (true).
@@ -257,10 +259,10 @@ api:  # @schema additionalProperties: false
   disableDebugRouteTelemetry:  # @schema type: [boolean, null]
   # -- (bool) Disable telemetry on the version route. Leave unset for the upstream default (true).
   disableVersionRouteTelemetry:  # @schema type: [boolean, null]
-  # -- Enable debug route for debugging purposes
-  enableDebugRoute: false
-  # -- Set the maximum duration to wait for the API to start
-  startTimeout: ""
+  # -- (bool) Enable debug route for debugging purposes
+  enableDebugRoute:  # @schema type: [boolean, null]
+  # -- (string) Set the maximum duration to wait for the API to start
+  startTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
   basicAuth:  # @schema additionalProperties: false
     # -- Enable basic authentication, with credentials from `existingSecret`, or `username` and `password`. Mutually exclusive with `enableOidcAuth`.
     enabled: false
@@ -274,32 +276,32 @@ api:  # @schema additionalProperties: false
     username:  # @schema type: [string, null]
     # -- Set the password (ignored if existingSecret is set)
     password:  # @schema type: [string, null]
-  # -- Enable OIDC bearer token authentication. Mutually exclusive with `basicAuth.enabled`.
-  enableOidcAuth: false
-  # -- Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match.
-  oidcIssuer: ""
-  # -- Set the expected OIDC audience - the token `aud` claim must contain it.
-  oidcAudience: ""
-  # -- Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty.
-  oidcJwksUrl: ""
-  # -- List of regular expressions for the allowed `downloadFrom` URLs. Terminate the host, e.g. `^https://files\.example\.com/`: a match skips the IP-class checks.
-  downloadFromAllowList: []  # @schema item: string; itemPattern: ^.+$
-  # -- List of regular expressions for the denied `downloadFrom` URLs
-  downloadFromDenyList: []  # @schema item: string; itemPattern: ^.+$
-  # -- Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected.
-  downloadFromDenyPrivateIps: false
-  # -- Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches.
-  downloadFromDenyPublicIps: false
+  # -- (bool) Enable OIDC bearer token authentication. Mutually exclusive with `basicAuth.enabled`.
+  enableOidcAuth:  # @schema type: [boolean, null]
+  # -- (string) Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match.
+  oidcIssuer:  # @schema type: [string, null]
+  # -- (string) Set the expected OIDC audience - the token `aud` claim must contain it.
+  oidcAudience:  # @schema type: [string, null]
+  # -- (string) Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty.
+  oidcJwksUrl:  # @schema type: [string, null]
+  # -- (list) List of regular expressions for the allowed `downloadFrom` URLs. Terminate the host, e.g. `^https://files\.example\.com/`: a match skips the IP-class checks. An empty list clears Gotenberg's default.
+  downloadFromAllowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (list) List of regular expressions for the denied `downloadFrom` URLs An empty list clears Gotenberg's default.
+  downloadFromDenyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (bool) Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected.
+  downloadFromDenyPrivateIps:  # @schema type: [boolean, null]
+  # -- (bool) Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches.
+  downloadFromDenyPublicIps:  # @schema type: [boolean, null]
   # -- (int) Set the maximum number of retries for the download from feature. Leave unset for the upstream default (4).
   downloadFromMaxRetry:  # @schema type: [integer, null]; minimum: 0
   # -- (int) Set the maximum number of concurrent fetches per request for the download from feature. Leave unset for the upstream default (10); set to 0 for no limit.
   downloadFromMaxConcurrency:  # @schema type: [integer, null]; minimum: 0
   # -- (int) Set the maximum number of entries in the `downloadFrom` array. Leave unset or set to 0 for no limit.
   downloadFromMaxEntries:  # @schema type: [integer, null]; minimum: 0
-  # -- Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.
-  downloadFromEnableEnvironmentProxy: false
-  # -- Disable the download from feature
-  disableDownloadFrom: false
+  # -- (bool) Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.
+  downloadFromEnableEnvironmentProxy:  # @schema type: [boolean, null]
+  # -- (bool) Disable the download from feature
+  disableDownloadFrom:  # @schema type: [boolean, null]
   # -- (int) Set the maximum number of entries of a zip archive sent in the `archives` form field. Must be positive. Leave unset for the upstream default (10000).
   archiveMaxEntries:  # @schema type: [integer, null]; minimum: 1
   # -- (int) Set how many times its own size a zip archive sent in the `archives` form field may unpack to. Must be positive. Leave unset for the upstream default (100).
@@ -312,157 +314,161 @@ chromium:  # @schema additionalProperties: false
   restartAfter:  # @schema type: [integer, null]; minimum: 0
   # -- (int) Maximum number of concurrent Chromium conversions, from 1 to 6. Leave unset for the upstream default (6).
   maxConcurrency:  # @schema type: [integer, null]; minimum: 1; maximum: 6
-  # -- Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion
-  autoStart: false
-  # -- Maximum duration to wait for Chromium to start or restart (default 20s)
-  startTimeout: ""
-  # -- Allow file:// URIs to read other file:// URIs
-  allowFileAccessFromFiles: false
-  # -- Ignore TLS/SSL errors on localhost
-  allowInsecureLocalhost: false
-  # -- List of regular expressions for the allowed Chromium URLs. The page sent to the HTML and Markdown routes skips the lists, but the files uploaded with it load from `file:///tmp/`: include `^file:///tmp/` to keep them. Terminate the host, e.g. `^https://assets\.example\.com/`: a match skips the IP-class checks.
-  allowList: []  # @schema item: string; itemPattern: ^.+$
-  # -- List of regular expressions for the denied Chromium URLs. Setting it replaces the upstream default, `^file:(?!//\/tmp/).*`.
-  denyList: []  # @schema item: string; itemPattern: ^.+$
-  # -- Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. With `proxyServer`, a DNS rebinding can slip past it.
-  denyPrivateIps: false
-  # -- Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.
-  denyPublicIps: false
-  # -- Ignore the certificate errors
-  ignoreCertificateErrors: false
-  # -- Don't enforce the same-origin policy
-  disableWebSecurity: false
-  # -- Set custom mappings to the host resolver, e.g. `MAP intranet.local 10.0.0.5`. The IP-class checks still apply to the mapped address.
-  hostResolverRules: ""
-  # -- Set the outbound proxy server; this switch only affects HTTP and HTTPS requests
-  proxyServer: ""
-  # -- Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset.
-  enableEnvironmentProxy: false
-  # -- Disable JavaScript
-  disableJavaScript: false
-  # -- Disable the routes
-  disableRoutes: false
-  # -- Share one browser context, with its cookies, cache and storage, across all conversions. Each conversion gets its own isolated context by default; enable this only when all callers trust each other.
-  sharedBrowserContext: false
-  # -- Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext`.
-  clearCache: false
-  # -- Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext`.
-  clearCookies: false
-  # -- Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext`.
-  clearStorage: false
+  # -- (bool) Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion
+  autoStart:  # @schema type: [boolean, null]
+  # -- (string) Maximum duration to wait for Chromium to start or restart (default 20s)
+  startTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  # -- (bool) Allow file:// URIs to read other file:// URIs
+  allowFileAccessFromFiles:  # @schema type: [boolean, null]
+  # -- (bool) Ignore TLS/SSL errors on localhost
+  allowInsecureLocalhost:  # @schema type: [boolean, null]
+  # -- (list) List of regular expressions for the allowed Chromium URLs. The page sent to the HTML and Markdown routes skips the lists, but the files uploaded with it load from `file:///tmp/`: include `^file:///tmp/` to keep them. Terminate the host, e.g. `^https://assets\.example\.com/`: a match skips the IP-class checks. An empty list clears Gotenberg's default.
+  allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (list) List of regular expressions for the denied Chromium URLs. Setting it replaces the upstream default, `^file:(?!//\/tmp/).*`. An empty list clears Gotenberg's default.
+  denyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (bool) Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. With `proxyServer`, a DNS rebinding can slip past it.
+  denyPrivateIps:  # @schema type: [boolean, null]
+  # -- (bool) Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.
+  denyPublicIps:  # @schema type: [boolean, null]
+  # -- (bool) Ignore the certificate errors
+  ignoreCertificateErrors:  # @schema type: [boolean, null]
+  # -- (bool) Don't enforce the same-origin policy
+  disableWebSecurity:  # @schema type: [boolean, null]
+  # -- (string) Set custom mappings to the host resolver, e.g. `MAP intranet.local 10.0.0.5`. The IP-class checks still apply to the mapped address.
+  hostResolverRules:  # @schema type: [string, null]
+  # -- (string) Set the outbound proxy server; this switch only affects HTTP and HTTPS requests
+  proxyServer:  # @schema type: [string, null]
+  # -- (bool) Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset.
+  enableEnvironmentProxy:  # @schema type: [boolean, null]
+  # -- (bool) Disable JavaScript
+  disableJavaScript:  # @schema type: [boolean, null]
+  # -- (bool) Disable the routes
+  disableRoutes:  # @schema type: [boolean, null]
+  # -- (bool) Share one browser context, with its cookies, cache and storage, across all conversions. Each conversion gets its own isolated context by default; enable this only when all callers trust each other.
+  sharedBrowserContext:  # @schema type: [boolean, null]
+  # -- (bool) Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext`.
+  clearCache:  # @schema type: [boolean, null]
+  # -- (bool) Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext`.
+  clearCookies:  # @schema type: [boolean, null]
+  # -- (bool) Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext`.
+  clearStorage:  # @schema type: [boolean, null]
   # -- (int) Maximum request queue size for Chromium. Set to 0 to disable this feature. Leave unset for the upstream default (0).
   maxQueueSize:  # @schema type: [integer, null]; minimum: 0
-  # -- Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
-  idleShutdownTimeout: ""
-  # -- Set the memory all Chromium processes together may hold while converting, e.g. "800MB". Over it, Gotenberg restarts Chromium and the conversions in flight answer 503. Chromium, LibreOffice and PDF processing share the container's memory: keep `maxMemory` here and in `libreOffice` together under its limit. Empty disables it. Added in Gotenberg 9.6.0.
-  maxMemory: ""
-  # -- Log every DevTools Protocol message at the debug log level. The messages carry URLs, cookies and header values, credentials included: enable it only to troubleshoot.
-  debugProtocol: false
+  # -- (string) Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
+  idleShutdownTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  # -- (string) Set the memory all Chromium processes together may hold while converting, e.g. "800MB". Over it, Gotenberg restarts Chromium and the conversions in flight answer 503. Chromium, LibreOffice and PDF processing share the container's memory: keep `maxMemory` here and in `libreOffice` together under its limit. Empty disables it. Added in Gotenberg 9.6.0.
+  maxMemory:  # @schema type: [string, null]
+  # -- (bool) Log every DevTools Protocol message at the debug log level. The messages carry URLs, cookies and header values, credentials included: enable it only to troubleshoot.
+  debugProtocol:  # @schema type: [boolean, null]
 
 # The LibreOffice module converts documents to PDF with a supervised LibreOfficeKit process.
 # https://gotenberg.dev/docs/configuration#libreoffice
 libreOffice:  # @schema additionalProperties: false
   # -- (int) Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (10).
   restartAfter:  # @schema type: [integer, null]; minimum: 0
-  # -- Automatically launch LibreOffice upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)
-  autoStart: false
-  # -- Maximum duration to wait for LibreOffice to start or restart (default 20s)
-  startTimeout: ""
-  # -- Disable the routes
-  disableRoutes: false
+  # -- (bool) Automatically launch LibreOffice upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)
+  autoStart:  # @schema type: [boolean, null]
+  # -- (string) Maximum duration to wait for LibreOffice to start or restart (default 20s)
+  startTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  # -- (bool) Disable the routes
+  disableRoutes:  # @schema type: [boolean, null]
   # -- (int) Maximum request queue size for LibreOffice. Set to 0 to disable this feature. Leave unset for the upstream default (0).
   maxQueueSize:  # @schema type: [integer, null]; minimum: 0
-  # -- Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
-  idleShutdownTimeout: ""
-  # -- List of regular expressions for the allowed URLs LibreOffice requests: the style sheets an HTML document links, and the URLs macros open with `enableMacros`. Terminate the host: a match skips the IP-class checks.
-  allowList: []  # @schema item: string; itemPattern: ^.+$
-  # -- List of regular expressions for the denied URLs LibreOffice requests
-  denyList: []  # @schema item: string; itemPattern: ^.+$
-  # -- Reject LibreOffice requests resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected.
-  denyPrivateIps: false
-  # -- Reject LibreOffice requests resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.
-  denyPublicIps: false
-  # -- Route LibreOffice requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.
-  enableEnvironmentProxy: false
-  # -- Set the memory LibreOffice may hold during a conversion, e.g. "900MB". Over it, Gotenberg kills LibreOffice and answers that conversion 422. Keep it and `chromium.maxMemory` together under the container's memory limit. Empty disables it. Added in Gotenberg 9.6.0.
-  maxMemory: ""
-  # -- Run the macros of converted documents, including those bound to document events. Macros run code inside the container: enable it only for trusted documents.
-  enableMacros: false
+  # -- (string) Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled).
+  idleShutdownTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  # -- (list) List of regular expressions for the allowed URLs LibreOffice requests: the style sheets an HTML document links, and the URLs macros open with `enableMacros`. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.
+  allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (list) List of regular expressions for the denied URLs LibreOffice requests An empty list clears Gotenberg's default.
+  denyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (bool) Reject LibreOffice requests resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected.
+  denyPrivateIps:  # @schema type: [boolean, null]
+  # -- (bool) Reject LibreOffice requests resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.
+  denyPublicIps:  # @schema type: [boolean, null]
+  # -- (bool) Route LibreOffice requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.
+  enableEnvironmentProxy:  # @schema type: [boolean, null]
+  # -- (string) Set the memory LibreOffice may hold during a conversion, e.g. "900MB". Over it, Gotenberg kills LibreOffice and answers that conversion 422. Keep it and `chromium.maxMemory` together under the container's memory limit. Empty disables it. Added in Gotenberg 9.6.0.
+  maxMemory:  # @schema type: [string, null]
+  # -- (bool) Run the macros of converted documents, including those bound to document events. Macros run code inside the container: enable it only for trusted documents.
+  enableMacros:  # @schema type: [boolean, null]
 
 # The PDF module merges, splits, stamps, remediates and otherwise processes PDFs, on the /forms/pdf routes and as stages of the conversion routes.
 # https://gotenberg.dev/docs/configuration#pdf
 pdf:  # @schema additionalProperties: false
   # -- (int) Maximum number of PDF documents a request processes at once. Leave unset for the upstream default (1).
   maxConcurrency:  # @schema type: [integer, null]; minimum: 1
-  # -- Disable the /forms/pdf routes. Conversion routes still run stages: set `disableStages` too to turn off PDF processing.
-  disableRoutes: false
-  # -- Refuse the `stages` field of the Chromium and LibreOffice routes, so they only convert. Added in Gotenberg 9.3.0.
-  disableStages: false
-  # -- Set the maximum size a PDF stream may decode to, e.g. "512MB" (default 256MiB)
-  maxStreamBytes: ""
-  # -- Set the maximum size of an embedded file read for validation, e.g. "100MB" (default 50MiB)
-  maxEmbeddedFileBytes: ""
+  # -- (bool) Disable the /forms/pdf routes. Conversion routes still run stages: set `disableStages` too to turn off PDF processing.
+  disableRoutes:  # @schema type: [boolean, null]
+  # -- (bool) Refuse the `stages` field of the Chromium and LibreOffice routes, so they only convert. Added in Gotenberg 9.3.0.
+  disableStages:  # @schema type: [boolean, null]
+  # -- (string) Set the maximum size a PDF stream may decode to, e.g. "512MB" (default 256MiB)
+  maxStreamBytes:  # @schema type: [string, null]
+  # -- (string) Set the maximum size of an embedded file read for validation, e.g. "100MB" (default 50MiB)
+  maxEmbeddedFileBytes:  # @schema type: [string, null]
   # -- (int) Set the maximum number of pixels an image may hold. Leave unset for the upstream default (100000000).
   maxImagePixels:  # @schema type: [integer, null]; minimum: 0
   # -- (int) Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset for the upstream default (50000000). Added in Gotenberg 9.3.0.
   maxRenderPixels:  # @schema type: [integer, null]; minimum: 0
-  # -- List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks.
-  allowList: []  # @schema item: string; itemPattern: ^.+$
-  # -- List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages
-  denyList: []  # @schema item: string; itemPattern: ^.+$
-  # -- Reject timestamp authority URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). Callers choose these URLs: enable it for untrusted callers. A URL matching `allowList` skips the IP-class check.
-  denyPrivateIps: false
-  # -- Reject timestamp authority URLs resolving to a public IP
-  denyPublicIps: false
-  # -- Route timestamp authority requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.
-  enableEnvironmentProxy: false
+  # -- (list) List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.
+  allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (list) List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages An empty list clears Gotenberg's default.
+  denyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (bool) Reject timestamp authority URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). Callers choose these URLs: enable it for untrusted callers. A URL matching `allowList` skips the IP-class check.
+  denyPrivateIps:  # @schema type: [boolean, null]
+  # -- (bool) Reject timestamp authority URLs resolving to a public IP
+  denyPublicIps:  # @schema type: [boolean, null]
+  # -- (bool) Route timestamp authority requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.
+  enableEnvironmentProxy:  # @schema type: [boolean, null]
 
 # The Webhook module provides a middleware that allows you to upload the output file
 # from multipart/form-data routes to the destination of your choice.
 # https://gotenberg.dev/docs/configuration#webhook
 webhook:  # @schema additionalProperties: false
-  # -- Enable synchronous mode for the webhook feature
-  enableSyncMode: false
-  # -- List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks.
-  allowList: []  # @schema item: string; itemPattern: ^.+$
-  # -- List of regular expressions for the denied webhook URLs
-  denyList: []  # @schema item: string; itemPattern: ^.+$
-  # -- Reject webhook URLs (result and events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected.
-  denyPrivateIps: false
-  # -- Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.
-  denyPublicIps: false
+  # -- (bool) Enable synchronous mode for the webhook feature
+  enableSyncMode:  # @schema type: [boolean, null]
+  # -- (list) List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.
+  allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (list) List of regular expressions for the denied webhook URLs An empty list clears Gotenberg's default.
+  denyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
+  # -- (bool) Reject webhook URLs (result and events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected.
+  denyPrivateIps:  # @schema type: [boolean, null]
+  # -- (bool) Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.
+  denyPublicIps:  # @schema type: [boolean, null]
   # -- (int) Set the maximum number of retries for the webhook feature. Leave unset for the upstream default (4).
   maxRetry:  # @schema type: [integer, null]; minimum: 0
-  # -- Set the minimum duration to wait before trying to call the webhook again (default 1s)
-  retryMinWait: ""
-  # -- Set the maximum duration to wait before trying to call the webhook again (default 30s)
-  retryMaxWait: ""
-  # -- Set the time limit for requests to the webhook (default 30s)
-  clientTimeout: ""
-  # -- Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.
-  enableEnvironmentProxy: false
-  # -- Disable the webhook feature
-  disable: false
+  # -- (string) Set the minimum duration to wait before trying to call the webhook again (default 1s)
+  retryMinWait:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  # -- (string) Set the maximum duration to wait before trying to call the webhook again (default 30s)
+  retryMaxWait:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  # -- (string) Set the time limit for requests to the webhook (default 30s)
+  clientTimeout:  # @schema type: [string, null]; pattern: ^([0-9]+(\.[0-9]+)?(ns|us|ms|s|m|h))+$
+  # -- (bool) Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.
+  enableEnvironmentProxy:  # @schema type: [boolean, null]
+  # -- (bool) Disable the webhook feature
+  disable:  # @schema type: [boolean, null]
 
 # The Logging module provides a logger to Gotenberg.
 # https://gotenberg.dev/docs/configuration#logging
 logging:  # @schema additionalProperties: false
-  # -- Set the log format - auto, json, or text (default "auto"). Gotenberg logs to stderr.
-  stdFormat: ""
-  # -- Set the case of the `level` field - lower or upper (default "lower")
-  stdLevelCase: ""
-  # -- Set the log level - error, warn, info, or debug (default "info")
-  level: ""
-  # -- Prepend a specified prefix to each field in the logs
-  fieldsPrefix: ""
-  # -- Enable GCP log field mapping for Cloud Run
-  stdEnableGcpFields: false
+  # -- (string) Set the log format - auto, json, or text (default "auto"). Gotenberg logs to stderr.
+  stdFormat:  # @schema type: [string, null]; enum: [auto, json, text, null]
+  # -- (string) Set the case of the `level` field - lower or upper (default "lower")
+  stdLevelCase:  # @schema type: [string, null]; enum: [lower, upper, null]
+  # -- (string) Set the log level - error, warn, info, or debug (default "info")
+  level:  # @schema type: [string, null]; enum: [error, warn, info, debug, null]
+  # -- (string) Prepend a specified prefix to each field in the logs
+  fieldsPrefix:  # @schema type: [string, null]
+  # -- (bool) Enable GCP log field mapping for Cloud Run
+  stdEnableGcpFields:  # @schema type: [boolean, null]
 
 # Misc.
 # https://gotenberg.dev/docs/configuration#gotenberg
 gotenberg:  # @schema additionalProperties: false
-  # -- Set the graceful shutdown duration in seconds
-  gracefulShutdownDurationSec: 30  # @schema minimum: 0
+  # -- (int) Set the graceful shutdown duration in seconds. Leave unset for the upstream default (30). `terminationGracePeriodSeconds` follows it.
+  gracefulShutdownDurationSec:  # @schema type: [integer, null]; minimum: 0
+  # -- (bool) Hide the banner above the startup summary. Gotenberg prints it only to a terminal.
+  hideBanner:  # @schema type: [boolean, null]
+  # -- (bool) Build the debug data the debug route serves. Leave unset for the upstream default (true).
+  buildDebugData:  # @schema type: [boolean, null]
 
 metrics:  # @schema additionalProperties: false
   # -- Serve Prometheus metrics at `/metrics` on `metrics.port`, through Gotenberg's OpenTelemetry Prometheus exporter, with a ClusterIP `<fullname>-metrics` Service. Also on when `serviceMonitor.enabled` is true. The chart then sets the `OTEL_METRICS_EXPORTER` and `OTEL_EXPORTER_PROMETHEUS_*` variables, so `extraEnv` can't.

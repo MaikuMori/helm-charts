@@ -29,12 +29,12 @@ npm run test:upgrade -- master 5
 `charts/gotenberg/tests/` holds [helm-unittest](https://github.com/helm-unittest/helm-unittest) suites:
 
 - `snapshot_test.yaml` renders the chart with the `ci/` values files and `tests/values/all-flags.yaml`, and compares the output with `tests/__snapshot__/`. When you change rendered output on purpose, run `helm unittest -u charts/gotenberg` and commit the updated snapshot. Its diff in the pull request shows reviewers exactly what changed in the manifests.
-- When adding a Gotenberg flag, add a value for it to `tests/values/all-flags.yaml` so the snapshot covers it.
+- When adding a Gotenberg flag, add a row to the flag table in `templates/_helpers.tpl`, a value defaulting to null in `values.yaml`, and a value in `tests/values/all-flags.yaml` and `ci/every-flag-values.yaml`.
 - Other suites test template logic: fallbacks, defaults and conditionals. Add a case there when you add logic beyond a plain value-to-flag mapping.
 
 `schema_test.yaml` checks what `values.schema.json` accepts and rejects.
 
-`test/zero-values-test.js` sets every integer value in the schema to 0 and fails if 0 doesn't render wherever another number would, so a value guarded by `{{ if .Values.x }}` doesn't silently drop 0. Leave numeric flags unset by default (`null`, with `# @schema type: [integer, null]`) and render them with `{{ if not (kindIs "invalid" .Values.x) }}` and `| int64`. Give the schema the `minimum` and `maximum` Gotenberg enforces at startup, so the install fails rather than the pod: the test accepts a value the schema rejects at 0. Add a value to `ZERO_IGNORED`, with the reason, only when the schema can't express its bounds or 0 has no meaning of its own.
+The flag table in `templates/_helpers.tpl` maps each value to its Gotenberg flag. A null value leaves Gotenberg's default; any other value is passed as is, `0`, `false`, `""` and `[]` included. Give the schema the bounds, patterns and enums Gotenberg enforces at startup, so the install fails rather than the pod. `test/flags-test.js` checks the table against the `--help` of the `appVersion` image (every flag mapped, or chart-managed with a reason), that each value defaults to null, that `tests/values/all-flags.yaml` and `ci/every-flag-values.yaml` cover the table, and that each value renders its flag at its type's zero.
 
 `test/subchart/` is a parent chart that depends on `charts/gotenberg` and sets Helm `global` values. CI renders it with each of the chart's `ci/` and `tests/values/` files nested under `gotenberg:`, and installs it in the kind clusters, so the chart keeps working as a dependency.
 

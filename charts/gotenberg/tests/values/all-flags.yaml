@@ -1,6 +1,7 @@
 # Sets every value that maps to a Gotenberg flag, so the snapshot covers each one.
 # Add a value here when adding a flag; values are placeholders and only need to render.
 api:
+  bindIp: bindIp-value
   archiveMaxEntries: 20000000
   archiveMaxRatio: 7
   bodyLimit: bodyLimit-value
@@ -27,13 +28,14 @@ api:
     password: password-value
     username: username-value
   enableDebugRoute: true
+  enableOidcAuth: false
   oidcAudience: oidcAudience-value
   oidcIssuer: oidcIssuer-value
   oidcJwksUrl: oidcJwksUrl-value
   port: 3007
-  rootPath: rootPath-value
-  startTimeout: startTimeout-value
-  timeout: timeout-value
+  rootPath: /rootPath-value/
+  startTimeout: 7s
+  timeout: 7s
 chromium:
   allowFileAccessFromFiles: true
   allowInsecureLocalhost: true
@@ -55,7 +57,7 @@ chromium:
   disableWebSecurity: true
   enableEnvironmentProxy: true
   hostResolverRules: hostResolverRules-value
-  idleShutdownTimeout: idleShutdownTimeout-value
+  idleShutdownTimeout: 7s
   ignoreCertificateErrors: true
   maxConcurrency: 4
   maxMemory: maxMemory-value
@@ -63,9 +65,11 @@ chromium:
   proxyServer: proxyServer-value
   restartAfter: 7
   sharedBrowserContext: true
-  startTimeout: startTimeout-value
+  startTimeout: 7s
 gotenberg:
+  buildDebugData: false
   gracefulShutdownDurationSec: 37
+  hideBanner: true
 libreOffice:
   allowList:
     - ^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)
@@ -79,17 +83,17 @@ libreOffice:
   disableRoutes: true
   enableEnvironmentProxy: true
   enableMacros: true
-  idleShutdownTimeout: idleShutdownTimeout-value
+  idleShutdownTimeout: 7s
   maxMemory: maxMemory-value
   maxQueueSize: 7
   restartAfter: 7
-  startTimeout: startTimeout-value
+  startTimeout: 7s
 logging:
   fieldsPrefix: fieldsPrefix-value
-  level: level-value
+  level: debug
   stdEnableGcpFields: true
-  stdFormat: stdFormat-value
-  stdLevelCase: stdLevelCase-value
+  stdFormat: json
+  stdLevelCase: upper
 pdf:
   allowList:
     - ^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)
@@ -111,7 +115,7 @@ webhook:
   allowList:
     - ^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)
     - ^https://allowList\.example\.com/
-  clientTimeout: clientTimeout-value
+  clientTimeout: 7s
   denyList:
     - ^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)
     - ^https://denyList\.example\.com/
@@ -121,5 +125,5 @@ webhook:
   enableEnvironmentProxy: true
   enableSyncMode: true
   maxRetry: 7
-  retryMaxWait: retryMaxWait-value
-  retryMinWait: retryMinWait-value
+  retryMaxWait: 7s
+  retryMinWait: 7s

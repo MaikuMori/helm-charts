@@ -60,13 +60,27 @@
           },
           "additionalProperties": false
         },
+        "bindIp": {
+          "description": "Set the IP address the API binds to, e.g. \"::\" for IPv6 (default all addresses). The probes and the Service reach the pod IP, so keep it bound there.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "bodyLimit": {
           "description": "Set the request body limit for multipart/form-data (e.g., \"100MB\")",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "correlationIdHeader": {
           "description": "Set the header name to use for identifying requests (default \"Gotenberg-Trace\")",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
         },
         "disableDebugRouteTelemetry": {
           "description": "Disable telemetry on the debug route. Leave unset for the upstream default (true).",
@@ -77,7 +91,10 @@
         },
         "disableDownloadFrom": {
           "description": "Disable the download from feature",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "disableHealthCheckRouteTelemetry": {
           "description": "Disable health check route telemetry. Leave unset for the upstream default (true).",
@@ -101,16 +118,22 @@
           ]
         },
         "downloadFromAllowList": {
-          "description": "List of regular expressions for the allowed `downloadFrom` URLs. Terminate the host, e.g. `^https://files\\.example\\.com/`: a match skips the IP-class checks.",
-          "type": "array",
+          "description": "List of regular expressions for the allowed `downloadFrom` URLs. Terminate the host, e.g. `^https://files\\.example\\.com/`: a match skips the IP-class checks. An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
           }
         },
         "downloadFromDenyList": {
-          "description": "List of regular expressions for the denied `downloadFrom` URLs",
-          "type": "array",
+          "description": "List of regular expressions for the denied `downloadFrom` URLs An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
@@ -118,15 +141,24 @@
         },
         "downloadFromDenyPrivateIps": {
           "description": "Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "downloadFromDenyPublicIps": {
           "description": "Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "downloadFromEnableEnvironmentProxy": {
           "description": "Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "downloadFromMaxConcurrency": {
           "description": "Set the maximum number of concurrent fetches per request for the download from feature. Leave unset for the upstream default (10); set to 0 for no limit.",
@@ -154,39 +186,66 @@
         },
         "enableDebugRoute": {
           "description": "Enable debug route for debugging purposes",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "enableOidcAuth": {
           "description": "Enable OIDC bearer token authentication. Mutually exclusive with `basicAuth.enabled`.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "oidcAudience": {
           "description": "Set the expected OIDC audience - the token `aud` claim must contain it.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "oidcIssuer": {
           "description": "Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "oidcJwksUrl": {
           "description": "Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "port": {
-          "description": "Set the port on which the API should listen (default 3000)",
+          "description": "Set the port on which the API should listen, also the container's and the Service's target port",
           "type": "integer"
         },
         "rootPath": {
           "description": "Set the root path of the API, e.g. \"/gotenberg/\" - for service discovery via URL paths (default \"/\"). `/health` moves under it: update the probe paths too.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^/(.*/)?$"
         },
         "startTimeout": {
           "description": "Set the maximum duration to wait for the API to start",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
         },
         "timeout": {
           "description": "Set the time limit for requests (default 30s)",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
         },
         "tlsSecretName": {
           "description": "Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key). Set `scheme: HTTPS` on the probes too.",
@@ -231,15 +290,24 @@
       "properties": {
         "allowFileAccessFromFiles": {
           "description": "Allow file:// URIs to read other file:// URIs",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "allowInsecureLocalhost": {
           "description": "Ignore TLS/SSL errors on localhost",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "allowList": {
-          "description": "List of regular expressions for the allowed Chromium URLs. The page sent to the HTML and Markdown routes skips the lists, but the files uploaded with it load from `file:///tmp/`: include `^file:///tmp/` to keep them. Terminate the host, e.g. `^https://assets\\.example\\.com/`: a match skips the IP-class checks.",
-          "type": "array",
+          "description": "List of regular expressions for the allowed Chromium URLs. The page sent to the HTML and Markdown routes skips the lists, but the files uploaded with it load from `file:///tmp/`: include `^file:///tmp/` to keep them. Terminate the host, e.g. `^https://assets\\.example\\.com/`: a match skips the IP-class checks. An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
@@ -247,27 +315,45 @@
         },
         "autoStart": {
           "description": "Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "clearCache": {
           "description": "Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext`.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "clearCookies": {
           "description": "Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext`.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "clearStorage": {
           "description": "Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext`.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "debugProtocol": {
           "description": "Log every DevTools Protocol message at the debug log level. The messages carry URLs, cookies and header values, credentials included: enable it only to troubleshoot.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "denyList": {
-          "description": "List of regular expressions for the denied Chromium URLs. Setting it replaces the upstream default, `^file:(?!//\\/tmp/).*`.",
-          "type": "array",
+          "description": "List of regular expressions for the denied Chromium URLs. Setting it replaces the upstream default, `^file:(?!//\\/tmp/).*`. An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
@@ -275,39 +361,67 @@
         },
         "denyPrivateIps": {
           "description": "Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. With `proxyServer`, a DNS rebinding can slip past it.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "denyPublicIps": {
           "description": "Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "disableJavaScript": {
           "description": "Disable JavaScript",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "disableRoutes": {
           "description": "Disable the routes",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "disableWebSecurity": {
           "description": "Don't enforce the same-origin policy",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "enableEnvironmentProxy": {
           "description": "Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "hostResolverRules": {
           "description": "Set custom mappings to the host resolver, e.g. `MAP intranet.local 10.0.0.5`. The IP-class checks still apply to the mapped address.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "idleShutdownTimeout": {
           "description": "Duration after which idle Chromium browser processes are shut down (e.g., \"30s\"). Set to 0s or leave empty to disable (default 0s, disabled).",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
         },
         "ignoreCertificateErrors": {
           "description": "Ignore the certificate errors",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "maxConcurrency": {
           "description": "Maximum number of concurrent Chromium conversions, from 1 to 6. Leave unset for the upstream default (6).",
@@ -320,7 +434,10 @@
         },
         "maxMemory": {
           "description": "Set the memory all Chromium processes together may hold while converting, e.g. \"800MB\". Over it, Gotenberg restarts Chromium and the conversions in flight answer 503. Chromium, LibreOffice and PDF processing share the container's memory: keep `maxMemory` here and in `libreOffice` together under its limit. Empty disables it. Added in Gotenberg 9.6.0.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "maxQueueSize": {
           "description": "Maximum request queue size for Chromium. Set to 0 to disable this feature. Leave unset for the upstream default (0).",
@@ -332,7 +449,10 @@
         },
         "proxyServer": {
           "description": "Set the outbound proxy server; this switch only affects HTTP and HTTPS requests",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "restartAfter": {
           "description": "Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (100).",
@@ -344,11 +464,18 @@
         },
         "sharedBrowserContext": {
           "description": "Share one browser context, with its cookies, cache and storage, across all conversions. Each conversion gets its own isolated context by default; enable this only when all callers trust each other.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "startTimeout": {
           "description": "Maximum duration to wait for Chromium to start or restart (default 20s)",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
         }
       },
       "additionalProperties": false
@@ -405,10 +532,27 @@
     "gotenberg": {
       "type": "object",
       "properties": {
+        "buildDebugData": {
+          "description": "Build the debug data the debug route serves. Leave unset for the upstream default (true).",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
         "gracefulShutdownDurationSec": {
-          "description": "Set the graceful shutdown duration in seconds",
-          "type": "integer",
+          "description": "Set the graceful shutdown duration in seconds. Leave unset for the upstream default (30). `terminationGracePeriodSeconds` follows it.",
+          "type": [
+            "integer",
+            "null"
+          ],
           "minimum": 0
+        },
+        "hideBanner": {
+          "description": "Hide the banner above the startup summary. Gotenberg prints it only to a terminal.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "additionalProperties": false
@@ -475,8 +619,11 @@
       "type": "object",
       "properties": {
         "allowList": {
-          "description": "List of regular expressions for the allowed URLs LibreOffice requests: the style sheets an HTML document links, and the URLs macros open with `enableMacros`. Terminate the host: a match skips the IP-class checks.",
-          "type": "array",
+          "description": "List of regular expressions for the allowed URLs LibreOffice requests: the style sheets an HTML document links, and the URLs macros open with `enableMacros`. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
@@ -484,11 +631,17 @@
         },
         "autoStart": {
           "description": "Automatically launch LibreOffice upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false)",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "denyList": {
-          "description": "List of regular expressions for the denied URLs LibreOffice requests",
-          "type": "array",
+          "description": "List of regular expressions for the denied URLs LibreOffice requests An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
@@ -496,31 +649,53 @@
         },
         "denyPrivateIps": {
           "description": "Reject LibreOffice requests resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "denyPublicIps": {
           "description": "Reject LibreOffice requests resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "disableRoutes": {
           "description": "Disable the routes",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "enableEnvironmentProxy": {
           "description": "Route LibreOffice requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "enableMacros": {
           "description": "Run the macros of converted documents, including those bound to document events. Macros run code inside the container: enable it only for trusted documents.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "idleShutdownTimeout": {
           "description": "Duration after which idle LibreOffice processes are shut down (e.g., \"30s\"). Set to 0s or leave empty to disable (default 0s, disabled).",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
         },
         "maxMemory": {
           "description": "Set the memory LibreOffice may hold during a conversion, e.g. \"900MB\". Over it, Gotenberg kills LibreOffice and answers that conversion 422. Keep it and `chromium.maxMemory` together under the container's memory limit. Empty disables it. Added in Gotenberg 9.6.0.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "maxQueueSize": {
           "description": "Maximum request queue size for LibreOffice. Set to 0 to disable this feature. Leave unset for the upstream default (0).",
@@ -540,7 +715,11 @@
         },
         "startTimeout": {
           "description": "Maximum duration to wait for LibreOffice to start or restart (default 20s)",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
         }
       },
       "additionalProperties": false
@@ -589,23 +768,56 @@
       "properties": {
         "fieldsPrefix": {
           "description": "Prepend a specified prefix to each field in the logs",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "level": {
           "description": "Set the log level - error, warn, info, or debug (default \"info\")",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "error",
+            "warn",
+            "info",
+            "debug",
+            null
+          ]
         },
         "stdEnableGcpFields": {
           "description": "Enable GCP log field mapping for Cloud Run",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "stdFormat": {
           "description": "Set the log format - auto, json, or text (default \"auto\"). Gotenberg logs to stderr.",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "auto",
+            "json",
+            "text",
+            null
+          ]
         },
         "stdLevelCase": {
           "description": "Set the case of the `level` field - lower or upper (default \"lower\")",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "lower",
+            "upper",
+            null
+          ]
         }
       },
       "additionalProperties": false
@@ -770,16 +982,22 @@
       "type": "object",
       "properties": {
         "allowList": {
-          "description": "List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks.",
-          "type": "array",
+          "description": "List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
           }
         },
         "denyList": {
-          "description": "List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages",
-          "type": "array",
+          "description": "List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
@@ -787,23 +1005,38 @@
         },
         "denyPrivateIps": {
           "description": "Reject timestamp authority URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). Callers choose these URLs: enable it for untrusted callers. A URL matching `allowList` skips the IP-class check.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "denyPublicIps": {
           "description": "Reject timestamp authority URLs resolving to a public IP",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "disableRoutes": {
           "description": "Disable the /forms/pdf routes. Conversion routes still run stages: set `disableStages` too to turn off PDF processing.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "disableStages": {
           "description": "Refuse the `stages` field of the Chromium and LibreOffice routes, so they only convert. Added in Gotenberg 9.3.0.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "enableEnvironmentProxy": {
           "description": "Route timestamp authority requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "maxConcurrency": {
           "description": "Maximum number of PDF documents a request processes at once. Leave unset for the upstream default (1).",
@@ -815,7 +1048,10 @@
         },
         "maxEmbeddedFileBytes": {
           "description": "Set the maximum size of an embedded file read for validation, e.g. \"100MB\" (default 50MiB)",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "maxImagePixels": {
           "description": "Set the maximum number of pixels an image may hold. Leave unset for the upstream default (100000000).",
@@ -835,7 +1071,10 @@
         },
         "maxStreamBytes": {
           "description": "Set the maximum size a PDF stream may decode to, e.g. \"512MB\" (default 256MiB)",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": false
@@ -1017,8 +1256,11 @@
       "type": "object",
       "properties": {
         "allowList": {
-          "description": "List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks.",
-          "type": "array",
+          "description": "List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
@@ -1026,11 +1268,18 @@
         },
         "clientTimeout": {
           "description": "Set the time limit for requests to the webhook (default 30s)",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
         },
         "denyList": {
-          "description": "List of regular expressions for the denied webhook URLs",
-          "type": "array",
+          "description": "List of regular expressions for the denied webhook URLs An empty list clears Gotenberg's default.",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string",
             "pattern": "^.+$"
@@ -1038,23 +1287,38 @@
         },
         "denyPrivateIps": {
           "description": "Reject webhook URLs (result and events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "denyPublicIps": {
           "description": "Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "disable": {
           "description": "Disable the webhook feature",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "enableEnvironmentProxy": {
           "description": "Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included.",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "enableSyncMode": {
           "description": "Enable synchronous mode for the webhook feature",
-          "type": "boolean"
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "maxRetry": {
           "description": "Set the maximum number of retries for the webhook feature. Leave unset for the upstream default (4).",
@@ -1066,11 +1330,19 @@
         },
         "retryMaxWait": {
           "description": "Set the maximum duration to wait before trying to call the webhook again (default 30s)",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
         },
         "retryMinWait": {
           "description": "Set the minimum duration to wait before trying to call the webhook again (default 1s)",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
         }
       },
       "additionalProperties": false
