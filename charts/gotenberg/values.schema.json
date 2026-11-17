@@ -60,13 +60,6 @@
           },
           "additionalProperties": false
         },
-        "bindIp": {
-          "description": "Set the IP address the API binds to, e.g. \"::\" for IPv6 (default all addresses). The probes and the Service reach the pod IP, so keep it bound there.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "bodyLimit": {
           "description": "Set the request body limit for multipart/form-data (e.g., \"100MB\")",
           "type": [
@@ -237,7 +230,7 @@
             "string",
             "null"
           ],
-          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
+          "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         },
         "timeout": {
           "description": "Set the time limit for requests (default 30s)",
@@ -245,7 +238,7 @@
             "string",
             "null"
           ],
-          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
+          "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         },
         "tlsSecretName": {
           "description": "Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key). Set `scheme: HTTPS` on the probes too.",
@@ -414,7 +407,7 @@
             "string",
             "null"
           ],
-          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
+          "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         },
         "ignoreCertificateErrors": {
           "description": "Ignore the certificate errors",
@@ -475,7 +468,7 @@
             "string",
             "null"
           ],
-          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
+          "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         }
       },
       "additionalProperties": false
@@ -688,7 +681,7 @@
             "string",
             "null"
           ],
-          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
+          "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         },
         "maxMemory": {
           "description": "Set the memory LibreOffice may hold during a conversion, e.g. \"900MB\". Over it, Gotenberg kills LibreOffice and answers that conversion 422. Keep it and `chromium.maxMemory` together under the container's memory limit. Empty disables it. Added in Gotenberg 9.6.0.",
@@ -719,7 +712,7 @@
             "string",
             "null"
           ],
-          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
+          "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         }
       },
       "additionalProperties": false
@@ -1278,7 +1271,7 @@
             "string",
             "null"
           ],
-          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
+          "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         },
         "denyList": {
           "description": "List of regular expressions for the denied webhook URLs An empty list clears Gotenberg's default.",
@@ -1340,7 +1333,7 @@
             "string",
             "null"
           ],
-          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
+          "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         },
         "retryMinWait": {
           "description": "Set the minimum duration to wait before trying to call the webhook again (default 1s)",
@@ -1348,7 +1341,7 @@
             "string",
             "null"
           ],
-          "pattern": "^([0-9]+(\\.[0-9]+)?(ns|us|ms|s|m|h))+$"
+          "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         }
       },
       "additionalProperties": false

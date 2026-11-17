@@ -163,7 +163,6 @@ matches with every flag set:
                 - gotenberg
                 - --api-port=3007
                 - --api-enable-basic-auth
-                - --api-bind-ip=bindIp-value
                 - --api-timeout=7s
                 - --api-body-limit=bodyLimit-value
                 - --api-root-path=/rootPath-value/

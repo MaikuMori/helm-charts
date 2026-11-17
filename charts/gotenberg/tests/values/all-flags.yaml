@@ -1,7 +1,6 @@
 # Sets every value that maps to a Gotenberg flag, so the snapshot covers each one.
 # Add a value here when adding a flag; values are placeholders and only need to render.
 api:
-  bindIp: bindIp-value
   archiveMaxEntries: 20000000
   archiveMaxRatio: 7
   bodyLimit: bodyLimit-value
