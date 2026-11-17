@@ -12,7 +12,7 @@ Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces c
 - **Metric names change**, e.g. `gotenberg_chromium_requests_queue_size` is now `gotenberg_chromium_queue_size`, restarts become counters and the errors counter is gone: update dashboards, alerts, recording rules and `autoscaling.extraMetrics`. Gotenberg exports metrics to one exporter, so `metrics.enabled` and an `OTEL_METRICS_EXPORTER` in `extraEnv` now fail the install. A NetworkPolicy with `extraIngress` must allow the metrics port.
 - Allow and deny lists are YAML lists, one flag per entry: Gotenberg splits the old strings on commas, which broke patterns such as `[a-z]{1,10}` into two unsafe entries.
 - Numeric values default to `null`, which leaves Gotenberg's default, and render without an exponent. `api.downloadFromMaxRetry` no longer pins `4`.
-- `api.disableHealthCheckRouteTelemetry` and the root, debug and version route telemetry switches default to `null`, upstream's `true`; `false` now turns route telemetry on.
+- **Check your values**: `api.disableHealthCheckRouteTelemetry` and the root, debug and version route telemetry switches default to `null`, upstream's `true`. An explicit `false`, which 1.x ignored, now turns telemetry on for that route, so every health probe gets logged and traced. Delete these four keys if you copied the 1.x defaults.
 - `enableServiceLinks` defaults to `false`: Gotenberg doesn't use service links, and a Service named `api` broke its startup.
 - Add `pdf.*` values for the new PDF module, and `api.archiveMaxEntries`, `api.archiveMaxRatio`, `chromium.maxMemory`, `chromium.debugProtocol`, `libreOffice.maxMemory` and `libreOffice.enableMacros`.
 - The hardening example sets `pdf.denyPrivateIps`: the `sign` and `timestamp` stages call caller-chosen timestamp authorities.
@@ -38,6 +38,7 @@ Gotenberg 9 refuses its removed flags, so their values are gone, and the values 
 | `service.loadBalancerIP` | Removed: use your provider's Service annotations |
 | `*.allowList`, `*.denyList`, `api.downloadFrom*List` strings | Lists of regular expressions, e.g. `allowList: ["^https://a\\.example\\.com/"]` |
 | `chromium.restartAfter`, `libreOffice.restartAfter`, `webhook.maxRetry` strings | Integers |
+| `api.disableHealthCheckRouteTelemetry`, `api.disableRootRouteTelemetry`, `api.disableDebugRouteTelemetry`, `api.disableVersionRouteTelemetry` set to `false` | Delete them: `false` now turns route telemetry on |
 
 ## 1.31.0
 
