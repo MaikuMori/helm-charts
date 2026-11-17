@@ -8,7 +8,7 @@ Ideally here's the flow:
 
 - Make the changes
 - Bump chart's version in `Chart.yaml`
-- Update `CHANGELOG.md` for the chart
+- Update `CHANGELOG.md` for the chart, and replace the `artifacthub.io/changes` annotation in `Chart.yaml` with the release's entries
 - Run [`helm-docs`](https://github.com/norwoodj/helm-docs)
 - Run [`helm schema`](https://github.com/losisin/helm-values-schema-json) in `charts/gotenberg` to regenerate `values.schema.json`
 - Run [`helm unittest charts/gotenberg`](https://github.com/helm-unittest/helm-unittest)
@@ -34,7 +34,7 @@ npm run test:upgrade -- master 5
 
 `schema_test.yaml` checks what `values.schema.json` accepts and rejects.
 
-`test/zero-values-test.js` sets every integer value in the schema to 0 and fails if 0 doesn't render wherever another number would, so a value guarded by `{{ if .Values.x }}` doesn't silently drop 0. Leave numeric flags unset by default (`null`, with `# @schema type: [integer, null]`) and render them with `{{ if not (kindIs "invalid" .Values.x) }}` and `| int64`, or add the value to its `ZERO_IGNORED` list with the reason 0 has no meaning of its own.
+`test/zero-values-test.js` sets every integer value in the schema to 0 and fails if 0 doesn't render wherever another number would, so a value guarded by `{{ if .Values.x }}` doesn't silently drop 0. Leave numeric flags unset by default (`null`, with `# @schema type: [integer, null]`) and render them with `{{ if not (kindIs "invalid" .Values.x) }}` and `| int64`. Give the schema the `minimum` and `maximum` Gotenberg enforces at startup, so the install fails rather than the pod: the test accepts a value the schema rejects at 0. Add a value to `ZERO_IGNORED`, with the reason, only when the schema can't express its bounds or 0 has no meaning of its own.
 
 `test/subchart/` is a parent chart that depends on `charts/gotenberg` and sets Helm `global` values. CI renders it with each of the chart's `ci/` and `tests/values/` files nested under `gotenberg:`, and installs it in the kind clusters, so the chart keeps working as a dependency.
 

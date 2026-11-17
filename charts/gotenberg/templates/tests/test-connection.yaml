@@ -27,7 +27,7 @@ spec:
       args:
         - |
           for attempt in 1 2 3 4 5 6 7 8 9 10; do
-            wget -q -T 5 -O /dev/null '{{ include "gotenberg.fullname" . }}:{{ .Values.service.port }}/health' && exit 0
+            wget -q -T 5 -O /dev/null '{{ ternary "https" "http" (not (empty .Values.api.tlsSecretName)) }}://{{ include "gotenberg.fullname" . }}:{{ .Values.service.port }}{{ .Values.api.rootPath | default "/" | trimSuffix "/" }}/health' && exit 0
             sleep 3
           done
           exit 1

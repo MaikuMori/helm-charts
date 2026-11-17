@@ -22,9 +22,11 @@ api:
   downloadFromMaxConcurrency: 7
   downloadFromMaxEntries: 7
   downloadFromMaxRetry: 11
-  enableBasicAuth: true
+  basicAuth:
+    enabled: true
+    password: password-value
+    username: username-value
   enableDebugRoute: true
-  enableOidcAuth: true
   oidcAudience: oidcAudience-value
   oidcIssuer: oidcIssuer-value
   oidcJwksUrl: oidcJwksUrl-value
@@ -55,7 +57,7 @@ chromium:
   hostResolverRules: hostResolverRules-value
   idleShutdownTimeout: idleShutdownTimeout-value
   ignoreCertificateErrors: true
-  maxConcurrency: 7
+  maxConcurrency: 4
   maxMemory: maxMemory-value
   maxQueueSize: 7
   proxyServer: proxyServer-value
@@ -64,7 +66,6 @@ chromium:
   startTimeout: startTimeout-value
 gotenberg:
   gracefulShutdownDurationSec: 37
-  hideBanner: true
 libreOffice:
   allowList:
     - ^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)

@@ -47,10 +47,10 @@ tests:
 
   - it: reads basic auth credentials from an existing secret with default keys
     set:
-      api.enableBasicAuth: true
-      api.existingSecret: creds
-      api.basicAuthUsername: ignored
-      api.basicAuthPassword: ignored
+      api.basicAuth.enabled: true
+      api.basicAuth.existingSecret: creds
+      api.basicAuth.username: ignored
+      api.basicAuth.password: ignored
     asserts:
       - equal:
           path: spec.template.spec.containers[0].env
@@ -68,10 +68,10 @@ tests:
 
   - it: uses custom secret keys for basic auth
     set:
-      api.enableBasicAuth: true
-      api.existingSecret: creds
-      api.existingSecretUsernameKey: user
-      api.existingSecretPasswordKey: pass
+      api.basicAuth.enabled: true
+      api.basicAuth.existingSecret: creds
+      api.basicAuth.usernameKey: user
+      api.basicAuth.passwordKey: pass
     asserts:
       - equal:
           path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.key
@@ -80,21 +80,74 @@ tests:
           path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.key
           value: pass
 
-  - it: sets inline basic auth credentials only when both are given
+  - it: refuses basic auth without credentials
     set:
-      api.enableBasicAuth: true
-      api.basicAuthUsername: admin
+      api.basicAuth.enabled: true
+      api.basicAuth.username: admin
+    asserts:
+      - failedTemplate:
+          errorPattern: "api.basicAuth.enabled needs"
+
+  - it: accepts basic auth credentials from extraEnv
+    set:
+      api.basicAuth.enabled: true
+      extraEnv:
+        - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+          value: admin
+        - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+          value: secret
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
           content: --api-enable-basic-auth
-      - isNullOrEmpty:
+
+  - it: refuses basic auth together with OIDC
+    set:
+      api.basicAuth.enabled: true
+      api.basicAuth.existingSecret: creds
+      api.enableOidcAuth: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "mutually exclusive"
+
+  - it: quotes inline basic auth credentials
+    set:
+      api.basicAuth.enabled: true
+      api.basicAuth.username: "123456"
+      api.basicAuth.password: "p@ss #1"
+    asserts:
+      - equal:
           path: spec.template.spec.containers[0].env
+          value:
+            - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+              value: "123456"
+            - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+              value: "p@ss #1"
+
+  - it: passes the OIDC flags
+    set:
+      api.enableOidcAuth: true
+      api.oidcIssuer: https://issuer.example.com/
+      api.oidcAudience: gotenberg
+      api.oidcJwksUrl: https://issuer.example.com/jwks
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-enable-oidc-auth
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-oidc-issuer=https://issuer.example.com/
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-oidc-audience=gotenberg
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-oidc-jwks-url=https://issuer.example.com/jwks
 
   - it: ignores basic auth credentials when basic auth is disabled
     set:
-      api.basicAuthUsername: admin
-      api.basicAuthPassword: secret
+      api.basicAuth.username: admin
+      api.basicAuth.password: secret
     asserts:
       - isNullOrEmpty:
           path: spec.template.spec.containers[0].env
@@ -216,7 +269,7 @@ tests:
           content: --gotenberg-graceful-shutdown-duration=0s
       - equal:
           path: spec.template.spec.terminationGracePeriodSeconds
-          value: 0
+          value: 10
 
   - it: passes each list entry as its own flag, quoting entries with commas
     set:
@@ -255,3 +308,46 @@ tests:
             - gotenberg
             - --api-port=3000
             - --gotenberg-graceful-shutdown-duration=30s
+
+  - it: rejects empty list entries, which would clear Chromium's default deny list
+    set:
+      chromium.denyList: [""]
+    asserts:
+      - failedTemplate:
+          errorPattern: "/chromium/denyList"
+
+  - it: gives the pod 10 seconds more than Gotenberg's shutdown by default
+    set:
+      gotenberg.gracefulShutdownDurationSec: 45
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 55
+
+  - it: uses an explicit terminationGracePeriodSeconds
+    set:
+      terminationGracePeriodSeconds: 120
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 120
+
+  - it: leaves Gotenberg's shutdown duration to upstream when unset
+    set:
+      gotenberg.gracefulShutdownDurationSec: null
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --gotenberg-graceful-shutdown-duration=0s
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 40
+
+  - it: sleeps before stopping by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle
+          value:
+            preStop:
+              sleep:
+                seconds: 5

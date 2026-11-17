@@ -16,8 +16,12 @@ const API_VERSIONS = ['monitoring.coreos.com/v1', 'autoscaling.k8s.io/v1', 'gate
 const ZERO_IGNORED = {
   'autoscaling.targetCPUUtilizationPercentage': 'a 0% utilization target is meaningless; unset disables the metric',
   'autoscaling.targetMemoryUtilizationPercentage': 'a 0% utilization target is meaningless; unset disables the metric',
-  // The schema only allows integers, so 0 is how users unset it to use pdb.maxUnavailable instead.
-  'pdb.minAvailable': '0 leaves it out so pdb.maxUnavailable can be used',
+  'chromium.maxConcurrency': 'Gotenberg allows 1 to 6, which the schema enforces',
+};
+
+// Values a switch can't be turned on without.
+const SWITCH_NEEDS = {
+  'api.basicAuth.enabled': ['api.basicAuth.existingSecret="credentials"'],
 };
 
 function leaves(schema, prefix = '') {
@@ -50,7 +54,7 @@ const render = (base, set) => text('helm', [
 function main() {
   const schema = JSON.parse(fs.readFileSync(path.join(CHART, 'values.schema.json'), 'utf8'));
   const values = text('helm', ['show', 'values', CHART]);
-  const bases = [[], switches(schema).map(s => `${s}=true`)];
+  const bases = [[], switches(schema).flatMap(s => [`${s}=true`, ...(SWITCH_NEEDS[s] ?? [])])];
   let failures = 0;
   for (const { name } of leaves(schema)) {
     const def = lookup(values, name);

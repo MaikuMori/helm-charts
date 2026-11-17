@@ -92,7 +92,15 @@ helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --install
 
 ### Upgrading to 2.0.0
 
-Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and metrics. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) and the chart's [CHANGELOG](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#200), which maps every 1.x value that changed. Upgrade with your values file rather than `--reuse-values`, which carries removed 1.x defaults that the values schema rejects, and drop any `image.tag` or `image.digest` that pins Gotenberg 8. If your values file is a copy of the 1.x defaults, delete the four `api.disable*RouteTelemetry: false` entries: in 2.0.0, `false` turns telemetry on for the health check, root, debug and version routes.
+Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and metrics. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) and the chart's [CHANGELOG](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#200), which maps every 1.x value that changed. Migrate your values file with that table, then upgrade with it and `--reset-values`: without it, Helm can reuse the release's 1.x values, which the values schema rejects.
+
+```console
+helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --version 2.0.0 --reset-values -f values.yaml
+```
+
+- Drop any `image.tag` or `image.digest` that pins Gotenberg 8, and rebuild custom images based on `gotenberg/gotenberg:8`.
+- If your values file is a copy of the 1.x defaults, delete the four `api.disable*RouteTelemetry: false` entries, which now turn telemetry on for the health check, root, debug and version routes, and `chromium.maxConcurrency: 0`, which Gotenberg 9 refuses.
+- During the rollout, Gotenberg 8 and 9 pods serve behind one Service, and clients of the removed routes and fields fail on the 9 pods. Migrate the clients first, set `strategy.type: Recreate` for the upgrade, or install 2.0.0 as a separate release and switch clients over.
 
 To stay on Gotenberg 8, keep chart 1.31.0, which runs 8.40.0, the final Gotenberg 8 release.
 
@@ -103,13 +111,13 @@ Chart releases are typically published when new features or breaking changes are
 To use a specific version of Gotenberg:
 
 ```console
-helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.5.1"
+helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.6.0"
 ```
 
-Or with the `--atomic` flag for automatic rollback on failure:
+Or with `--rollback-on-failure` (`--atomic` on Helm 3) for automatic rollback on failure:
 
 ```console
-helm upgrade --install --atomic my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.5.1"
+helm upgrade --install --rollback-on-failure my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.6.0"
 ```
 
 This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes within a major version. A newer flag the chart maps needs a Gotenberg version that has it.
@@ -127,7 +135,7 @@ helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg 
 
 ## Resources
 
-The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit. Chromium, LibreOffice and PDF processing share it: `chromium.maxMemory` and `libreOffice.maxMemory` restart the process that runs over its budget instead of letting the container get OOM-killed. Keep them together under the limit, with room for Gotenberg's own PDF work, and cap that with `GOMEMLIMIT` in `extraEnv`:
+The chart sets no resource requests or limits by default. Gotenberg recommends at least 512Mi of memory and 0.2 CPU; Chromium and LibreOffice use more under load, so leave headroom in the memory limit. Chromium, LibreOffice and Gotenberg itself, which does the PDF processing, share it. `chromium.maxMemory` and `libreOffice.maxMemory` fail the conversion that runs over its budget and restart that engine, instead of letting the container get OOM-killed. `GOMEMLIMIT`, set through `extraEnv`, makes Gotenberg's Go runtime collect garbage before it reaches its share; it's a soft limit, not a cap. Keep the three together under the container's limit:
 
 ```yaml
 resources:
@@ -135,14 +143,14 @@ resources:
     cpu: 200m
     memory: 512Mi
   limits:
-    memory: 2Gi
+    memory: 3Gi
 chromium:
   maxMemory: 800MB
 libreOffice:
   maxMemory: 900MB
 extraEnv:
   - name: GOMEMLIMIT
-    value: 1500MiB
+    value: 1000MiB
 ```
 
 See [Limits](https://gotenberg.dev/docs/operate/limits) for these and the PDF module's limits.
@@ -174,8 +182,7 @@ networkPolicy:
   enabled: true
   # Only accept API calls from pods in the release's namespace. Replace the
   # rule with a selector for your clients. 3000 is api.port.
-  allowIngress: false
-  extraIngress:
+  ingress:
     - from:
         - podSelector: {}
       ports:
@@ -188,8 +195,7 @@ networkPolicy:
   # only: on dual-stack clusters, add ::/0 excepting fc00::/7 and fe80::/10.
   # DNS pods are kube-dns, or openshift-dns listening on 5353 on OpenShift
   # (not tested with OVN-Kubernetes).
-  allowEgress: false
-  extraEgress:
+  egress:
     - to:
         - namespaceSelector: {}
           podSelector:
@@ -226,7 +232,7 @@ networkPolicy:
         - port: 443
 ```
 
-Also require authentication on the API, with `api.enableBasicAuth` or `api.enableOidcAuth`, and disable what you don't use, such as `chromium.disableRoutes`, `libreOffice.disableRoutes`, or `pdf.disableRoutes` with `pdf.disableStages` for all PDF processing. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
+Also require authentication on the API, with `api.basicAuth.enabled` or `api.enableOidcAuth`, and disable what you don't use, such as `chromium.disableRoutes`, `libreOffice.disableRoutes`, or `pdf.disableRoutes` with `pdf.disableStages` for all PDF processing. See [Outbound URL Filtering](https://gotenberg.dev/docs/outbound-url-filtering) for the allow and deny lists.
 
 ## OpenShift
 
@@ -239,8 +245,12 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | affinity | object | `{}` |  |
 | api.archiveMaxEntries | int | `nil` | Set the maximum number of entries of a zip archive sent in the `archives` form field. Must be positive. Leave unset for the upstream default (10000). |
 | api.archiveMaxRatio | int | `nil` | Set how many times its own size a zip archive sent in the `archives` form field may unpack to. Must be positive. Leave unset for the upstream default (100). |
-| api.basicAuthPassword | string | `nil` | Set the basic authentication password (ignored if existingSecret is set) |
-| api.basicAuthUsername | string | `nil` | Set the basic authentication username (ignored if existingSecret is set) |
+| api.basicAuth.enabled | bool | `false` | Enable basic authentication, with credentials from `existingSecret`, or `username` and `password`. Mutually exclusive with `enableOidcAuth`. |
+| api.basicAuth.existingSecret | string | `""` | Name of an existing secret holding the credentials |
+| api.basicAuth.password | string | `nil` | Set the password (ignored if existingSecret is set) |
+| api.basicAuth.passwordKey | string | `""` | Key in `existingSecret` for the password (default: password) |
+| api.basicAuth.username | string | `nil` | Set the username (ignored if existingSecret is set) |
+| api.basicAuth.usernameKey | string | `""` | Key in `existingSecret` for the username (default: username) |
 | api.bodyLimit | string | `""` | Set the request body limit for multipart/form-data (e.g., "100MB") |
 | api.correlationIdHeader | string | `""` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
 | api.disableDebugRouteTelemetry | bool | `nil` | Disable telemetry on the debug route. Leave unset for the upstream default (true). |
@@ -248,7 +258,7 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | api.disableHealthCheckRouteTelemetry | bool | `nil` | Disable health check route telemetry. Leave unset for the upstream default (true). |
 | api.disableRootRouteTelemetry | bool | `nil` | Disable telemetry on the root route. Leave unset for the upstream default (true). |
 | api.disableVersionRouteTelemetry | bool | `nil` | Disable telemetry on the version route. Leave unset for the upstream default (true). |
-| api.downloadFromAllowList | list | `[]` | List of regular expressions for the allowed `downloadFrom` URLs. Terminate the host, e.g. `^https://files\.example\.com(:|/|$)`: a match skips the IP-class checks. |
+| api.downloadFromAllowList | list | `[]` | List of regular expressions for the allowed `downloadFrom` URLs. Terminate the host, e.g. `^https://files\.example\.com/`: a match skips the IP-class checks. |
 | api.downloadFromDenyList | list | `[]` | List of regular expressions for the denied `downloadFrom` URLs |
 | api.downloadFromDenyPrivateIps | bool | `false` | Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected. |
 | api.downloadFromDenyPublicIps | bool | `false` | Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches. |
@@ -256,20 +266,16 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | api.downloadFromMaxConcurrency | int | `nil` | Set the maximum number of concurrent fetches per request for the download from feature. Leave unset for the upstream default (10); set to 0 for no limit. |
 | api.downloadFromMaxEntries | int | `nil` | Set the maximum number of entries in the `downloadFrom` array. Leave unset or set to 0 for no limit. |
 | api.downloadFromMaxRetry | int | `nil` | Set the maximum number of retries for the download from feature. Leave unset for the upstream default (4). |
-| api.enableBasicAuth | bool | `false` | Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values |
 | api.enableDebugRoute | bool | `false` | Enable debug route for debugging purposes |
-| api.enableOidcAuth | bool | `false` | Enable OIDC bearer token authentication. Mutually exclusive with `enableBasicAuth`. |
-| api.existingSecret | string | `""` | Name of an existing secret containing basic auth credentials (keys: username, password) |
-| api.existingSecretPasswordKey | string | `""` | Key in existingSecret for the password (default: password) |
-| api.existingSecretUsernameKey | string | `""` | Key in existingSecret for the username (default: username) |
+| api.enableOidcAuth | bool | `false` | Enable OIDC bearer token authentication. Mutually exclusive with `basicAuth.enabled`. |
 | api.oidcAudience | string | `""` | Set the expected OIDC audience - the token `aud` claim must contain it. |
 | api.oidcIssuer | string | `""` | Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match. |
 | api.oidcJwksUrl | string | `""` | Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty. |
 | api.port | int | `3000` | Set the port on which the API should listen (default 3000) |
-| api.rootPath | string | `""` | Set the root path of the API - for service discovery via URL paths (default "/") |
+| api.rootPath | string | `""` | Set the root path of the API, e.g. "/gotenberg/" - for service discovery via URL paths (default "/"). `/health` moves under it: update the probe paths too. |
 | api.startTimeout | string | `""` | Set the maximum duration to wait for the API to start |
 | api.timeout | string | `""` | Set the time limit for requests (default 30s) |
-| api.tlsSecretName | string | `""` | Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key) |
+| api.tlsSecretName | string | `""` | Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key). Set `scheme: HTTPS` on the probes too. |
 | autoscaling.behavior | object | `{}` |  |
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.extraMetrics | list | `[]` |  |
@@ -279,7 +285,7 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | autoscaling.targetMemoryUtilizationPercentage | int | `nil` | Target average memory utilization percentage. Leave unset to not scale on memory. |
 | chromium.allowFileAccessFromFiles | bool | `false` | Allow file:// URIs to read other file:// URIs |
 | chromium.allowInsecureLocalhost | bool | `false` | Ignore TLS/SSL errors on localhost |
-| chromium.allowList | list | `[]` | List of regular expressions for the allowed Chromium URLs, the page sent to the HTML and Markdown routes included. Terminate the host, e.g. `^https://assets\.example\.com(:|/|$)`: a match skips the IP-class checks. |
+| chromium.allowList | list | `[]` | List of regular expressions for the allowed Chromium URLs. The page sent to the HTML and Markdown routes skips the lists, but the files uploaded with it load from `file:///tmp/`: include `^file:///tmp/` to keep them. Terminate the host, e.g. `^https://assets\.example\.com/`: a match skips the IP-class checks. |
 | chromium.autoStart | bool | `false` | Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion |
 | chromium.clearCache | bool | `false` | Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext`. |
 | chromium.clearCookies | bool | `false` | Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext`. |
@@ -295,7 +301,7 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | chromium.hostResolverRules | string | `""` | Set custom mappings to the host resolver, e.g. `MAP intranet.local 10.0.0.5`. The IP-class checks still apply to the mapped address. |
 | chromium.idleShutdownTimeout | string | `""` | Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
 | chromium.ignoreCertificateErrors | bool | `false` | Ignore the certificate errors |
-| chromium.maxConcurrency | int | `nil` | Maximum number of concurrent Chromium conversions. Leave unset for the upstream default (6). |
+| chromium.maxConcurrency | int | `nil` | Maximum number of concurrent Chromium conversions, from 1 to 6. Leave unset for the upstream default (6). |
 | chromium.maxMemory | string | `""` | Set the memory all Chromium processes together may hold while converting, e.g. "800MB". Over it, Gotenberg restarts Chromium and the conversions in flight answer 503. Chromium, LibreOffice and PDF processing share the container's memory: keep `maxMemory` here and in `libreOffice` together under its limit. Empty disables it. Added in Gotenberg 9.6.0. |
 | chromium.maxQueueSize | int | `nil` | Maximum request queue size for Chromium. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
 | chromium.proxyServer | string | `""` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests |
@@ -310,8 +316,7 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | gateway.hostnames | list | `[]` | Hostnames to match for routing, see values.yaml for an example. |
 | gateway.labels | object | `{}` | Labels to add to the HTTPRoute |
 | gateway.parentRefs | list | `[]` | Parent Gateway references, see values.yaml for an example. |
-| gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration in seconds, also the pod's `terminationGracePeriodSeconds` |
-| gotenberg.hideBanner | bool | `false` | Hide the Gotenberg banner on startup |
+| gotenberg.gracefulShutdownDurationSec | int | `30` | Set the graceful shutdown duration in seconds |
 | image.digest | string | `""` | Image digest, e.g. `sha256:...`. When set, the image is pulled by digest. |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"gotenberg/gotenberg"` |  |
@@ -337,15 +342,17 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | libreOffice.maxQueueSize | int | `nil` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
 | libreOffice.restartAfter | int | `nil` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (10). |
 | libreOffice.startTimeout | string | `""` | Maximum duration to wait for LibreOffice to start or restart (default 20s) |
-| lifecycle | object | `{}` | Define the container lifecycle hooks. A `preStop` hook keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates. Gotenberg's own graceful shutdown does not cover this: it stops as soon as it is idle, so an idle pod closes its listener within milliseconds of SIGTERM. |
+| lifecycle | object | `{"preStop":{"sleep":{"seconds":5}}}` | Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. The `sleep` action needs Kubernetes 1.30; set `lifecycle: {}` on older clusters. |
 | livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. |
 | logging.fieldsPrefix | string | `""` | Prepend a specified prefix to each field in the logs |
 | logging.level | string | `""` | Set the log level - error, warn, info, or debug (default "info") |
-| logging.stdEnableGcpFields | bool | `false` | Enable GCP log standard output field mapping for Cloud Run |
-| logging.stdFormat | string | `""` | Set log standard output format - auto, json, or text (default "auto") |
-| logging.stdLevelCase | string | `""` | Set the case of the `level` field in standard output - lower or upper (default "lower") |
+| logging.stdEnableGcpFields | bool | `false` | Enable GCP log field mapping for Cloud Run |
+| logging.stdFormat | string | `""` | Set the log format - auto, json, or text (default "auto"). Gotenberg logs to stderr. |
+| logging.stdLevelCase | string | `""` | Set the case of the `level` field - lower or upper (default "lower") |
 | metrics.enabled | bool | `false` | Serve Prometheus metrics at `/metrics` on `metrics.port`, through Gotenberg's OpenTelemetry Prometheus exporter, with a ClusterIP `<fullname>-metrics` Service. Also on when `serviceMonitor.enabled` is true. The chart then sets the `OTEL_METRICS_EXPORTER` and `OTEL_EXPORTER_PROMETHEUS_*` variables, so `extraEnv` can't. |
 | metrics.port | int | `9464` | Port of the Prometheus metrics endpoint, on the container and the metrics Service. Must differ from `api.port`. |
+| metrics.service.annotations | object | `{}` | Annotations to add to the metrics Service |
+| metrics.service.labels | object | `{}` | Labels to add to the metrics Service |
 | metrics.serviceMonitor.annotations | object | `{}` | Additional annotations for the service monitor |
 | metrics.serviceMonitor.enabled | bool | `false` | Enable ServiceMonitor. Turns the metrics endpoint on. |
 | metrics.serviceMonitor.honorLabels | bool | `false` | HonorLabels chooses the metric’s labels on collisions with target labels |
@@ -357,15 +364,13 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | metrics.serviceMonitor.relabelings | list | `[]` | List of relabel configs to apply to samples before scraping |
 | metrics.serviceMonitor.scrapeTimeout | string | `nil` | Timeout after which the scrape is ended |
 | nameOverride | string | `""` |  |
-| networkPolicy.allowEgress | bool | `true` |  |
-| networkPolicy.allowIngress | bool | `true` |  |
-| networkPolicy.enabled | bool | `false` |  |
-| networkPolicy.extraEgress | list | `[]` |  |
-| networkPolicy.extraIngress | list | `[]` |  |
+| networkPolicy.egress | list | `[{}]` | Egress rules. The default allows all traffic; `[]` denies all. See `ci/hardened-values.yaml` for an example. |
+| networkPolicy.enabled | bool | `false` | Create a NetworkPolicy for the Gotenberg pods |
+| networkPolicy.ingress | list | `[{}]` | Ingress rules. The default allows all traffic; `[]` denies all. See values.yaml for an example. |
 | nodeSelector | object | `{}` |  |
-| pdb.create | bool | `false` |  |
-| pdb.maxUnavailable | string | `""` |  |
-| pdb.minAvailable | int | `1` |  |
+| pdb.enabled | bool | `false` | Create a PodDisruptionBudget |
+| pdb.maxUnavailable | int or string | `nil` | Pods that may be unavailable, as a number or a percentage such as "25%". Set this or `minAvailable`. |
+| pdb.minAvailable | int or string | `nil` | Pods that must stay available, as a number or a percentage such as "50%". Set this or `maxUnavailable`; with neither, the PDB keeps 1 available. |
 | pdb.unhealthyPodEvictionPolicy | string | `nil` | Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow) |
 | pdf.allowList | list | `[]` | List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks. |
 | pdf.denyList | list | `[]` | List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages |
@@ -382,7 +387,7 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` | List of additional pod labels |
 | podSecurityContext | object | `{}` |  |
-| progressDeadlineSeconds | int | `120` |  |
+| progressDeadlineSeconds | int | `600` | Seconds a rollout may take before Kubernetes reports it failed. Each node pulls the 1.5GB image on an upgrade. |
 | readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
@@ -396,6 +401,7 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
 | startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. |
 | strategy | object | `{}` |  |
+| terminationGracePeriodSeconds | int | `nil` | Seconds Kubernetes waits for the pod to stop. Leave unset for `gotenberg.gracefulShutdownDurationSec` plus 10, which covers the `preStop` sleep. |
 | testImage | object | `{"digest":"sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4","repository":"busybox","tag":"1.38.0"}` | Image configuration for the helm test pod |
 | testImage.digest | string | `"sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4"` | Digest for the test image. Set to "" to pull by tag only. |
 | testImage.repository | string | `"busybox"` | Repository for the test image |
@@ -405,7 +411,7 @@ OpenShift support is best effort. When the cluster serves the `security.openshif
 | topologySpreadConstraints | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |
-| vpa.create | bool | `false` | Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler |
+| vpa.enabled | bool | `false` | Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler |
 | vpa.resourcePolicy | object | `{}` | Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example. |
 | vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only) |
 | webhook.allowList | list | `[]` | List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks. |

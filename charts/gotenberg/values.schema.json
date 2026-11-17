@@ -24,19 +24,41 @@
           ],
           "minimum": 1
         },
-        "basicAuthPassword": {
-          "description": "Set the basic authentication password (ignored if existingSecret is set)",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "basicAuthUsername": {
-          "description": "Set the basic authentication username (ignored if existingSecret is set)",
-          "type": [
-            "string",
-            "null"
-          ]
+        "basicAuth": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Enable basic authentication, with credentials from `existingSecret`, or `username` and `password`. Mutually exclusive with `enableOidcAuth`.",
+              "type": "boolean"
+            },
+            "existingSecret": {
+              "description": "Name of an existing secret holding the credentials",
+              "type": "string"
+            },
+            "password": {
+              "description": "Set the password (ignored if existingSecret is set)",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "passwordKey": {
+              "description": "Key in `existingSecret` for the password (default: password)",
+              "type": "string"
+            },
+            "username": {
+              "description": "Set the username (ignored if existingSecret is set)",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "usernameKey": {
+              "description": "Key in `existingSecret` for the username (default: username)",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         },
         "bodyLimit": {
           "description": "Set the request body limit for multipart/form-data (e.g., \"100MB\")",
@@ -79,17 +101,19 @@
           ]
         },
         "downloadFromAllowList": {
-          "description": "List of regular expressions for the allowed `downloadFrom` URLs. Terminate the host, e.g. `^https://files\\.example\\.com(:|/|$)`: a match skips the IP-class checks.",
+          "description": "List of regular expressions for the allowed `downloadFrom` URLs. Terminate the host, e.g. `^https://files\\.example\\.com/`: a match skips the IP-class checks.",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "downloadFromDenyList": {
           "description": "List of regular expressions for the denied `downloadFrom` URLs",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "downloadFromDenyPrivateIps": {
@@ -109,45 +133,32 @@
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 0
         },
         "downloadFromMaxEntries": {
           "description": "Set the maximum number of entries in the `downloadFrom` array. Leave unset or set to 0 for no limit.",
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 0
         },
         "downloadFromMaxRetry": {
           "description": "Set the maximum number of retries for the download from feature. Leave unset for the upstream default (4).",
           "type": [
             "integer",
             "null"
-          ]
-        },
-        "enableBasicAuth": {
-          "description": "Enable basic authentication, see also the basicAuthUsername and basicAuthPassword values",
-          "type": "boolean"
+          ],
+          "minimum": 0
         },
         "enableDebugRoute": {
           "description": "Enable debug route for debugging purposes",
           "type": "boolean"
         },
         "enableOidcAuth": {
-          "description": "Enable OIDC bearer token authentication. Mutually exclusive with `enableBasicAuth`.",
+          "description": "Enable OIDC bearer token authentication. Mutually exclusive with `basicAuth.enabled`.",
           "type": "boolean"
-        },
-        "existingSecret": {
-          "description": "Name of an existing secret containing basic auth credentials (keys: username, password)",
-          "type": "string"
-        },
-        "existingSecretPasswordKey": {
-          "description": "Key in existingSecret for the password (default: password)",
-          "type": "string"
-        },
-        "existingSecretUsernameKey": {
-          "description": "Key in existingSecret for the username (default: username)",
-          "type": "string"
         },
         "oidcAudience": {
           "description": "Set the expected OIDC audience - the token `aud` claim must contain it.",
@@ -166,7 +177,7 @@
           "type": "integer"
         },
         "rootPath": {
-          "description": "Set the root path of the API - for service discovery via URL paths (default \"/\")",
+          "description": "Set the root path of the API, e.g. \"/gotenberg/\" - for service discovery via URL paths (default \"/\"). `/health` moves under it: update the probe paths too.",
           "type": "string"
         },
         "startTimeout": {
@@ -178,7 +189,7 @@
           "type": "string"
         },
         "tlsSecretName": {
-          "description": "Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key)",
+          "description": "Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key). Set `scheme: HTTPS` on the probes too.",
           "type": "string"
         }
       },
@@ -227,10 +238,11 @@
           "type": "boolean"
         },
         "allowList": {
-          "description": "List of regular expressions for the allowed Chromium URLs, the page sent to the HTML and Markdown routes included. Terminate the host, e.g. `^https://assets\\.example\\.com(:|/|$)`: a match skips the IP-class checks.",
+          "description": "List of regular expressions for the allowed Chromium URLs. The page sent to the HTML and Markdown routes skips the lists, but the files uploaded with it load from `file:///tmp/`: include `^file:///tmp/` to keep them. Terminate the host, e.g. `^https://assets\\.example\\.com/`: a match skips the IP-class checks.",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "autoStart": {
@@ -257,7 +269,8 @@
           "description": "List of regular expressions for the denied Chromium URLs. Setting it replaces the upstream default, `^file:(?!//\\/tmp/).*`.",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "denyPrivateIps": {
@@ -297,11 +310,13 @@
           "type": "boolean"
         },
         "maxConcurrency": {
-          "description": "Maximum number of concurrent Chromium conversions. Leave unset for the upstream default (6).",
+          "description": "Maximum number of concurrent Chromium conversions, from 1 to 6. Leave unset for the upstream default (6).",
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "maximum": 6,
+          "minimum": 1
         },
         "maxMemory": {
           "description": "Set the memory all Chromium processes together may hold while converting, e.g. \"800MB\". Over it, Gotenberg restarts Chromium and the conversions in flight answer 503. Chromium, LibreOffice and PDF processing share the container's memory: keep `maxMemory` here and in `libreOffice` together under its limit. Empty disables it. Added in Gotenberg 9.6.0.",
@@ -312,7 +327,8 @@
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 0
         },
         "proxyServer": {
           "description": "Set the outbound proxy server; this switch only affects HTTP and HTTPS requests",
@@ -323,7 +339,8 @@
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 0
         },
         "sharedBrowserContext": {
           "description": "Share one browser context, with its cookies, cache and storage, across all conversions. Each conversion gets its own isolated context by default; enable this only when all callers trust each other.",
@@ -389,12 +406,9 @@
       "type": "object",
       "properties": {
         "gracefulShutdownDurationSec": {
-          "description": "Set the graceful shutdown duration in seconds, also the pod's `terminationGracePeriodSeconds`",
-          "type": "integer"
-        },
-        "hideBanner": {
-          "description": "Hide the Gotenberg banner on startup",
-          "type": "boolean"
+          "description": "Set the graceful shutdown duration in seconds",
+          "type": "integer",
+          "minimum": 0
         }
       },
       "additionalProperties": false
@@ -464,7 +478,8 @@
           "description": "List of regular expressions for the allowed URLs LibreOffice requests: the style sheets an HTML document links, and the URLs macros open with `enableMacros`. Terminate the host: a match skips the IP-class checks.",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "autoStart": {
@@ -475,7 +490,8 @@
           "description": "List of regular expressions for the denied URLs LibreOffice requests",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "denyPrivateIps": {
@@ -511,14 +527,16 @@
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 0
         },
         "restartAfter": {
           "description": "Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (10).",
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 0
         },
         "startTimeout": {
           "description": "Maximum duration to wait for LibreOffice to start or restart (default 20s)",
@@ -528,8 +546,23 @@
       "additionalProperties": false
     },
     "lifecycle": {
-      "description": "Define the container lifecycle hooks. A `preStop` hook keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates. Gotenberg's own graceful shutdown does not cover this: it stops as soon as it is idle, so an idle pod closes its listener within milliseconds of SIGTERM.",
-      "type": "object"
+      "description": "Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. The `sleep` action needs Kubernetes 1.30; set `lifecycle: {}` on older clusters.",
+      "type": "object",
+      "properties": {
+        "preStop": {
+          "type": "object",
+          "properties": {
+            "sleep": {
+              "type": "object",
+              "properties": {
+                "seconds": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "livenessProbe": {
       "description": "Define the liveness probe object for the container.",
@@ -563,15 +596,15 @@
           "type": "string"
         },
         "stdEnableGcpFields": {
-          "description": "Enable GCP log standard output field mapping for Cloud Run",
+          "description": "Enable GCP log field mapping for Cloud Run",
           "type": "boolean"
         },
         "stdFormat": {
-          "description": "Set log standard output format - auto, json, or text (default \"auto\")",
+          "description": "Set the log format - auto, json, or text (default \"auto\"). Gotenberg logs to stderr.",
           "type": "string"
         },
         "stdLevelCase": {
-          "description": "Set the case of the `level` field in standard output - lower or upper (default \"lower\")",
+          "description": "Set the case of the `level` field - lower or upper (default \"lower\")",
           "type": "string"
         }
       },
@@ -589,6 +622,20 @@
           "type": "integer",
           "maximum": 65535,
           "minimum": 1
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "annotations": {
+              "description": "Annotations to add to the metrics Service",
+              "type": "object"
+            },
+            "labels": {
+              "description": "Labels to add to the metrics Service",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
         },
         "serviceMonitor": {
           "type": "object",
@@ -657,20 +704,23 @@
     "networkPolicy": {
       "type": "object",
       "properties": {
-        "allowEgress": {
-          "type": "boolean"
-        },
-        "allowIngress": {
-          "type": "boolean"
+        "egress": {
+          "description": "Egress rules. The default allows all traffic; `[]` denies all. See `ci/hardened-values.yaml` for an example.",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         },
         "enabled": {
+          "description": "Create a NetworkPolicy for the Gotenberg pods",
           "type": "boolean"
         },
-        "extraEgress": {
-          "type": "array"
-        },
-        "extraIngress": {
-          "type": "array"
+        "ingress": {
+          "description": "Ingress rules. The default allows all traffic; `[]` denies all. See values.yaml for an example.",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       },
       "additionalProperties": false
@@ -681,14 +731,25 @@
     "pdb": {
       "type": "object",
       "properties": {
-        "create": {
+        "enabled": {
+          "description": "Create a PodDisruptionBudget",
           "type": "boolean"
         },
         "maxUnavailable": {
-          "type": "string"
+          "description": "(int or string) Pods that may be unavailable, as a number or a percentage such as \"25%\". Set this or `minAvailable`.",
+          "type": [
+            "integer",
+            "string",
+            "null"
+          ]
         },
         "minAvailable": {
-          "type": "integer"
+          "description": "(int or string) Pods that must stay available, as a number or a percentage such as \"50%\". Set this or `maxUnavailable`; with neither, the PDB keeps 1 available.",
+          "type": [
+            "integer",
+            "string",
+            "null"
+          ]
         },
         "unhealthyPodEvictionPolicy": {
           "description": "Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow)",
@@ -712,14 +773,16 @@
           "description": "List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks.",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "denyList": {
           "description": "List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "denyPrivateIps": {
@@ -747,7 +810,8 @@
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 1
         },
         "maxEmbeddedFileBytes": {
           "description": "Set the maximum size of an embedded file read for validation, e.g. \"100MB\" (default 50MiB)",
@@ -758,14 +822,16 @@
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 0
         },
         "maxRenderPixels": {
           "description": "Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset for the upstream default (50000000). Added in Gotenberg 9.3.0.",
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 0
         },
         "maxStreamBytes": {
           "description": "Set the maximum size a PDF stream may decode to, e.g. \"512MB\" (default 256MiB)",
@@ -785,6 +851,7 @@
       "type": "object"
     },
     "progressDeadlineSeconds": {
+      "description": "Seconds a rollout may take before Kubernetes reports it failed. Each node pulls the 1.5GB image on an upgrade.",
       "type": "integer"
     },
     "readinessProbe": {
@@ -884,6 +951,14 @@
     "strategy": {
       "type": "object"
     },
+    "terminationGracePeriodSeconds": {
+      "description": "Seconds Kubernetes waits for the pod to stop. Leave unset for `gotenberg.gracefulShutdownDurationSec` plus 10, which covers the `preStop` sleep.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
     "testImage": {
       "description": "Image configuration for the helm test pod",
       "type": "object",
@@ -923,7 +998,7 @@
     "vpa": {
       "type": "object",
       "properties": {
-        "create": {
+        "enabled": {
           "description": "Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler",
           "type": "boolean"
         },
@@ -945,7 +1020,8 @@
           "description": "List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks.",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "clientTimeout": {
@@ -956,7 +1032,8 @@
           "description": "List of regular expressions for the denied webhook URLs",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^.+$"
           }
         },
         "denyPrivateIps": {
@@ -984,7 +1061,8 @@
           "type": [
             "integer",
             "null"
-          ]
+          ],
+          "minimum": 0
         },
         "retryMaxWait": {
           "description": "Set the maximum duration to wait before trying to call the webhook again (default 30s)",
