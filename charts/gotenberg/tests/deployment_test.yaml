@@ -204,7 +204,7 @@ tests:
           path: spec.template.spec.securityContext.seccompProfile.type
           value: Localhost
 
-  - it: uses a custom securityContext as is and sets HOME for another user
+  - it: keeps the restricted defaults under a custom securityContext and sets HOME for another user
     set:
       securityContext:
         runAsUser: 2000
@@ -212,7 +212,16 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].securityContext
           value:
+            privileged: false
             runAsUser: 2000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+            readOnlyRootFilesystem: false
       - contains:
           path: spec.template.spec.containers[0].env
           content:
@@ -358,3 +367,73 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].args
           content: --chromium-deny-list=
+
+  - it: loosens the security context only where it is set
+    set:
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        capabilities:
+          drop: []
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsNonRoot
+          value: false
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+          value: 0
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.capabilities.drop
+          value: []
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: drops the default HTTP check from a probe with another handler
+    set:
+      readinessProbe:
+        exec:
+          command: [cat, /tmp/ready]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe
+          value:
+            exec:
+              command: [cat, /tmp/ready]
+
+  - it: points the default probes at HTTPS under the root path
+    set:
+      api.tlsSecretName: gotenberg-tls
+      api.rootPath: /gotenberg/
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet
+          value:
+            path: /gotenberg/health
+            port: http
+            scheme: HTTPS
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.httpGet.path
+          value: /gotenberg/health
+
+  - it: leaves a probe path and scheme you set
+    set:
+      api.tlsSecretName: gotenberg-tls
+      api.rootPath: /gotenberg/
+      livenessProbe.httpGet.path: /custom
+      livenessProbe.httpGet.scheme: HTTP
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet
+          value:
+            path: /custom
+            port: http
+            scheme: HTTP
+
+  - it: refuses OIDC without an issuer and an audience
+    set:
+      api.enableOidcAuth: true
+      api.oidcIssuer: https://issuer.example.com/
+    asserts:
+      - failedTemplate:
+          errorPattern: "api.enableOidcAuth needs api.oidcIssuer and api.oidcAudience"

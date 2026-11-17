@@ -16,12 +16,25 @@ To try it from your machine:
 Prometheus metrics: http://{{ include "gotenberg.metricsServiceName" . }}.{{ $namespace }}.svc:{{ .Values.metrics.port }}/metrics
 {{- end }}
 {{- $warnings := list }}
+{{- $auth := or .Values.api.basicAuth.enabled .Values.api.enableOidcAuth }}
 {{- $exposed := list }}
 {{- if .Values.ingress.enabled }}{{ $exposed = append $exposed "an Ingress" }}{{ end }}
 {{- if .Values.gateway.enabled }}{{ $exposed = append $exposed "an HTTPRoute" }}{{ end }}
 {{- if has .Values.service.type (list "LoadBalancer" "NodePort") }}{{ $exposed = append $exposed (printf "a %s Service" .Values.service.type) }}{{ end }}
-{{- if and $exposed (not .Values.api.basicAuth.enabled) (not .Values.api.enableOidcAuth) }}
+{{- if and $exposed (not $auth) }}
 {{- $warnings = append $warnings (printf "Gotenberg is exposed through %s without authentication. Anyone who reaches it can make it fetch URLs and read the files it converts: set api.basicAuth.enabled or api.enableOidcAuth, and see the README's Hardening Example." (join " and " $exposed)) }}
+{{- end }}
+{{- if and .Values.api.enableDebugRoute (not $auth) }}
+{{- $warnings = append $warnings "api.enableDebugRoute serves Gotenberg's configuration without authentication." }}
+{{- end }}
+{{- if .Values.chromium.debugProtocol }}
+{{- $warnings = append $warnings "chromium.debugProtocol logs every DevTools message whole at the debug level, URLs, cookies and credentials included. Turn it off once done troubleshooting." }}
+{{- end }}
+{{- if .Values.libreOffice.enableMacros }}
+{{- $warnings = append $warnings "libreOffice.enableMacros runs the macros of every converted document, which run code in the container. Enable it only when every document is trusted." }}
+{{- end }}
+{{- if .Values.chromium.proxyServer }}
+{{- $warnings = append $warnings "chromium.proxyServer replaces Gotenberg's pinning proxy: a DNS rebinding can slip past the deny lists and IP checks, and a Web Worker's WebSocket reaches your proxy unchecked. Enforce the outbound policy in the proxy too." }}
 {{- end }}
 {{- with .Values.chromium.denyList | default list }}
 {{- $fileRule := false }}

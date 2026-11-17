@@ -80,3 +80,11 @@ tests:
       - matchRegex:
           path: spec.containers[0].args[0]
           pattern: "'https://RELEASE-NAME-gotenberg:80/gotenberg/health'"
+
+  - it: pulls a tag you set without the chart's digest
+    set:
+      testImage.tag: 1.37.0
+    asserts:
+      - equal:
+          path: spec.containers[0].image
+          value: busybox:1.37.0
