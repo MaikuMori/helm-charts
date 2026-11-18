@@ -87,6 +87,7 @@ jobs:
             const chartPath = 'charts/gotenberg/Chart.yaml';
             const COMMIT_LIMIT = 100;
             const BOT_EMAIL = 'github-actions[bot]@users.noreply.github.com';
+            const BOT_INTRO = 'Automated bump of Gotenberg';
             // Total PR-body cap. GitHub's hard limit is 65 536; leave headroom for
             // the boilerplate sections we always emit.
             const PR_BODY_MAX = 60000;
@@ -170,7 +171,7 @@ jobs:
               : `${s.slice(0, max)}\n\n_…release body truncated (${s.length - max} chars omitted)_`;
 
             const sections = [];
-            sections.push(`Automated bump of Gotenberg from \`${CURRENT}\` to \`${LATEST}\`.`);
+            sections.push(`${BOT_INTRO} from \`${CURRENT}\` to \`${LATEST}\`.`);
 
             sections.push('## Release notes');
             if (releases.length > 0) {
@@ -229,12 +230,36 @@ jobs:
               /^bump-gotenberg-\d+\.\d+\.\d+$/.test(pr.head.ref)
             );
 
+            const defaultBranch = context.payload.repository.default_branch;
+            // A bump PR is the bot's until a maintainer pushes to it or rewrites its body.
+            const maintainerOwned = async (pr) => {
+              if (!(pr.body ?? '').startsWith(BOT_INTRO)) return true;
+              const ref = pr.head.ref;
+              // Explicit refspec because actions/checkout configures
+              // remote.origin.fetch to a single-branch refspec by default.
+              await sh('git', [
+                'fetch', '--no-tags', 'origin',
+                `+refs/heads/${ref}:refs/remotes/origin/${ref}`,
+              ]);
+              const { stdout: countOut } = await execFile('git', [
+                'rev-list', '--count', `origin/${defaultBranch}..origin/${ref}`,
+              ]);
+              const { stdout: authorOut } = await execFile('git', [
+                'log', '-1', '--pretty=%ae', `origin/${ref}`,
+              ]);
+              return parseInt(countOut.trim(), 10) !== 1 || authorOut.trim() !== BOT_EMAIL;
+            };
+
             const existing = bumpPRs.find(pr => pr.head.ref === branch);
             if (existing) {
-              core.info(`PR #${existing.number} already targets ${LATEST}, refreshing body.`);
-              await github.rest.pulls.update({
-                ...here, pull_number: existing.number, body,
-              });
+              if (await maintainerOwned(existing)) {
+                core.info(`PR #${existing.number} already targets ${LATEST} and has maintainer changes, leaving it alone.`);
+              } else {
+                core.info(`PR #${existing.number} already targets ${LATEST}, refreshing body.`);
+                await github.rest.pulls.update({
+                  ...here, pull_number: existing.number, body,
+                });
+              }
               return;
             }
 
@@ -263,7 +288,7 @@ jobs:
               ...here,
               title: `Bump Gotenberg to ${LATEST}`,
               head: branch,
-              base: context.payload.repository.default_branch,
+              base: defaultBranch,
               body,
             });
             const newPrUrl = created.data.html_url;
@@ -275,29 +300,11 @@ jobs:
             // navigable both directions.
             for (const pr of bumpPRs) {
               if (pr.head.ref === branch) continue;
-              const ref = pr.head.ref;
-
-              // Explicit refspec because actions/checkout configures
-              // remote.origin.fetch to a single-branch refspec by default —
-              // `git fetch origin <ref>` would only update FETCH_HEAD, leaving
-              // origin/<ref> missing for the rev-list/log lookups below.
-              await sh('git', [
-                'fetch', '--no-tags', 'origin',
-                `+refs/heads/${ref}:refs/remotes/origin/${ref}`,
-              ]);
-              const { stdout: countOut } = await execFile('git', [
-                'rev-list', '--count', `origin/${context.payload.repository.default_branch}..origin/${ref}`,
-              ]);
-              const { stdout: authorOut } = await execFile('git', [
-                'log', '-1', '--pretty=%ae', `origin/${ref}`,
-              ]);
-              const count = parseInt(countOut.trim(), 10);
-              const author = authorOut.trim();
-
-              if (count !== 1 || author !== BOT_EMAIL) {
-                core.info(`PR #${pr.number} (${ref}) has maintainer commits — leaving it alone.`);
+              if (await maintainerOwned(pr)) {
+                core.info(`PR #${pr.number} (${pr.head.ref}) has maintainer changes, leaving it alone.`);
                 continue;
               }
+              const ref = pr.head.ref;
 
               core.info(`Closing superseded PR #${pr.number} (${ref}) — replaced by ${newPrUrl}.`);
               await github.rest.issues.createComment({
