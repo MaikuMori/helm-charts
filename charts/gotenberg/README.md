@@ -247,188 +247,188 @@ Kubernetes: `>=1.30.0-0`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| replicaCount | int | `1` |  |
-| image.repository | string | `"gotenberg/gotenberg"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| image.digest | string | `""` | Image digest, e.g. `sha256:...`. When set, the image is pulled by digest. |
-| imagePullSecrets | list | `[]` |  |
-| nameOverride | string | `""` |  |
-| fullnameOverride | string | `""` |  |
-| serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
-| serviceAccount.automount | bool | `false` | Mount the service account's API token in the pods. Gotenberg doesn't use the Kubernetes API. |
-| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
-| serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
-| podAnnotations | object | `{}` |  |
-| testPodAnnotations | object | `{}` | Set annotations for the helm test pods (for example to disable certain kube-score checks) |
-| testImage | object | `{"digest":null,"repository":"busybox","tag":null}` | Image configuration for the helm test pod |
-| testImage.repository | string | `"busybox"` | Repository for the test image |
-| testImage.tag | string | `nil` | Tag for the test image. Leave unset, with `digest`, for the chart's pinned busybox image. |
-| testImage.digest | string | `nil` | Digest for the test image, e.g. `sha256:...`. Unset pulls the chart's pinned digest when `tag` is unset too, and pulls by tag otherwise. |
-| podLabels | object | `{}` | List of additional pod labels |
-| enableServiceLinks | bool | `false` | Inject service discovery environment variables (`<SVCNAME>_SERVICE_HOST`, `<SVCNAME>_PORT`, ...) into the pod. Gotenberg doesn't use them, and they collide with its own configuration: a Service named `api` in the same namespace injects `API_PORT=tcp://<clusterIP>:<port>`, which Gotenberg reads as an override for `--api-port` and refuses to start. |
-| podSecurityContext | object | `{}` |  |
-| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user, non-root check and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium. | Define the security context for the container. Keys set here override the default's, e.g. `runAsUser`, and the rest stays; set a key to loosen it, e.g. `allowPrivilegeEscalation: true`. |
-| service.type | string | `"ClusterIP"` |  |
-| service.port | int | `80` |  |
-| service.annotations | object | `{}` | Annotations to add to the service |
-| strategy | object | `{}` |  |
-| progressDeadlineSeconds | int | `600` | Seconds a rollout may take before Kubernetes reports it failed. Each node pulls the 1.5GB image on an upgrade. |
-| resources | object | `{}` |  |
-| lifecycle | object | `{"preStop":{"sleep":{"seconds":5}}}` | Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. Helm merges this with your value, so set `lifecycle.preStop: null` to drop the sleep. |
-| terminationGracePeriodSeconds | int | `nil` | Seconds Kubernetes waits for the pod to stop. Leave unset for `gotenberg.gracefulShutdownDurationSec` plus 10, which covers the `preStop` sleep. |
-| livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. |
-| readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. |
-| startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. |
-| autoscaling.enabled | bool | `false` |  |
-| autoscaling.minReplicas | int | `1` |  |
-| autoscaling.maxReplicas | int | `100` |  |
-| autoscaling.behavior | object | `{}` |  |
-| autoscaling.extraMetrics | list | `[]` |  |
-| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
-| autoscaling.targetMemoryUtilizationPercentage | int | `nil` | Target average memory utilization percentage. Leave unset to not scale on memory. |
-| vpa.enabled | bool | `false` | Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler |
-| vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only) |
-| vpa.resourcePolicy | object | `{}` | Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example. |
-| pdb.enabled | bool | `false` | Create a PodDisruptionBudget |
-| pdb.minAvailable | int or string | `nil` | Pods that must stay available, as a number or a percentage such as "50%". Set this or `maxUnavailable`; with neither, the PDB keeps 1 available. |
-| pdb.maxUnavailable | int or string | `nil` | Pods that may be unavailable, as a number or a percentage such as "25%". Set this or `minAvailable`. |
-| pdb.unhealthyPodEvictionPolicy | string | `nil` | Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow) |
-| nodeSelector | object | `{}` |  |
-| tolerations | list | `[]` |  |
 | affinity | object | `{}` |  |
-| topologySpreadConstraints | list | `[]` |  |
-| volumes | list | `[]` |  |
-| volumeMounts | list | `[]` |  |
-| extraEnv | list | `[]` | List of extra environment variables for gotenberg container. Every Gotenberg flag also reads an environment variable, which wins over the chart's value, e.g. `API_BIND_IP` for a flag the chart doesn't map. Gotenberg exports traces, metrics and logs with the standard `OTEL_*` variables; to serve Prometheus metrics, use `metrics.enabled` instead. See https://gotenberg.dev/docs/configuration for details. |
-| initContainers | list | `[]` | List of init containers for the gotenberg pod |
-| ingress.enabled | bool | `false` | Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet. |
-| ingress.className | string | `""` | Set the class name of the ingress |
-| ingress.annotations | object | `{}` | Set the annotations of the ingress |
-| ingress.labels | object | `{}` | Set the labels of the ingress |
-| ingress.hosts | list | `[]` | Set the hostnames of the ingress, see values.yaml for an example. |
-| ingress.tls | list | `[]` | Set the TLS configuration for the ingress, see values.yaml for an example. |
-| gateway.enabled | bool | `false` | Set to true to create an HTTPRoute resource |
-| gateway.annotations | object | `{}` | Annotations to add to the HTTPRoute |
-| gateway.labels | object | `{}` | Labels to add to the HTTPRoute |
-| gateway.parentRefs | list | `[]` | Parent Gateway references, see values.yaml for an example. |
-| gateway.hostnames | list | `[]` | Hostnames to match for routing, see values.yaml for an example. |
-| api.port | int | `3000` | Set the port on which the API should listen, also the container's and the Service's target port |
-| api.tlsSecretName | string | `""` | Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key). Set `scheme: HTTPS` on the probes too. |
-| api.timeout | string | `nil` | Set the time limit for requests (default 30s) |
-| api.bodyLimit | string | `nil` | Set the request body limit for multipart/form-data (e.g., "100MB") |
-| api.rootPath | string | `nil` | Set the root path of the API, e.g. "/gotenberg/" - for service discovery via URL paths (default "/"). `/health` moves under it: update the probe paths too. |
-| api.correlationIdHeader | string | `nil` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
-| api.disableHealthCheckRouteTelemetry | bool | `nil` | Disable health check route telemetry. Leave unset for the upstream default (true). |
-| api.disableRootRouteTelemetry | bool | `nil` | Disable telemetry on the root route. Leave unset for the upstream default (true). |
-| api.disableDebugRouteTelemetry | bool | `nil` | Disable telemetry on the debug route. Leave unset for the upstream default (true). |
-| api.disableVersionRouteTelemetry | bool | `nil` | Disable telemetry on the version route. Leave unset for the upstream default (true). |
-| api.enableDebugRoute | bool | `nil` | Enable debug route for debugging purposes |
-| api.startTimeout | string | `nil` | Set the maximum duration to wait for the API to start |
+| api.archiveMaxEntries | int | `nil` | Set the maximum number of entries of a zip archive sent in the `archives` form field. Must be positive. Leave unset for the upstream default (10000). |
+| api.archiveMaxRatio | int | `nil` | Set how many times its own size a zip archive sent in the `archives` form field may unpack to. Must be positive. Leave unset for the upstream default (100). |
 | api.basicAuth.enabled | bool | `false` | Enable basic authentication, with credentials from `existingSecret`, or `username` and `password`. Mutually exclusive with `enableOidcAuth`. |
 | api.basicAuth.existingSecret | string | `""` | Name of an existing secret holding the credentials |
-| api.basicAuth.usernameKey | string | `""` | Key in `existingSecret` for the username (default: username) |
+| api.basicAuth.password | string | `nil` | Set the password (ignored if existingSecret is set) |
 | api.basicAuth.passwordKey | string | `""` | Key in `existingSecret` for the password (default: password) |
 | api.basicAuth.username | string | `nil` | Set the username (ignored if existingSecret is set) |
-| api.basicAuth.password | string | `nil` | Set the password (ignored if existingSecret is set) |
-| api.enableOidcAuth | bool | `nil` | Enable OIDC bearer token authentication. Mutually exclusive with `basicAuth.enabled`. |
-| api.oidcIssuer | string | `nil` | Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match. |
-| api.oidcAudience | string | `nil` | Set the expected OIDC audience - the token `aud` claim must contain it. |
-| api.oidcJwksUrl | string | `nil` | Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty. |
+| api.basicAuth.usernameKey | string | `""` | Key in `existingSecret` for the username (default: username) |
+| api.bodyLimit | string | `nil` | Set the request body limit for multipart/form-data (e.g., "100MB") |
+| api.correlationIdHeader | string | `nil` | Set the header name to use for identifying requests (default "Gotenberg-Trace") |
+| api.disableDebugRouteTelemetry | bool | `nil` | Disable telemetry on the debug route. Leave unset for the upstream default (true). |
+| api.disableDownloadFrom | bool | `nil` | Disable the download from feature |
+| api.disableHealthCheckRouteTelemetry | bool | `nil` | Disable health check route telemetry. Leave unset for the upstream default (true). |
+| api.disableRootRouteTelemetry | bool | `nil` | Disable telemetry on the root route. Leave unset for the upstream default (true). |
+| api.disableVersionRouteTelemetry | bool | `nil` | Disable telemetry on the version route. Leave unset for the upstream default (true). |
 | api.downloadFromAllowList | list | `nil` | List of regular expressions for the allowed `downloadFrom` URLs. Terminate the host, e.g. `^https://files\.example\.com/`: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
 | api.downloadFromDenyList | list | `nil` | List of regular expressions for the denied `downloadFrom` URLs An empty list clears Gotenberg's default. |
 | api.downloadFromDenyPrivateIps | bool | `nil` | Reject `downloadFrom` URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `downloadFromAllowList` skips the IP-class check; a URL matching `downloadFromDenyList` is always rejected. |
 | api.downloadFromDenyPublicIps | bool | `nil` | Reject `downloadFrom` URLs resolving to a public IP. Setting both `downloadFromDenyPrivateIps` and `downloadFromDenyPublicIps` to true rejects every URL unless the allow-list matches. |
-| api.downloadFromMaxRetry | int | `nil` | Set the maximum number of retries for the download from feature. Leave unset for the upstream default (4). |
+| api.downloadFromEnableEnvironmentProxy | bool | `nil` | Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. |
 | api.downloadFromMaxConcurrency | int | `nil` | Set the maximum number of concurrent fetches per request for the download from feature. Leave unset for the upstream default (10); set to 0 for no limit. |
 | api.downloadFromMaxEntries | int | `nil` | Set the maximum number of entries in the `downloadFrom` array. Leave unset or set to 0 for no limit. |
-| api.downloadFromEnableEnvironmentProxy | bool | `nil` | Route `downloadFrom` fetches through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. |
-| api.disableDownloadFrom | bool | `nil` | Disable the download from feature |
-| api.archiveMaxEntries | int | `nil` | Set the maximum number of entries of a zip archive sent in the `archives` form field. Must be positive. Leave unset for the upstream default (10000). |
-| api.archiveMaxRatio | int | `nil` | Set how many times its own size a zip archive sent in the `archives` form field may unpack to. Must be positive. Leave unset for the upstream default (100). |
-| chromium.restartAfter | int | `nil` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (100). |
-| chromium.maxConcurrency | int | `nil` | Maximum number of concurrent Chromium conversions, from 1 to 6. Leave unset for the upstream default (6). |
-| chromium.autoStart | bool | `nil` | Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion |
-| chromium.startTimeout | string | `nil` | Maximum duration to wait for Chromium to start or restart (default 20s) |
+| api.downloadFromMaxRetry | int | `nil` | Set the maximum number of retries for the download from feature. Leave unset for the upstream default (4). |
+| api.enableDebugRoute | bool | `nil` | Enable debug route for debugging purposes |
+| api.enableOidcAuth | bool | `nil` | Enable OIDC bearer token authentication. Mutually exclusive with `basicAuth.enabled`. |
+| api.oidcAudience | string | `nil` | Set the expected OIDC audience - the token `aud` claim must contain it. |
+| api.oidcIssuer | string | `nil` | Set the OIDC issuer URL, e.g. `https://tenant.example.com/` - the token `iss` claim must match. |
+| api.oidcJwksUrl | string | `nil` | Set the OIDC JWKS URL. Discovered from the issuer's well-known configuration when empty. |
+| api.port | int | `3000` | Set the port on which the API should listen, also the container's and the Service's target port |
+| api.rootPath | string | `nil` | Set the root path of the API, e.g. "/gotenberg/" - for service discovery via URL paths (default "/"). `/health` moves under it: update the probe paths too. |
+| api.startTimeout | string | `nil` | Set the maximum duration to wait for the API to start |
+| api.timeout | string | `nil` | Set the time limit for requests (default 30s) |
+| api.tlsSecretName | string | `""` | Enables TLS on the API server: K8S TLS secret name containing the TLS certificate and key (tls.crt, tls.key). Set `scheme: HTTPS` on the probes too. |
+| autoscaling.behavior | object | `{}` |  |
+| autoscaling.enabled | bool | `false` |  |
+| autoscaling.extraMetrics | list | `[]` |  |
+| autoscaling.maxReplicas | int | `100` |  |
+| autoscaling.minReplicas | int | `1` |  |
+| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| autoscaling.targetMemoryUtilizationPercentage | int | `nil` | Target average memory utilization percentage. Leave unset to not scale on memory. |
 | chromium.allowFileAccessFromFiles | bool | `nil` | Allow file:// URIs to read other file:// URIs |
 | chromium.allowInsecureLocalhost | bool | `nil` | Ignore TLS/SSL errors on localhost |
 | chromium.allowList | list | `nil` | List of regular expressions for the allowed Chromium URLs. The page sent to the HTML and Markdown routes skips the lists, but the files uploaded with it load from `file:///tmp/`: include `^file:///tmp/` to keep them. Terminate the host, e.g. `^https://assets\.example\.com/`: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
-| chromium.denyList | list | `nil` | List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule. |
-| chromium.denyPrivateIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Weakened by `proxyServer`, see there. |
-| chromium.denyPublicIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
-| chromium.ignoreCertificateErrors | bool | `nil` | Ignore the certificate errors |
-| chromium.disableWebSecurity | bool | `nil` | Don't enforce the same-origin policy |
-| chromium.hostResolverRules | string | `nil` | Set custom mappings to the host resolver, e.g. `MAP intranet.local 10.0.0.5`. The IP-class checks still apply to the mapped address. |
-| chromium.proxyServer | string | `nil` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests. It replaces Gotenberg's pinning proxy: a DNS rebinding can slip past the deny lists and IP checks, and a Web Worker's WebSocket reaches the proxy unchecked, so enforce the outbound policy there too. |
-| chromium.enableEnvironmentProxy | bool | `nil` | Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset. |
-| chromium.disableJavaScript | bool | `nil` | Disable JavaScript |
-| chromium.disableRoutes | bool | `nil` | Disable the routes |
-| chromium.sharedBrowserContext | bool | `nil` | Share one browser context, with its cookies, cache and storage, across all conversions. Each conversion gets its own isolated context by default; enable this only when all callers trust each other. |
+| chromium.autoStart | bool | `nil` | Automatically launch Chromium upon initialization if set to true; otherwise, Chromium will start at the time of the first conversion |
 | chromium.clearCache | bool | `nil` | Clear Chromium cache between each conversion. Only applies with `sharedBrowserContext`. |
 | chromium.clearCookies | bool | `nil` | Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext`. |
 | chromium.clearStorage | bool | `nil` | Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext`. |
-| chromium.maxQueueSize | int | `nil` | Maximum request queue size for Chromium. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
-| chromium.idleShutdownTimeout | string | `nil` | Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
-| chromium.maxMemory | string | `nil` | Set the memory all Chromium processes together may hold while converting, e.g. "800MB". Over it, Gotenberg restarts Chromium and the conversions in flight answer 503. Chromium, LibreOffice and PDF processing share the container's memory: keep `maxMemory` here and in `libreOffice` together under its limit. Empty disables it. Added in Gotenberg 9.6.0. |
 | chromium.debugProtocol | bool | `nil` | Log every DevTools Protocol message at the debug log level. The messages carry URLs, cookies and header values, credentials included: enable it only to troubleshoot. |
-| libreOffice.restartAfter | int | `nil` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (10). |
-| libreOffice.autoStart | bool | `nil` | Automatically launch LibreOffice upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false) |
-| libreOffice.startTimeout | string | `nil` | Maximum duration to wait for LibreOffice to start or restart (default 20s) |
-| libreOffice.disableRoutes | bool | `nil` | Disable the routes |
-| libreOffice.maxQueueSize | int | `nil` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
-| libreOffice.idleShutdownTimeout | string | `nil` | Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
+| chromium.denyList | list | `nil` | List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule. |
+| chromium.denyPrivateIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Weakened by `proxyServer`, see there. |
+| chromium.denyPublicIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
+| chromium.disableJavaScript | bool | `nil` | Disable JavaScript |
+| chromium.disableRoutes | bool | `nil` | Disable the routes |
+| chromium.disableWebSecurity | bool | `nil` | Don't enforce the same-origin policy |
+| chromium.enableEnvironmentProxy | bool | `nil` | Route Chromium's outbound requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. Use this instead of `proxyServer` for authenticated proxies, and leave `proxyServer` and `hostResolverRules` unset. |
+| chromium.hostResolverRules | string | `nil` | Set custom mappings to the host resolver, e.g. `MAP intranet.local 10.0.0.5`. The IP-class checks still apply to the mapped address. |
+| chromium.idleShutdownTimeout | string | `nil` | Duration after which idle Chromium browser processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
+| chromium.ignoreCertificateErrors | bool | `nil` | Ignore the certificate errors |
+| chromium.maxConcurrency | int | `nil` | Maximum number of concurrent Chromium conversions, from 1 to 6. Leave unset for the upstream default (6). |
+| chromium.maxMemory | string | `nil` | Set the memory all Chromium processes together may hold while converting, e.g. "800MB". Over it, Gotenberg restarts Chromium and the conversions in flight answer 503. Chromium, LibreOffice and PDF processing share the container's memory: keep `maxMemory` here and in `libreOffice` together under its limit. Empty disables it. Added in Gotenberg 9.6.0. |
+| chromium.maxQueueSize | int | `nil` | Maximum request queue size for Chromium. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
+| chromium.proxyServer | string | `nil` | Set the outbound proxy server; this switch only affects HTTP and HTTPS requests. It replaces Gotenberg's pinning proxy: a DNS rebinding can slip past the deny lists and IP checks, and a Web Worker's WebSocket reaches the proxy unchecked, so enforce the outbound policy there too. |
+| chromium.restartAfter | int | `nil` | Number of conversions after which Chromium will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (100). |
+| chromium.sharedBrowserContext | bool | `nil` | Share one browser context, with its cookies, cache and storage, across all conversions. Each conversion gets its own isolated context by default; enable this only when all callers trust each other. |
+| chromium.startTimeout | string | `nil` | Maximum duration to wait for Chromium to start or restart (default 20s) |
+| enableServiceLinks | bool | `false` | Inject service discovery environment variables (`<SVCNAME>_SERVICE_HOST`, `<SVCNAME>_PORT`, ...) into the pod. Gotenberg doesn't use them, and they collide with its own configuration: a Service named `api` in the same namespace injects `API_PORT=tcp://<clusterIP>:<port>`, which Gotenberg reads as an override for `--api-port` and refuses to start. |
+| extraEnv | list | `[]` | List of extra environment variables for gotenberg container. Every Gotenberg flag also reads an environment variable, which wins over the chart's value, e.g. `API_BIND_IP` for a flag the chart doesn't map. Gotenberg exports traces, metrics and logs with the standard `OTEL_*` variables; to serve Prometheus metrics, use `metrics.enabled` instead. See https://gotenberg.dev/docs/configuration for details. |
+| fullnameOverride | string | `""` |  |
+| gateway.annotations | object | `{}` | Annotations to add to the HTTPRoute |
+| gateway.enabled | bool | `false` | Set to true to create an HTTPRoute resource |
+| gateway.hostnames | list | `[]` | Hostnames to match for routing, see values.yaml for an example. |
+| gateway.labels | object | `{}` | Labels to add to the HTTPRoute |
+| gateway.parentRefs | list | `[]` | Parent Gateway references, see values.yaml for an example. |
+| gotenberg.buildDebugData | bool | `nil` | Build the debug data the debug route serves. Leave unset for the upstream default (true). |
+| gotenberg.gracefulShutdownDurationSec | int | `nil` | Set the graceful shutdown duration in seconds. Leave unset for the upstream default (30). `terminationGracePeriodSeconds` follows it. |
+| gotenberg.hideBanner | bool | `nil` | Hide the banner above the startup summary. Gotenberg prints it only to a terminal. |
+| image.digest | string | `""` | Image digest, e.g. `sha256:...`. When set, the image is pulled by digest. |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.repository | string | `"gotenberg/gotenberg"` |  |
+| image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
+| imagePullSecrets | list | `[]` |  |
+| ingress.annotations | object | `{}` | Set the annotations of the ingress |
+| ingress.className | string | `""` | Set the class name of the ingress |
+| ingress.enabled | bool | `false` | Set to true to enable ingress record generation. WARNING: Gotenberg shouldn't be exposed to the internet. |
+| ingress.hosts | list | `[]` | Set the hostnames of the ingress, see values.yaml for an example. |
+| ingress.labels | object | `{}` | Set the labels of the ingress |
+| ingress.tls | list | `[]` | Set the TLS configuration for the ingress, see values.yaml for an example. |
+| initContainers | list | `[]` | List of init containers for the gotenberg pod |
 | libreOffice.allowList | list | `nil` | List of regular expressions for the allowed URLs LibreOffice requests: the style sheets an HTML document links, and the URLs macros open with `enableMacros`. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
+| libreOffice.autoStart | bool | `nil` | Automatically launch LibreOffice upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false) |
 | libreOffice.denyList | list | `nil` | List of regular expressions for the denied URLs LibreOffice requests An empty list clears Gotenberg's default. |
 | libreOffice.denyPrivateIps | bool | `nil` | Reject LibreOffice requests resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. |
 | libreOffice.denyPublicIps | bool | `nil` | Reject LibreOffice requests resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
+| libreOffice.disableRoutes | bool | `nil` | Disable the routes |
 | libreOffice.enableEnvironmentProxy | bool | `nil` | Route LibreOffice requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. |
-| libreOffice.maxMemory | string | `nil` | Set the memory LibreOffice may hold during a conversion, e.g. "900MB". Over it, Gotenberg kills LibreOffice and answers that conversion 422. Keep it and `chromium.maxMemory` together under the container's memory limit. Empty disables it. Added in Gotenberg 9.6.0. |
 | libreOffice.enableMacros | bool | `nil` | Run the macros of converted documents, including those bound to document events. Macros run code inside the container: enable it only for trusted documents. |
-| pdf.maxConcurrency | int | `nil` | Maximum number of PDF documents a request processes at once. Leave unset for the upstream default (1). |
-| pdf.disableRoutes | bool | `nil` | Disable the /forms/pdf routes. Conversion routes still run stages: set `disableStages` too to turn off PDF processing. |
-| pdf.disableStages | bool | `nil` | Refuse the `stages` field of the Chromium and LibreOffice routes, so they only convert. Added in Gotenberg 9.3.0. |
-| pdf.maxStreamBytes | string | `nil` | Set the maximum size a PDF stream may decode to, e.g. "512MB" (default 256MiB) |
-| pdf.maxEmbeddedFileBytes | string | `nil` | Set the maximum size of an embedded file read for validation, e.g. "100MB" (default 50MiB) |
-| pdf.maxImagePixels | int | `nil` | Set the maximum number of pixels an image may hold. Leave unset for the upstream default (100000000). |
-| pdf.maxRenderPixels | int | `nil` | Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset for the upstream default (50000000). Added in Gotenberg 9.3.0. |
-| pdf.allowList | list | `nil` | List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
-| pdf.denyList | list | `nil` | List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages An empty list clears Gotenberg's default. |
-| pdf.denyPrivateIps | bool | `nil` | Reject timestamp authority URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). Callers choose these URLs: enable it for untrusted callers. A URL matching `allowList` skips the IP-class check. |
-| pdf.denyPublicIps | bool | `nil` | Reject timestamp authority URLs resolving to a public IP |
-| pdf.enableEnvironmentProxy | bool | `nil` | Route timestamp authority requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. |
-| webhook.enableSyncMode | bool | `nil` | Enable synchronous mode for the webhook feature |
-| webhook.allowList | list | `nil` | List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
-| webhook.denyList | list | `nil` | List of regular expressions for the denied webhook URLs An empty list clears Gotenberg's default. |
-| webhook.denyPrivateIps | bool | `nil` | Reject webhook URLs (result and events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. |
-| webhook.denyPublicIps | bool | `nil` | Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
-| webhook.maxRetry | int | `nil` | Set the maximum number of retries for the webhook feature. Leave unset for the upstream default (4). |
-| webhook.retryMinWait | string | `nil` | Set the minimum duration to wait before trying to call the webhook again (default 1s) |
-| webhook.retryMaxWait | string | `nil` | Set the maximum duration to wait before trying to call the webhook again (default 30s) |
-| webhook.clientTimeout | string | `nil` | Set the time limit for requests to the webhook (default 30s) |
-| webhook.enableEnvironmentProxy | bool | `nil` | Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. |
-| webhook.disable | bool | `nil` | Disable the webhook feature |
+| libreOffice.idleShutdownTimeout | string | `nil` | Duration after which idle LibreOffice processes are shut down (e.g., "30s"). Set to 0s or leave empty to disable (default 0s, disabled). |
+| libreOffice.maxMemory | string | `nil` | Set the memory LibreOffice may hold during a conversion, e.g. "900MB". Over it, Gotenberg kills LibreOffice and answers that conversion 422. Keep it and `chromium.maxMemory` together under the container's memory limit. Empty disables it. Added in Gotenberg 9.6.0. |
+| libreOffice.maxQueueSize | int | `nil` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
+| libreOffice.restartAfter | int | `nil` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (10). |
+| libreOffice.startTimeout | string | `nil` | Maximum duration to wait for LibreOffice to start or restart (default 20s) |
+| lifecycle | object | `{"preStop":{"sleep":{"seconds":5}}}` | Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. Helm merges this with your value, so set `lifecycle.preStop: null` to drop the sleep. |
+| livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. |
+| logging.fieldsPrefix | string | `nil` | Prepend a specified prefix to each field in the logs |
+| logging.level | string | `nil` | Set the log level - error, warn, info, or debug (default "info") |
+| logging.stdEnableGcpFields | bool | `nil` | Enable GCP log field mapping for Cloud Run |
 | logging.stdFormat | string | `nil` | Set the log format - auto, json, or text (default "auto"). Gotenberg logs to stderr. |
 | logging.stdLevelCase | string | `nil` | Set the case of the `level` field - lower or upper (default "lower") |
-| logging.level | string | `nil` | Set the log level - error, warn, info, or debug (default "info") |
-| logging.fieldsPrefix | string | `nil` | Prepend a specified prefix to each field in the logs |
-| logging.stdEnableGcpFields | bool | `nil` | Enable GCP log field mapping for Cloud Run |
-| gotenberg.gracefulShutdownDurationSec | int | `nil` | Set the graceful shutdown duration in seconds. Leave unset for the upstream default (30). `terminationGracePeriodSeconds` follows it. |
-| gotenberg.hideBanner | bool | `nil` | Hide the banner above the startup summary. Gotenberg prints it only to a terminal. |
-| gotenberg.buildDebugData | bool | `nil` | Build the debug data the debug route serves. Leave unset for the upstream default (true). |
 | metrics.enabled | bool | `false` | Serve Prometheus metrics at `/metrics` on `metrics.port`, through Gotenberg's OpenTelemetry Prometheus exporter, with a ClusterIP `<fullname>-metrics` Service. Also on when `serviceMonitor.enabled` is true. The chart then sets the `OTEL_METRICS_EXPORTER` and `OTEL_EXPORTER_PROMETHEUS_*` variables, so `extraEnv` can't. |
 | metrics.port | int | `9464` | Port of the Prometheus metrics endpoint, on the container and the metrics Service. Must differ from `api.port`. |
 | metrics.service.annotations | object | `{}` | Annotations to add to the metrics Service |
 | metrics.service.labels | object | `{}` | Labels to add to the metrics Service |
-| metrics.serviceMonitor.enabled | bool | `false` | Enable ServiceMonitor. Turns the metrics endpoint on. |
-| metrics.serviceMonitor.namespace | string | `nil` | Namespace for ServiceMonitor, defaults to release namespace |
-| metrics.serviceMonitor.jobLabel | string | `nil` | Optional job label for the target service in Prometheus |
-| metrics.serviceMonitor.interval | string | `nil` | Interval at which metrics should be scraped |
-| metrics.serviceMonitor.scrapeTimeout | string | `nil` | Timeout after which the scrape is ended |
-| metrics.serviceMonitor.honorLabels | bool | `false` | HonorLabels chooses the metric’s labels on collisions with target labels |
-| metrics.serviceMonitor.metricRelabelings | list | `[]` | List of metric relabel configs to apply to samples before ingestion |
-| metrics.serviceMonitor.relabelings | list | `[]` | List of relabel configs to apply to samples before scraping |
 | metrics.serviceMonitor.annotations | object | `{}` | Additional annotations for the service monitor |
+| metrics.serviceMonitor.enabled | bool | `false` | Enable ServiceMonitor. Turns the metrics endpoint on. |
+| metrics.serviceMonitor.honorLabels | bool | `false` | HonorLabels chooses the metric’s labels on collisions with target labels |
+| metrics.serviceMonitor.interval | string | `nil` | Interval at which metrics should be scraped |
+| metrics.serviceMonitor.jobLabel | string | `nil` | Optional job label for the target service in Prometheus |
 | metrics.serviceMonitor.labels | object | `{}` | Additional labels for the service monitor |
+| metrics.serviceMonitor.metricRelabelings | list | `[]` | List of metric relabel configs to apply to samples before ingestion |
+| metrics.serviceMonitor.namespace | string | `nil` | Namespace for ServiceMonitor, defaults to release namespace |
+| metrics.serviceMonitor.relabelings | list | `[]` | List of relabel configs to apply to samples before scraping |
+| metrics.serviceMonitor.scrapeTimeout | string | `nil` | Timeout after which the scrape is ended |
+| nameOverride | string | `""` |  |
+| networkPolicy.egress | list | `[{}]` | Egress rules. The default allows all traffic; `[]` denies all. See `ci/hardened-values.yaml` for an example. |
 | networkPolicy.enabled | bool | `false` | Create a NetworkPolicy for the Gotenberg pods |
 | networkPolicy.ingress | list | `[{}]` | Ingress rules. The default allows all traffic; `[]` denies all. See values.yaml for an example. |
-| networkPolicy.egress | list | `[{}]` | Egress rules. The default allows all traffic; `[]` denies all. See `ci/hardened-values.yaml` for an example. |
+| nodeSelector | object | `{}` |  |
+| pdb.enabled | bool | `false` | Create a PodDisruptionBudget |
+| pdb.maxUnavailable | int or string | `nil` | Pods that may be unavailable, as a number or a percentage such as "25%". Set this or `minAvailable`. |
+| pdb.minAvailable | int or string | `nil` | Pods that must stay available, as a number or a percentage such as "50%". Set this or `maxUnavailable`; with neither, the PDB keeps 1 available. |
+| pdb.unhealthyPodEvictionPolicy | string | `nil` | Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow) |
+| pdf.allowList | list | `nil` | List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
+| pdf.denyList | list | `nil` | List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages An empty list clears Gotenberg's default. |
+| pdf.denyPrivateIps | bool | `nil` | Reject timestamp authority URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). Callers choose these URLs: enable it for untrusted callers. A URL matching `allowList` skips the IP-class check. |
+| pdf.denyPublicIps | bool | `nil` | Reject timestamp authority URLs resolving to a public IP |
+| pdf.disableRoutes | bool | `nil` | Disable the /forms/pdf routes. Conversion routes still run stages: set `disableStages` too to turn off PDF processing. |
+| pdf.disableStages | bool | `nil` | Refuse the `stages` field of the Chromium and LibreOffice routes, so they only convert. Added in Gotenberg 9.3.0. |
+| pdf.enableEnvironmentProxy | bool | `nil` | Route timestamp authority requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. |
+| pdf.maxConcurrency | int | `nil` | Maximum number of PDF documents a request processes at once. Leave unset for the upstream default (1). |
+| pdf.maxEmbeddedFileBytes | string | `nil` | Set the maximum size of an embedded file read for validation, e.g. "100MB" (default 50MiB) |
+| pdf.maxImagePixels | int | `nil` | Set the maximum number of pixels an image may hold. Leave unset for the upstream default (100000000). |
+| pdf.maxRenderPixels | int | `nil` | Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset for the upstream default (50000000). Added in Gotenberg 9.3.0. |
+| pdf.maxStreamBytes | string | `nil` | Set the maximum size a PDF stream may decode to, e.g. "512MB" (default 256MiB) |
+| podAnnotations | object | `{}` |  |
+| podLabels | object | `{}` | List of additional pod labels |
+| podSecurityContext | object | `{}` |  |
+| progressDeadlineSeconds | int | `600` | Seconds a rollout may take before Kubernetes reports it failed. Each node pulls the 1.5GB image on an upgrade. |
+| readinessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the readiness probe object for the container. |
+| replicaCount | int | `1` |  |
+| resources | object | `{}` |  |
+| securityContext | object | Meets the Pod Security `restricted` level: runs as non-root user 1001, with no privilege escalation, all capabilities dropped and the `RuntimeDefault` seccomp profile unless `podSecurityContext` sets one. On OpenShift, the user, non-root check and seccomp profile are left to the SCC. The root filesystem stays writable for Chromium. | Define the security context for the container. Keys set here override the default's, e.g. `runAsUser`, and the rest stays; set a key to loosen it, e.g. `allowPrivilegeEscalation: true`. |
+| service.annotations | object | `{}` | Annotations to add to the service |
+| service.port | int | `80` |  |
+| service.type | string | `"ClusterIP"` |  |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| serviceAccount.automount | bool | `false` | Mount the service account's API token in the pods. Gotenberg doesn't use the Kubernetes API. |
+| serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
+| serviceAccount.name | string | `""` | The name of the service account to use. # If not set and create is true, a name is generated using the fullname template |
+| startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. |
+| strategy | object | `{}` |  |
+| terminationGracePeriodSeconds | int | `nil` | Seconds Kubernetes waits for the pod to stop. Leave unset for `gotenberg.gracefulShutdownDurationSec` plus 10, which covers the `preStop` sleep. |
+| testImage | object | `{"digest":null,"repository":"busybox","tag":null}` | Image configuration for the helm test pod |
+| testImage.digest | string | `nil` | Digest for the test image, e.g. `sha256:...`. Unset pulls the chart's pinned digest when `tag` is unset too, and pulls by tag otherwise. |
+| testImage.repository | string | `"busybox"` | Repository for the test image |
+| testImage.tag | string | `nil` | Tag for the test image. Leave unset, with `digest`, for the chart's pinned busybox image. |
+| testPodAnnotations | object | `{}` | Set annotations for the helm test pods (for example to disable certain kube-score checks) |
+| tolerations | list | `[]` |  |
+| topologySpreadConstraints | list | `[]` |  |
+| volumeMounts | list | `[]` |  |
+| volumes | list | `[]` |  |
+| vpa.enabled | bool | `false` | Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler |
+| vpa.resourcePolicy | object | `{}` | Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example. |
+| vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only) |
+| webhook.allowList | list | `nil` | List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
+| webhook.clientTimeout | string | `nil` | Set the time limit for requests to the webhook (default 30s) |
+| webhook.denyList | list | `nil` | List of regular expressions for the denied webhook URLs An empty list clears Gotenberg's default. |
+| webhook.denyPrivateIps | bool | `nil` | Reject webhook URLs (result and events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. |
+| webhook.denyPublicIps | bool | `nil` | Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
+| webhook.disable | bool | `nil` | Disable the webhook feature |
+| webhook.enableEnvironmentProxy | bool | `nil` | Route webhook callbacks through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. |
+| webhook.enableSyncMode | bool | `nil` | Enable synchronous mode for the webhook feature |
+| webhook.maxRetry | int | `nil` | Set the maximum number of retries for the webhook feature. Leave unset for the upstream default (4). |
+| webhook.retryMaxWait | string | `nil` | Set the maximum duration to wait before trying to call the webhook again (default 30s) |
+| webhook.retryMinWait | string | `nil` | Set the minimum duration to wait before trying to call the webhook again (default 1s) |
