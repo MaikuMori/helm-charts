@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 9.8.0](https://img.shields.io/badge/AppVersion-9.8.0-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 9.9.0](https://img.shields.io/badge/AppVersion-9.9.0-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -112,13 +112,13 @@ Chart releases are typically published when new features or breaking changes are
 To use a specific version of Gotenberg:
 
 ```console
-helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.8.0"
+helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.9.0"
 ```
 
 Or with `--rollback-on-failure` (`--atomic` on Helm 3) for automatic rollback on failure:
 
 ```console
-helm upgrade --install --rollback-on-failure my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.8.0"
+helm upgrade --install --rollback-on-failure my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.9.0"
 ```
 
 This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes within a major version. A newer flag the chart maps needs a Gotenberg version that has it.
@@ -129,10 +129,10 @@ Tags can be moved to point at a different image. To pull exactly the image you r
 
 ```console
 helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg \
-  --set image.tag="9.8.0" --set image.digest="sha256:<digest>"
+  --set image.tag="9.9.0" --set image.digest="sha256:<digest>"
 ```
 
-`docker buildx imagetools inspect gotenberg/gotenberg:9.8.0` prints the digest. The `helm test` image is pinned by digest unless you set `testImage.tag` or `testImage.digest`.
+`docker buildx imagetools inspect gotenberg/gotenberg:9.9.0` prints the digest. The `helm test` image is pinned by digest unless you set `testImage.tag` or `testImage.digest`.
 
 ## Resources
 
