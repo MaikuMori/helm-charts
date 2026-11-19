@@ -4,7 +4,7 @@
 
 Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces change: read the [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) before upgrading, and the README's [Upgrading to 2.0.0](https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg#upgrading-to-200).
 
-- Bump `gotenberg` version `8.40.0` -> `9.8.0`. Gotenberg 8 gets no further fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
+- Bump `gotenberg` version `8.40.0` -> `9.9.0`. Gotenberg 8 gets no further fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
 - Refresh the `busybox:1.38.0` digest of the `helm test` image, which upstream rebuilt.
 
 > [!CAUTION]
