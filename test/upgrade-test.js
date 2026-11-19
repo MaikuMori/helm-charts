@@ -1,6 +1,6 @@
 // Installs earlier versions of the chart, upgrades each release to the chart in
 // this checkout and runs `helm test`: the target branch's chart with the
-// default and the hardened values, and the latest published minor releases
+// default and the hardened values (each chart's own file), and the latest published minor releases
 // with the default values. Releases go into one namespace that only enforces
 // the Pod Security baseline level, since earlier versions may not meet
 // restricted, and are kept for the render test.
@@ -16,10 +16,12 @@ const REPO = 'https://maikumori.github.io/helm-charts';
 const NAMESPACE = 'upgrade';
 const HARDENED = path.join(CHART, 'ci', 'hardened-values.yaml');
 
-async function upgrade({ release, from, values }) {
-  const common = ['--namespace', NAMESPACE, '--wait', '--timeout', '5m', ...(values ? ['--values', values] : [])];
-  let log = await run('helm', ['install', release, ...from, ...common]);
-  log += await run('helm', ['upgrade', release, CHART, ...common]);
+// Each side gets its own chart's values, as a user upgrading their values file would.
+async function upgrade({ release, from, fromValues, values }) {
+  const common = ['--namespace', NAMESPACE, '--wait', '--timeout', '5m'];
+  const withValues = file => (file ? ['--values', file] : []);
+  let log = await run('helm', ['install', release, ...from, ...common, ...withValues(fromValues)]);
+  log += await run('helm', ['upgrade', release, CHART, ...common, ...withValues(values)]);
   log += await run('helm', ['test', release, '--namespace', NAMESPACE, '--logs']);
   return log;
 }
@@ -43,7 +45,10 @@ async function main() {
 
   const cases = [
     { release: 'upgrade-previous', from: [previousChart] },
-    { release: 'upgrade-previous-hardened', from: [previousChart], values: HARDENED },
+    {
+      release: 'upgrade-previous-hardened', from: [previousChart],
+      fromValues: path.join(previousChart, 'ci', 'hardened-values.yaml'), values: HARDENED,
+    },
     ...minors.map(v => ({ release: `upgrade-${v.replaceAll('.', '-')}`, from: ['gotenberg', '--repo', REPO, '--version', v] })),
   ];
   const results = await Promise.allSettled(cases.map(upgrade));

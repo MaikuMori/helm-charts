@@ -34,6 +34,6 @@ tests:
     set:
       networkPolicy.enabled: true
       metrics.serviceMonitor.enabled: true
-      vpa.create: true
+      vpa.enabled: true
     asserts:
       - matchSnapshot: {}

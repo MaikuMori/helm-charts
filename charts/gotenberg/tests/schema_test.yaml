@@ -55,9 +55,14 @@ tests:
 
   - it: accepts values that default to null
     set:
-      api.basicAuthUsername: user
-      api.basicAuthPassword: pass
+      api.basicAuth.username: user
+      api.basicAuth.password: pass
+      pdb.maxUnavailable: "25%"
+      terminationGracePeriodSeconds: 60
       api.downloadFromMaxConcurrency: 3
+      api.archiveMaxEntries: 5000
+      api.archiveMaxRatio: 50
+      api.disableRootRouteTelemetry: false
       autoscaling.targetMemoryUtilizationPercentage: 70
       pdb.unhealthyPodEvictionPolicy: AlwaysAllow
       metrics.serviceMonitor.namespace: monitoring
@@ -113,3 +118,69 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "/image/digest"
+
+  - it: rejects a string for an allow or deny list
+    set:
+      chromium.allowList: ^https://example\.com/
+    asserts:
+      - failedTemplate:
+          errorPattern: "/chromium/allowList"
+
+  - it: rejects archive limits below 1
+    set:
+      api.archiveMaxEntries: 0
+    asserts:
+      - failedTemplate:
+          errorPattern: "/api/archiveMaxEntries"
+
+  - it: rejects values removed in 2.0.0
+    set:
+      prometheus.namespace: gotenberg
+    asserts:
+      - failedTemplate:
+          errorPattern: "additional properties 'prometheus' not allowed"
+
+  - it: rejects removed values in a section
+    set:
+      chromium.incognito: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "additional properties 'incognito' not allowed"
+
+  - it: rejects a Chromium concurrency Gotenberg refuses
+    set:
+      chromium.maxConcurrency: 0
+    asserts:
+      - failedTemplate:
+          errorPattern: "/chromium/maxConcurrency"
+
+  - it: rejects a PDF concurrency of 0
+    set:
+      pdf.maxConcurrency: 0
+    asserts:
+      - failedTemplate:
+          errorPattern: "/pdf/maxConcurrency"
+
+  - it: rejects negative limits
+    set:
+      api.downloadFromMaxEntries: -1
+    asserts:
+      - failedTemplate:
+          errorPattern: "/api/downloadFromMaxEntries"
+
+  - it: accepts every duration form Gotenberg parses
+    set:
+      api.timeout: "0"
+      api.startTimeout: .5s
+      chromium.startTimeout: 1µs
+      chromium.idleShutdownTimeout: 1m30s
+      webhook.retryMinWait: +30s
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: rejects a duration without a unit
+    set:
+      api.timeout: "30"
+    asserts:
+      - failedTemplate:
+          errorPattern: "/api/timeout"

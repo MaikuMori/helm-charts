@@ -52,350 +52,46 @@ spec:
           - --api-port={{ .Values.api.port }}
           {{- if .Values.api.tlsSecretName }}
           - --api-tls-cert-file=/tls/tls.crt
-          {{- end }}
-          {{- if .Values.api.tlsSecretName }}
           - --api-tls-key-file=/tls/tls.key
           {{- end }}
-          {{- if .Values.api.timeout }}
-          - --api-timeout={{ .Values.api.timeout }}
-          {{- end }}
-          {{- if .Values.api.bodyLimit }}
-          - --api-body-limit={{ .Values.api.bodyLimit }}
-          {{- end }}
-          {{- if .Values.api.rootPath }}
-          - --api-root-path={{ .Values.api.rootPath }}
-          {{- end }}
-          {{- $correlationIdHeader := .Values.api.correlationIdHeader | default .Values.api.traceHeader }}
-          {{- if $correlationIdHeader }}
-          - --api-correlation-id-header={{ $correlationIdHeader }}
-          {{- end }}
-          {{- if or .Values.api.disableHealthCheckRouteTelemetry .Values.api.disableHealthCheckLogging }}
-          - --api-disable-health-check-route-telemetry
-          {{- end }}
-          {{- if .Values.api.enableDebugRoute }}
-          - --api-enable-debug-route
-          {{- end }}
-          {{- if .Values.api.startTimeout }}
-          - --api-start-timeout={{ .Values.api.startTimeout }}
-          {{- end }}
-          {{- if .Values.api.enableBasicAuth }}
+          {{- if .Values.api.basicAuth.enabled }}
           - --api-enable-basic-auth
           {{- end }}
-          {{- if .Values.api.enableOidcAuth }}
-          - --api-enable-oidc-auth
-          {{- end }}
-          {{- if .Values.api.oidcIssuer }}
-          - --api-oidc-issuer={{ .Values.api.oidcIssuer }}
-          {{- end }}
-          {{- if .Values.api.oidcAudience }}
-          - --api-oidc-audience={{ .Values.api.oidcAudience }}
-          {{- end }}
-          {{- if .Values.api.oidcJwksUrl }}
-          - --api-oidc-jwks-url={{ .Values.api.oidcJwksUrl }}
-          {{- end }}
-          {{- if .Values.api.downloadFromAllowList }}
-          - --api-download-from-allow-list={{ .Values.api.downloadFromAllowList }}
-          {{- end }}
-          {{- if .Values.api.downloadFromDenyList }}
-          - --api-download-from-deny-list={{ .Values.api.downloadFromDenyList }}
-          {{- end }}
-          {{- if .Values.api.downloadFromDenyPrivateIps }}
-          - --api-download-from-deny-private-ips
-          {{- end }}
-          {{- if .Values.api.downloadFromDenyPublicIps }}
-          - --api-download-from-deny-public-ips
-          {{- end }}
-          {{- if include "gotenberg.isSet" .Values.api.downloadFromMaxRetry }}
-          - --api-download-from-max-retry={{ .Values.api.downloadFromMaxRetry }}
-          {{- end }}
-          {{- if not (kindIs "invalid" .Values.api.downloadFromMaxConcurrency) }}
-          - --api-download-from-max-concurrency={{ .Values.api.downloadFromMaxConcurrency }}
-          {{- end }}
-          {{- if .Values.api.downloadFromMaxEntries }}
-          - --api-download-from-max-entries={{ .Values.api.downloadFromMaxEntries }}
-          {{- end }}
-          {{- if .Values.api.downloadFromEnableEnvironmentProxy }}
-          - --api-download-from-enable-environment-proxy
-          {{- end }}
-          {{- if .Values.api.disableDownloadFrom }}
-          - --api-disable-download-from
-          {{- end }}
-          {{- if .Values.api.disableRootRouteTelemetry }}
-          - --api-disable-root-route-telemetry
-          {{- end }}
-          {{- if .Values.api.disableDebugRouteTelemetry }}
-          - --api-disable-debug-route-telemetry
-          {{- end }}
-          {{- if .Values.api.disableVersionRouteTelemetry }}
-          - --api-disable-version-route-telemetry
-          {{- end }}
-
-          {{- if include "gotenberg.isSet" .Values.chromium.restartAfter }}
-          - --chromium-restart-after={{ .Values.chromium.restartAfter }}
-          {{- end }}
-          {{- if .Values.chromium.autoStart }}
-          - --chromium-auto-start
-          {{- end }}
-          {{- if .Values.chromium.startTimeout }}
-          - --chromium-start-timeout={{ .Values.chromium.startTimeout }}
-          {{- end }}
-          {{- if .Values.chromium.allowFileAccessFromFiles }}
-          - --chromium-allow-file-access-from-files
-          {{- end }}
-          {{- if .Values.chromium.allowInsecureLocalhost }}
-          - --chromium-allow-insecure-localhost
-          {{- end }}
-          {{- if .Values.chromium.allowList }}
-          - --chromium-allow-list={{ .Values.chromium.allowList }}
-          {{- end }}
-          {{- if .Values.chromium.denyList }}
-          - --chromium-deny-list={{ .Values.chromium.denyList }}
-          {{- end }}
-          {{- if .Values.chromium.denyPrivateIps }}
-          - --chromium-deny-private-ips
-          {{- end }}
-          {{- if .Values.chromium.denyPublicIps }}
-          - --chromium-deny-public-ips
-          {{- end }}
-          {{- if .Values.chromium.ignoreCertificateErrors }}
-          - --chromium-ignore-certificate-errors
-          {{- end }}
-          {{- if .Values.chromium.disableWebSecurity }}
-          - --chromium-disable-web-security
-          {{- end }}
-          {{- if .Values.chromium.incognito }}
-          - --chromium-incognito
-          {{- end }}
-          {{- if .Values.chromium.hostResolverRules }}
-          - --chromium-host-resolver-rules={{ .Values.chromium.hostResolverRules }}
-          {{- end }}
-          {{- if .Values.chromium.proxyServer }}
-          - --chromium-proxy-server={{ .Values.chromium.proxyServer }}
-          {{- end }}
-          {{- if .Values.chromium.enableEnvironmentProxy }}
-          - --chromium-enable-environment-proxy
-          {{- end }}
-          {{- if .Values.chromium.disableJavaScript }}
-          - --chromium-disable-javascript
-          {{- end }}
-          {{- if .Values.chromium.disableRoutes }}
-          - --chromium-disable-routes
-          {{- end }}
-          {{- if .Values.chromium.sharedBrowserContext }}
-          - --chromium-shared-browser-context
-          {{- end }}
-          {{- if .Values.chromium.clearCache }}
-          - --chromium-clear-cache
-          {{- end }}
-          {{- if .Values.chromium.clearCookies }}
-          - --chromium-clear-cookies
-          {{- end }}
-          {{- if .Values.chromium.clearStorage }}
-          - --chromium-clear-storage
-          {{- end }}
-          {{- if .Values.chromium.maxQueueSize }}
-          - --chromium-max-queue-size={{ .Values.chromium.maxQueueSize }}
-          {{- end }}
-          {{- if .Values.chromium.maxConcurrency }}
-          - --chromium-max-concurrency={{ .Values.chromium.maxConcurrency }}
-          {{- end }}
-          {{- if .Values.chromium.idleShutdownTimeout }}
-          - --chromium-idle-shutdown-timeout={{ .Values.chromium.idleShutdownTimeout }}
-          {{- end }}
-
-          {{- if include "gotenberg.isSet" .Values.libreOffice.restartAfter }}
-          - --libreoffice-restart-after={{ .Values.libreOffice.restartAfter }}
-          {{- end }}
-          {{- if .Values.libreOffice.autoStart }}
-          - --libreoffice-auto-start
-          {{- end }}
-          {{- if .Values.libreOffice.startTimeout }}
-          - --libreoffice-start-timeout={{ .Values.libreOffice.startTimeout }}
-          {{- end }}
-          {{- if .Values.libreOffice.disableRoutes }}
-          - --libreoffice-disable-routes
-          {{- end }}
-          {{- if .Values.libreOffice.maxQueueSize }}
-          - --libreoffice-max-queue-size={{ .Values.libreOffice.maxQueueSize }}
-          {{- end }}
-          {{- if .Values.libreOffice.idleShutdownTimeout }}
-          - --libreoffice-idle-shutdown-timeout={{ .Values.libreOffice.idleShutdownTimeout }}
-          {{- end }}
-          {{- if .Values.libreOffice.allowList }}
-          - --libreoffice-allow-list={{ .Values.libreOffice.allowList }}
-          {{- end }}
-          {{- if .Values.libreOffice.denyList }}
-          - --libreoffice-deny-list={{ .Values.libreOffice.denyList }}
-          {{- end }}
-          {{- if .Values.libreOffice.denyPrivateIps }}
-          - --libreoffice-deny-private-ips
-          {{- end }}
-          {{- if .Values.libreOffice.denyPublicIps }}
-          - --libreoffice-deny-public-ips
-          {{- end }}
-          {{- if .Values.libreOffice.enableEnvironmentProxy }}
-          - --libreoffice-enable-environment-proxy
-          {{- end }}
-
-          {{- if .Values.pdfEngines.engines }}
-          - --pdfengines-engines={{ .Values.pdfEngines.engines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.mergeEngines }}
-          - --pdfengines-merge-engines={{ .Values.pdfEngines.mergeEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.splitEngines }}
-          - --pdfengines-split-engines={{ .Values.pdfEngines.splitEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.flattenEngines }}
-          - --pdfengines-flatten-engines={{ .Values.pdfEngines.flattenEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.convertEngines }}
-          - --pdfengines-convert-engines={{ .Values.pdfEngines.convertEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.readMetadataEngines }}
-          - --pdfengines-read-metadata-engines={{ .Values.pdfEngines.readMetadataEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.writeMetadataEngines }}
-          - --pdfengines-write-metadata-engines={{ .Values.pdfEngines.writeMetadataEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.encryptEngines }}
-          - --pdfengines-encrypt-engines={{ .Values.pdfEngines.encryptEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.embedEngines }}
-          - --pdfengines-embed-engines={{ .Values.pdfEngines.embedEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.embedMetadataEngines }}
-          - --pdfengines-embed-metadata-engines={{ .Values.pdfEngines.embedMetadataEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.watermarkEngines }}
-          - --pdfengines-watermark-engines={{ .Values.pdfEngines.watermarkEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.stampEngines }}
-          - --pdfengines-stamp-engines={{ .Values.pdfEngines.stampEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.rotateEngines }}
-          - --pdfengines-rotate-engines={{ .Values.pdfEngines.rotateEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.readBookmarksEngines }}
-          - --pdfengines-read-bookmarks-engines={{ .Values.pdfEngines.readBookmarksEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.writeBookmarksEngines }}
-          - --pdfengines-write-bookmarks-engines={{ .Values.pdfEngines.writeBookmarksEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.facturXEngines }}
-          - --pdfengines-factur-x-engines={{ .Values.pdfEngines.facturXEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.optimizeImagesEngines }}
-          - --pdfengines-optimize-images-engines={{ .Values.pdfEngines.optimizeImagesEngines }}
-          {{- end }}
-          {{- if .Values.pdfEngines.maxConcurrency }}
-          - --pdfengines-max-concurrency={{ .Values.pdfEngines.maxConcurrency }}
-          {{- end }}
-          {{- if .Values.pdfEngines.disableRoutes }}
-          - --pdfengines-disable-routes
-          {{- end }}
-
-          {{- if .Values.webhook.enableSyncMode }}
-          - --webhook-enable-sync-mode
-          {{- end }}
-          {{- if .Values.webhook.allowList }}
-          - --webhook-allow-list={{ .Values.webhook.allowList }}
-          {{- end }}
-          {{- if .Values.webhook.denyList }}
-          - --webhook-deny-list={{ .Values.webhook.denyList }}
-          {{- end }}
-          {{- if .Values.webhook.denyPrivateIps }}
-          - --webhook-deny-private-ips
-          {{- end }}
-          {{- if .Values.webhook.denyPublicIps }}
-          - --webhook-deny-public-ips
-          {{- end }}
-          {{- if .Values.webhook.errorAllowList }}
-          - --webhook-error-allow-list={{ .Values.webhook.errorAllowList }}
-          {{- end }}
-          {{- if .Values.webhook.errorDenyList }}
-          - --webhook-error-deny-list={{ .Values.webhook.errorDenyList }}
-          {{- end }}
-          {{- if include "gotenberg.isSet" .Values.webhook.maxRetry }}
-          - --webhook-max-retry={{ .Values.webhook.maxRetry }}
-          {{- end }}
-          {{- if .Values.webhook.retryMinWait }}
-          - --webhook-retry-min-wait={{ .Values.webhook.retryMinWait }}
-          {{- end }}
-          {{- if .Values.webhook.retryMaxWait }}
-          - --webhook-retry-max-wait={{ .Values.webhook.retryMaxWait }}
-          {{- end }}
-          {{- if .Values.webhook.clientTimeout }}
-          - --webhook-client-timeout={{ .Values.webhook.clientTimeout }}
-          {{- end }}
-          {{- if .Values.webhook.enableEnvironmentProxy }}
-          - --webhook-enable-environment-proxy
-          {{- end }}
-          {{- if .Values.webhook.disable }}
-          - --webhook-disable
-          {{- end }}
-
-          {{- if .Values.prometheus.collectInterval }}
-          - --prometheus-collect-interval={{ .Values.prometheus.collectInterval }}
-          {{- end }}
-          {{- if .Values.prometheus.namespace }}
-          - --prometheus-namespace={{ .Values.prometheus.namespace }}
-          {{- end }}
-          {{- if .Values.prometheus.metricsPath }}
-          - --prometheus-metrics-path={{ .Values.prometheus.metricsPath }}
-          {{- end }}
-          {{- if .Values.prometheus.disableCollect  }}
-          - --prometheus-disable-collect
-          {{- end }}
-          {{- if or .Values.prometheus.disableRouteTelemetry .Values.prometheus.disableRouterLogging }}
-          - --prometheus-disable-route-telemetry
-          {{- end }}
-
-          {{- $logStdFormat := .Values.logging.stdFormat | default .Values.logging.format }}
-          {{- if $logStdFormat }}
-          - --log-std-format={{ $logStdFormat }}
-          {{- end }}
-          {{- if .Values.logging.stdLevelCase }}
-          - --log-std-level-case={{ .Values.logging.stdLevelCase }}
-          {{- end }}
-          {{- if .Values.logging.level }}
-          - --log-level={{ .Values.logging.level }}
-          {{- end }}
-          {{- if .Values.logging.fieldsPrefix }}
-          - --log-fields-prefix={{ .Values.logging.fieldsPrefix }}
-          {{- end }}
-          {{- if or .Values.logging.stdEnableGcpFields .Values.logging.enableGcpFields }}
-          - --log-std-enable-gcp-fields
-          {{- end }}
-          {{- if .Values.logging.enableGcpSeverity }}
-          - --log-enable-gcp-severity
-          {{- end }}
-
-          {{- if include "gotenberg.isSet" .Values.gotenberg.gracefulShutdownDurationSec }}
-          - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec }}s
-          {{- end }}
-          {{- if .Values.gotenberg.hideBanner }}
-          - --gotenberg-hide-banner
-          {{- end }}
+          {{- include "gotenberg.flags" . | trim | nindent 10 }}
+          {{- if not (kindIs "invalid" .Values.gotenberg.gracefulShutdownDurationSec) }}
+          - --gotenberg-graceful-shutdown-duration={{ .Values.gotenberg.gracefulShutdownDurationSec | int64 }}s
+          {{- end }}
+          {{- include "gotenberg.validateAuth" . }}
           env:
-          {{- if .Values.api.enableBasicAuth }}
-            {{- if .Values.api.existingSecret }}
+          {{- with .Values.api.basicAuth }}
+          {{- if .enabled }}
+            {{- if .existingSecret }}
             - name: GOTENBERG_API_BASIC_AUTH_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.api.existingSecret }}
-                  key: {{ .Values.api.existingSecretUsernameKey | default "username" }}
+                  name: {{ .existingSecret }}
+                  key: {{ .usernameKey | default "username" }}
             - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.api.existingSecret }}
-                  key: {{ .Values.api.existingSecretPasswordKey | default "password" }}
-            {{- else if and .Values.api.basicAuthUsername .Values.api.basicAuthPassword }}
+                  name: {{ .existingSecret }}
+                  key: {{ .passwordKey | default "password" }}
+            {{- else if and .username .password }}
             - name: GOTENBERG_API_BASIC_AUTH_USERNAME
-              value: {{ .Values.api.basicAuthUsername }}
+              value: {{ .username | toString | toJson }}
             - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
-              value: {{ .Values.api.basicAuthPassword }}
+              value: {{ .password | toString | toJson }}
             {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if include "gotenberg.metricsEnabled" . }}
+            {{- include "gotenberg.validateMetrics" . }}
+            - name: OTEL_METRICS_EXPORTER
+              value: prometheus
+            - name: OTEL_EXPORTER_PROMETHEUS_HOST
+              value: "0.0.0.0"
+            - name: OTEL_EXPORTER_PROMETHEUS_PORT
+              value: {{ .Values.metrics.port | quote }}
           {{- end }}
           {{- $runAsUser := 1001 }}
           {{- if .Values.securityContext.runAsUser }}
@@ -422,14 +118,23 @@ spec:
             - name: http
               containerPort: {{ .Values.api.port }}
               protocol: TCP
+            {{- if include "gotenberg.metricsEnabled" . }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+            {{- end }}
           {{- with .Values.startupProbe }}
           startupProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- include "gotenberg.probe" (list . $.Values.api.tlsSecretName $.Values.api.rootPath) | nindent 12 }}
           {{- end }}
+          {{- with .Values.livenessProbe }}
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- include "gotenberg.probe" (list . $.Values.api.tlsSecretName $.Values.api.rootPath) | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- include "gotenberg.probe" (list . $.Values.api.tlsSecretName $.Values.api.rootPath) | nindent 12 }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.lifecycle }}
@@ -447,7 +152,11 @@ spec:
               readOnly: true
             {{- end }}
           {{- end }}
-      terminationGracePeriodSeconds: {{ .Values.gotenberg.gracefulShutdownDurationSec }}
+      {{- $shutdown := 30 }}
+      {{- if not (kindIs "invalid" .Values.gotenberg.gracefulShutdownDurationSec) }}
+        {{- $shutdown = int .Values.gotenberg.gracefulShutdownDurationSec }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ ternary (add $shutdown 10) .Values.terminationGracePeriodSeconds (kindIs "invalid" .Values.terminationGracePeriodSeconds) | int64 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

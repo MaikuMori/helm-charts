@@ -4,8 +4,9 @@ icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-
 description: A Helm chart for Gotenberg
 
 type: application
-version: "1.31.0"
-appVersion: "8.40.0"
+version: "2.0.0"
+appVersion: "9.9.0"
+kubeVersion: ">=1.30.0-0"
 
 keywords:
   - gotenberg
@@ -37,7 +38,29 @@ annotations:
     fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
     url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
   artifacthub.io/changes: |
-    - kind: security
-      description: Bump Gotenberg to 8.40.0, the final Gotenberg 8 release, which fixes a QPDF password argument injection that could embed any file the gotenberg user can read, refuses every special-purpose IP range in the private-IP checks, distrusts the compromised eMudhra roots in Chromium from the first request and keeps the pinning proxy on with host-resolver rules
     - kind: changed
-      description: "Upstream behaviour change: an invalid chromium.hostResolverRules stops Gotenberg at startup, and the deny-private-IPs checks refuse more ranges"
+      description: Bump Gotenberg to 9.9.0, a major release. Routes, form fields, flags and metrics change, so read Gotenberg's upgrade guide and the chart's CHANGELOG before upgrading
+    - kind: removed
+      description: Remove the values for flags Gotenberg 9 removed, the deprecated aliases and service.loadBalancerIP
+    - kind: changed
+      description: Metrics are off by default and served through Gotenberg's OpenTelemetry Prometheus exporter on a separate metrics Service when metrics.enabled or metrics.serviceMonitor.enabled is set
+    - kind: changed
+      description: Every Gotenberg flag that works in a pod has a value, unset leaves Gotenberg's default and any set value is passed as is, with the schema refusing what Gotenberg refuses. Allow and deny lists are YAML lists
+    - kind: changed
+      description: networkPolicy.ingress and networkPolicy.egress take the rules directly, basic auth moves to api.basicAuth, the PDB takes numbers or percentages, and pdb.create and vpa.create become enabled
+    - kind: changed
+      description: The chart requires Kubernetes 1.30 or later
+    - kind: changed
+      description: Rollouts keep connections with a default preStop sleep and a longer grace period, progressDeadlineSeconds defaults to 600, and enableServiceLinks defaults to false
+    - kind: added
+      description: Add the pdf values for Gotenberg 9's PDF module, metrics Service metadata, and values for the new archive, memory limit, macro and DevTools debug flags
+    - kind: fixed
+      description: Quote inline basic auth credentials, fail early on auth settings Gotenberg refuses, drop the default httpGet from probes with another handler, and run helm test over HTTPS and under api.rootPath
+    - kind: changed
+      description: securityContext keys merge onto the restricted default, the default probes follow api.tlsSecretName and api.rootPath, and testImage.tag alone pulls that tag
+    - kind: added
+      description: The install notes give the in-cluster URL, try-it commands and the metrics URL, and warn about risky settings
+    - kind: security
+      description: The hardening example also denies private timestamp authority URLs
+    - kind: changed
+      description: Refresh the helm test busybox 1.38.0 image digest

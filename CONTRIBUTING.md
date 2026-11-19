@@ -8,7 +8,7 @@ Ideally here's the flow:
 
 - Make the changes
 - Bump chart's version in `Chart.yaml`
-- Update `CHANGELOG.md` for the chart
+- Update `CHANGELOG.md` for the chart, and replace the `artifacthub.io/changes` annotation in `Chart.yaml` with the release's entries
 - Run [`helm-docs`](https://github.com/norwoodj/helm-docs)
 - Run [`helm schema`](https://github.com/losisin/helm-values-schema-json) in `charts/gotenberg` to regenerate `values.schema.json`
 - Run [`helm unittest charts/gotenberg`](https://github.com/helm-unittest/helm-unittest)
@@ -29,12 +29,12 @@ npm run test:upgrade -- master 5
 `charts/gotenberg/tests/` holds [helm-unittest](https://github.com/helm-unittest/helm-unittest) suites:
 
 - `snapshot_test.yaml` renders the chart with the `ci/` values files and `tests/values/all-flags.yaml`, and compares the output with `tests/__snapshot__/`. When you change rendered output on purpose, run `helm unittest -u charts/gotenberg` and commit the updated snapshot. Its diff in the pull request shows reviewers exactly what changed in the manifests.
-- When adding a Gotenberg flag, add a value for it to `tests/values/all-flags.yaml` so the snapshot covers it.
+- When adding a Gotenberg flag, add a row to the flag table in `templates/_helpers.tpl`, a value defaulting to null in `values.yaml`, and a value in `tests/values/all-flags.yaml` and `ci/every-flag-values.yaml`.
 - Other suites test template logic: fallbacks, defaults and conditionals. Add a case there when you add logic beyond a plain value-to-flag mapping.
 
 `schema_test.yaml` checks what `values.schema.json` accepts and rejects.
 
-`test/zero-values-test.js` sets every integer value in the schema to 0 and fails if 0 doesn't render wherever another number would, so a value guarded by `{{ if .Values.x }}` doesn't silently drop 0. Guard numeric flags with `{{ if include "gotenberg.isSet" .Values.x }}`, or add the value to its `ZERO_IGNORED` list with the reason 0 has no meaning of its own.
+The flag table in `templates/_helpers.tpl` maps each value to its Gotenberg flag. A null value leaves Gotenberg's default; any other value is passed as is, `0`, `false`, `""` and `[]` included. Give the schema the bounds, patterns and enums Gotenberg enforces at startup, so the install fails rather than the pod. `test/flags-test.js` checks the table against the `--help` of the `appVersion` image (every flag mapped, or chart-managed with a reason), that each value defaults to null, that `tests/values/all-flags.yaml` and `ci/every-flag-values.yaml` cover the table, and that each value renders its flag at its type's zero.
 
 `test/subchart/` is a parent chart that depends on `charts/gotenberg` and sets Helm `global` values. CI renders it with each of the chart's `ci/` and `tests/values/` files nested under `gotenberg:`, and installs it in the kind clusters, so the chart keeps working as a dependency.
 
@@ -48,4 +48,4 @@ The `openshift` job installs the chart on [MicroShift](https://github.com/micros
 - A value without a default needs its type, e.g. `# @schema type: [string, null]`.
 - Deprecated values get `# @schema deprecated` and a description starting with `Deprecated:`.
 
-CI also installs the chart once per values file in `charts/gotenberg/ci/` on each Kubernetes version in the `install` matrix, in kind clusters that enforce the Pod Security `restricted` level (`test/kind/`), then runs `test/render/render-test.js` against every installed release: it converts the documents in `test/render/` with Chromium and LibreOffice, takes a screenshot, merges, reads and PDF/A-converts the results with the PDF engines, and checks the PDFs' text and page counts and the screenshot's format, dimensions and size. It also checks each release's egress: every release must reach a public address, and only releases without a restricting NetworkPolicy may reach another release's Service, or get a refused connection (rather than a timeout) on its pod's port 443. `test/upgrade-test.js` upgrades from the target branch's chart, with the default and the hardened values, and on the first Kubernetes version from the last five published minor releases, in a namespace that enforces only `baseline`.
+CI also installs the chart once per values file in `charts/gotenberg/ci/` on each Kubernetes version in the `install` matrix, in kind clusters that enforce the Pod Security `restricted` level (`test/kind/`), then runs `test/render/render-test.js` against every installed release: it converts the documents in `test/render/` with Chromium and LibreOffice, takes a screenshot, runs a stage, merges, reads and remediates the results to PDF/A on the PDF routes, checks the metrics Service when there is one, and checks the PDFs' text and page counts and the screenshot's format, dimensions and size. It also checks each release's egress: every release must reach a public address, and only releases without a restricting NetworkPolicy may reach another release's Service, or get a refused connection (rather than a timeout) on its pod's port 443. `test/upgrade-test.js` upgrades from the target branch's chart, with the default values and with each chart's own hardened values, and on the first Kubernetes version from the last five published minor releases, in a namespace that enforces only `baseline`.
