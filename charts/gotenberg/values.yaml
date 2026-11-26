@@ -322,7 +322,7 @@ chromium:  # @schema additionalProperties: false
   allowInsecureLocalhost:  # @schema type: [boolean, null]
   # -- (list) List of regular expressions for the allowed Chromium URLs. The page sent to the HTML and Markdown routes skips the lists, but the files uploaded with it load from `file:///tmp/`: include `^file:///tmp/` to keep them. Terminate the host, e.g. `^https://assets\.example\.com/`: a match skips the IP-class checks. An empty list clears Gotenberg's default.
   allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
-  # -- (list) List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule.
+  # -- (list) List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule. A Web Worker's HTTPS request shows its host only, `https://host/`: a rule naming a path can't refuse it.
   denyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
   # denyList:
   #   - ^file:(?!//\/tmp/).*
@@ -379,7 +379,7 @@ libreOffice:  # @schema additionalProperties: false
   idleShutdownTimeout:  # @schema type: [string, null]; pattern: ^[-+]?(0|(([0-9]+(\.[0-9]*)?|\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$
   # -- (list) List of regular expressions for the allowed URLs LibreOffice requests: the style sheets an HTML document links, and the URLs macros open with `enableMacros`. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.
   allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
-  # -- (list) List of regular expressions for the denied URLs LibreOffice requests An empty list clears Gotenberg's default.
+  # -- (list) List of regular expressions for the denied URLs LibreOffice requests. An HTTPS request shows its host only, `https://host/`: a rule naming a path can't refuse it. An empty list clears Gotenberg's default.
   denyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
   # -- (bool) Reject LibreOffice requests resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected.
   denyPrivateIps:  # @schema type: [boolean, null]
@@ -405,13 +405,13 @@ pdf:  # @schema additionalProperties: false
   maxStreamBytes:  # @schema type: [string, null]
   # -- (string) Set the maximum size of an embedded file read for validation, e.g. "100MB" (default 50MiB)
   maxEmbeddedFileBytes:  # @schema type: [string, null]
-  # -- (int) Set the maximum number of pixels an image may hold. Leave unset for the upstream default (100000000).
+  # -- (int) Set the maximum number of pixels an image may hold. Leave unset or set to 0 for the upstream default (100000000).
   maxImagePixels:  # @schema type: [integer, null]; minimum: 0
-  # -- (int) Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset for the upstream default (50000000). Added in Gotenberg 9.3.0.
+  # -- (int) Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset or set to 0 for the upstream default (50000000). Added in Gotenberg 9.3.0.
   maxRenderPixels:  # @schema type: [integer, null]; minimum: 0
   # -- (list) List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.
   allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
-  # -- (list) List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages An empty list clears Gotenberg's default.
+  # -- (list) List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages. An empty list clears Gotenberg's default.
   denyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
   # -- (bool) Reject timestamp authority URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). Callers choose these URLs: enable it for untrusted callers. A URL matching `allowList` skips the IP-class check.
   denyPrivateIps:  # @schema type: [boolean, null]
@@ -428,7 +428,7 @@ webhook:  # @schema additionalProperties: false
   enableSyncMode:  # @schema type: [boolean, null]
   # -- (list) List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default.
   allowList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
-  # -- (list) List of regular expressions for the denied webhook URLs An empty list clears Gotenberg's default.
+  # -- (list) List of regular expressions for the denied webhook URLs. An empty list clears Gotenberg's default.
   denyList:  # @schema type: [array, null]; item: string; itemPattern: ^.+$
   # -- (bool) Reject webhook URLs (result and events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected.
   denyPrivateIps:  # @schema type: [boolean, null]

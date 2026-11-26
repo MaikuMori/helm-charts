@@ -4,7 +4,7 @@
 
 Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces change: read the [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) before upgrading, and the README's [Upgrading to 2.0.0](https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg#upgrading-to-200).
 
-- Bump `gotenberg` version `8.40.0` -> `9.9.0`. Gotenberg 8 gets no further fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
+- Bump `gotenberg` version `8.40.0` -> `9.10.2`. Gotenberg 8 gets no further fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
 - Refresh the `busybox:1.38.0` digest of the `helm test` image, which upstream rebuilt.
 
 > [!CAUTION]
@@ -12,6 +12,7 @@ Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces c
 > - `/forms/pdfengines/*` routes answer `404`, replaced by `/forms/pdf/*`. Post-processing fields move to a `stages` list. The Webhook error URL and method headers are gone: errors reach `Gotenberg-Webhook-Events-Url`, now required with `Gotenberg-Webhook-Url`.
 > - PDF processing has limits by default, and a stream, image or rendered page over them answers `400` (see the `pdf.max*` values). A stage that rewrites a signed PDF answers `400` unless the request sets `dropSignatures`, and `remediate` can return a PDF with violations left, counted in `Gotenberg-Remediation-Residual`.
 > - Java, Python, unoconverter, QPDF, pdfcpu, pdftk and ExifTool leave the image, and `LOK_BIN_PATH` replaces `UNOCONVERTER_BIN_PATH`. Rebuild images based on `gotenberg/gotenberg:8`; probes and hooks that call those tools break.
+> - The Markdown routes no longer run `index.html` as a Go template: it holds text and `{{ toHTML "<file>" }}` actions only, each file named once, or the request answers `400`.
 > - During the rollout, Gotenberg 8 and 9 pods serve behind one Service: migrate clients first, set `strategy.type: Recreate`, or install 2.0.0 as a separate release.
 
 > [!WARNING]

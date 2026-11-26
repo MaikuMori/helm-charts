@@ -1,7 +1,7 @@
 # Gotenberg
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gotenberg)](https://artifacthub.io/packages/helm/maikumori/gotenberg)
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 9.9.0](https://img.shields.io/badge/AppVersion-9.9.0-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 9.10.2](https://img.shields.io/badge/AppVersion-9.10.2-informational?style=flat-square)
 
 This is a HELM chart for Gotenberg.
 
@@ -112,13 +112,13 @@ Chart releases are typically published when new features or breaking changes are
 To use a specific version of Gotenberg:
 
 ```console
-helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.9.0"
+helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.10.2"
 ```
 
 Or with `--rollback-on-failure` (`--atomic` on Helm 3) for automatic rollback on failure:
 
 ```console
-helm upgrade --install --rollback-on-failure my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.9.0"
+helm upgrade --install --rollback-on-failure my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --set image.tag="9.10.2"
 ```
 
 This allows you to stay current with Gotenberg releases without waiting for a new chart version, as there are typically no breaking changes within a major version. A newer flag the chart maps needs a Gotenberg version that has it.
@@ -129,10 +129,10 @@ Tags can be moved to point at a different image. To pull exactly the image you r
 
 ```console
 helm upgrade --install my-release oci://ghcr.io/maikumori/helm-charts/gotenberg \
-  --set image.tag="9.9.0" --set image.digest="sha256:<digest>"
+  --set image.tag="9.10.2" --set image.digest="sha256:<digest>"
 ```
 
-`docker buildx imagetools inspect gotenberg/gotenberg:9.9.0` prints the digest. The `helm test` image is pinned by digest unless you set `testImage.tag` or `testImage.digest`.
+`docker buildx imagetools inspect gotenberg/gotenberg:9.10.2` prints the digest. The `helm test` image is pinned by digest unless you set `testImage.tag` or `testImage.digest`.
 
 ## Resources
 
@@ -296,7 +296,7 @@ Kubernetes: `>=1.30.0-0`
 | chromium.clearCookies | bool | `nil` | Clear Chromium cookies between each conversion. Only applies with `sharedBrowserContext`. |
 | chromium.clearStorage | bool | `nil` | Clear Chromium local storage between each conversion. Only applies with `sharedBrowserContext`. |
 | chromium.debugProtocol | bool | `nil` | Log every DevTools Protocol message at the debug log level. The messages carry URLs, cookies and header values, credentials included: enable it only to troubleshoot. |
-| chromium.denyList | list | `nil` | List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule. |
+| chromium.denyList | list | `nil` | List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule. A Web Worker's HTTPS request shows its host only, `https://host/`: a rule naming a path can't refuse it. |
 | chromium.denyPrivateIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. Weakened by `proxyServer`, see there. |
 | chromium.denyPublicIps | bool | `nil` | Reject Chromium navigations and sub-resources resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
 | chromium.disableJavaScript | bool | `nil` | Disable JavaScript |
@@ -338,7 +338,7 @@ Kubernetes: `>=1.30.0-0`
 | initContainers | list | `[]` | List of init containers for the gotenberg pod |
 | libreOffice.allowList | list | `nil` | List of regular expressions for the allowed URLs LibreOffice requests: the style sheets an HTML document links, and the URLs macros open with `enableMacros`. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
 | libreOffice.autoStart | bool | `nil` | Automatically launch LibreOffice upon initialization if set to true; otherwise, LibreOffice will start at the time of the first conversion (default false) |
-| libreOffice.denyList | list | `nil` | List of regular expressions for the denied URLs LibreOffice requests An empty list clears Gotenberg's default. |
+| libreOffice.denyList | list | `nil` | List of regular expressions for the denied URLs LibreOffice requests. An HTTPS request shows its host only, `https://host/`: a rule naming a path can't refuse it. An empty list clears Gotenberg's default. |
 | libreOffice.denyPrivateIps | bool | `nil` | Reject LibreOffice requests resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. |
 | libreOffice.denyPublicIps | bool | `nil` | Reject LibreOffice requests resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
 | libreOffice.disableRoutes | bool | `nil` | Disable the routes |
@@ -380,7 +380,7 @@ Kubernetes: `>=1.30.0-0`
 | pdb.minAvailable | int or string | `nil` | Pods that must stay available, as a number or a percentage such as "50%". Set this or `maxUnavailable`; with neither, the PDB keeps 1 available. |
 | pdb.unhealthyPodEvictionPolicy | string | `nil` | Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow) |
 | pdf.allowList | list | `nil` | List of regular expressions for the allowed timestamp authority URLs of the sign and timestamp stages. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
-| pdf.denyList | list | `nil` | List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages An empty list clears Gotenberg's default. |
+| pdf.denyList | list | `nil` | List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages. An empty list clears Gotenberg's default. |
 | pdf.denyPrivateIps | bool | `nil` | Reject timestamp authority URLs resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). Callers choose these URLs: enable it for untrusted callers. A URL matching `allowList` skips the IP-class check. |
 | pdf.denyPublicIps | bool | `nil` | Reject timestamp authority URLs resolving to a public IP |
 | pdf.disableRoutes | bool | `nil` | Disable the /forms/pdf routes. Conversion routes still run stages: set `disableStages` too to turn off PDF processing. |
@@ -388,8 +388,8 @@ Kubernetes: `>=1.30.0-0`
 | pdf.enableEnvironmentProxy | bool | `nil` | Route timestamp authority requests through the proxy defined by the standard `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` variables (set them via `extraEnv`), credentials included. |
 | pdf.maxConcurrency | int | `nil` | Maximum number of PDF documents a request processes at once. Leave unset for the upstream default (1). |
 | pdf.maxEmbeddedFileBytes | string | `nil` | Set the maximum size of an embedded file read for validation, e.g. "100MB" (default 50MiB) |
-| pdf.maxImagePixels | int | `nil` | Set the maximum number of pixels an image may hold. Leave unset for the upstream default (100000000). |
-| pdf.maxRenderPixels | int | `nil` | Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset for the upstream default (50000000). Added in Gotenberg 9.3.0. |
+| pdf.maxImagePixels | int | `nil` | Set the maximum number of pixels an image may hold. Leave unset or set to 0 for the upstream default (100000000). |
+| pdf.maxRenderPixels | int | `nil` | Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset or set to 0 for the upstream default (50000000). Added in Gotenberg 9.3.0. |
 | pdf.maxStreamBytes | string | `nil` | Set the maximum size a PDF stream may decode to, e.g. "512MB" (default 256MiB) |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` | List of additional pod labels |
@@ -423,7 +423,7 @@ Kubernetes: `>=1.30.0-0`
 | vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only) |
 | webhook.allowList | list | `nil` | List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
 | webhook.clientTimeout | string | `nil` | Set the time limit for requests to the webhook (default 30s) |
-| webhook.denyList | list | `nil` | List of regular expressions for the denied webhook URLs An empty list clears Gotenberg's default. |
+| webhook.denyList | list | `nil` | List of regular expressions for the denied webhook URLs. An empty list clears Gotenberg's default. |
 | webhook.denyPrivateIps | bool | `nil` | Reject webhook URLs (result and events) resolving to a non-public IP (loopback, RFC1918, link-local, IPv6 unique-local). A URL matching `allowList` skips the IP-class check; a URL matching `denyList` is always rejected. |
 | webhook.denyPublicIps | bool | `nil` | Reject webhook URLs resolving to a public IP. Setting both `denyPrivateIps` and `denyPublicIps` to true rejects every URL unless the allow-list matches. |
 | webhook.disable | bool | `nil` | Disable the webhook feature |

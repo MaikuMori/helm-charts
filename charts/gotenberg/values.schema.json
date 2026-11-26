@@ -342,7 +342,7 @@
           ]
         },
         "denyList": {
-          "description": "List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule.",
+          "description": "List of regular expressions for the denied Chromium URLs. Setting it replaces Gotenberg's default, `^file:(?!//\\/tmp/).*`, which stops pages reading local files outside the uploads: keep that entry when you add your own, see values.yaml for an example. `[]` leaves no deny rule at all. The install notes warn when the list has no `file:` rule. A Web Worker's HTTPS request shows its host only, `https://host/`: a rule naming a path can't refuse it.",
           "type": [
             "array",
             "null"
@@ -630,7 +630,7 @@
           ]
         },
         "denyList": {
-          "description": "List of regular expressions for the denied URLs LibreOffice requests An empty list clears Gotenberg's default.",
+          "description": "List of regular expressions for the denied URLs LibreOffice requests. An HTTPS request shows its host only, `https://host/`: a rule naming a path can't refuse it. An empty list clears Gotenberg's default.",
           "type": [
             "array",
             "null"
@@ -986,7 +986,7 @@
           }
         },
         "denyList": {
-          "description": "List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages An empty list clears Gotenberg's default.",
+          "description": "List of regular expressions for the denied timestamp authority URLs of the sign and timestamp stages. An empty list clears Gotenberg's default.",
           "type": [
             "array",
             "null"
@@ -1047,7 +1047,7 @@
           ]
         },
         "maxImagePixels": {
-          "description": "Set the maximum number of pixels an image may hold. Leave unset for the upstream default (100000000).",
+          "description": "Set the maximum number of pixels an image may hold. Leave unset or set to 0 for the upstream default (100000000).",
           "type": [
             "integer",
             "null"
@@ -1055,7 +1055,7 @@
           "minimum": 0
         },
         "maxRenderPixels": {
-          "description": "Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset for the upstream default (50000000). Added in Gotenberg 9.3.0.",
+          "description": "Set the maximum number of pixels a page the render stage draws may hold, at 16 bytes of memory each. Leave unset or set to 0 for the upstream default (50000000). Added in Gotenberg 9.3.0.",
           "type": [
             "integer",
             "null"
@@ -1274,7 +1274,7 @@
           "pattern": "^[-+]?(0|(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$"
         },
         "denyList": {
-          "description": "List of regular expressions for the denied webhook URLs An empty list clears Gotenberg's default.",
+          "description": "List of regular expressions for the denied webhook URLs. An empty list clears Gotenberg's default.",
           "type": [
             "array",
             "null"
