@@ -326,7 +326,7 @@ Kubernetes: `>=1.30.0-0`
 | gotenberg.hideBanner | bool | `nil` | Hide the banner above the startup summary. Gotenberg prints it only to a terminal. |
 | image.digest | string | `""` | Image digest, e.g. `sha256:...`. When set, the image is pulled by digest. |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"gotenberg/gotenberg"` |  |
+| image.repository | string | `"docker.io/gotenberg/gotenberg"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` | Set the annotations of the ingress |
@@ -409,9 +409,9 @@ Kubernetes: `>=1.30.0-0`
 | startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health","port":"http"},"periodSeconds":10}` | Define the startup probe object for the container. |
 | strategy | object | `{}` |  |
 | terminationGracePeriodSeconds | int | `nil` | Seconds Kubernetes waits for the pod to stop. Leave unset for `gotenberg.gracefulShutdownDurationSec` plus 10, which covers the `preStop` sleep. |
-| testImage | object | `{"digest":null,"repository":"busybox","tag":null}` | Image configuration for the helm test pod |
+| testImage | object | `{"digest":null,"repository":"docker.io/library/busybox","tag":null}` | Image configuration for the helm test pod |
 | testImage.digest | string | `nil` | Digest for the test image, e.g. `sha256:...`. Unset pulls the chart's pinned digest when `tag` is unset too, and pulls by tag otherwise. |
-| testImage.repository | string | `"busybox"` | Repository for the test image |
+| testImage.repository | string | `"docker.io/library/busybox"` | Repository for the test image |
 | testImage.tag | string | `nil` | Tag for the test image. Leave unset, with `digest`, for the chart's pinned busybox image. |
 | testPodAnnotations | object | `{}` | Set annotations for the helm test pods (for example to disable certain kube-score checks) |
 | tolerations | list | `[]` |  |

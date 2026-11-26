@@ -37,6 +37,7 @@ Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces c
 > - Basic authentication moves to `api.basicAuth.*` and quotes inline credentials. The install fails on authentication Gotenberg refuses at startup: basic auth without credentials or together with OIDC, and OIDC without `api.oidcIssuer` and `api.oidcAudience`.
 > - `pdb.minAvailable` and `pdb.maxUnavailable` take a number or a percentage and default to `null`, which keeps 1 available; setting both fails. `pdb.create` and `vpa.create` become `pdb.enabled` and `vpa.enabled`.
 > - Rollouts keep connections: `lifecycle` defaults to a 5s `preStop` sleep, which `lifecycle.preStop: null` drops and a `preStop` handler of your own, such as 1.x's `exec`, replaces, and `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s. `progressDeadlineSeconds` defaults to `600`, Kubernetes' own default, so pulling the new image doesn't fail the rollout.
+> - `image.repository` and `testImage.repository` default to the fully qualified `docker.io/gotenberg/gotenberg` and `docker.io/library/busybox`. CRI-O without a short-name registry, as on MicroShift 5, can't pull `gotenberg/gotenberg`.
 > - `enableServiceLinks` defaults to `false`: Gotenberg doesn't use service links, and a Service named `api` broke its startup.
 
 > [!TIP]

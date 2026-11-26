@@ -125,7 +125,7 @@ matches a user's Chromium release with an allow list:
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -190,7 +190,7 @@ matches a user's LibreOffice-only release on OpenShift:
                   value: "9464"
                 - name: HOME
                   value: /home/gotenberg
-              image: gotenberg/gotenberg:9.8.0-libreoffice
+              image: docker.io/gotenberg/gotenberg:9.8.0-libreoffice
               imagePullPolicy: IfNotPresent
               lifecycle:
                 preStop:
@@ -330,7 +330,7 @@ matches a user's LibreOffice-only release on OpenShift:
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -374,7 +374,7 @@ matches with default values:
                 - gotenberg
                 - --api-port=3000
               env: null
-              image: gotenberg/gotenberg:0.0.0
+              image: docker.io/gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
               lifecycle:
                 preStop:
@@ -462,7 +462,7 @@ matches with default values:
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -617,7 +617,7 @@ matches with every flag set:
                   value: username-value
                 - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
                   value: password-value
-              image: gotenberg/gotenberg:0.0.0
+              image: docker.io/gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
               lifecycle:
                 preStop:
@@ -705,7 +705,7 @@ matches with every flag set:
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -756,7 +756,7 @@ matches with every optional resource enabled:
                   value: 0.0.0.0
                 - name: OTEL_EXPORTER_PROMETHEUS_PORT
                   value: "9464"
-              image: gotenberg/gotenberg:0.0.0
+              image: docker.io/gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
               lifecycle:
                 preStop:
@@ -967,7 +967,7 @@ matches with every optional resource enabled:
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -1019,7 +1019,7 @@ matches with the CRD-backed and policy resources enabled:
                   value: 0.0.0.0
                 - name: OTEL_EXPORTER_PROMETHEUS_PORT
                   value: "9464"
-              image: gotenberg/gotenberg:0.0.0
+              image: docker.io/gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
               lifecycle:
                 preStop:
@@ -1180,7 +1180,7 @@ matches with the CRD-backed and policy resources enabled:
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -1249,7 +1249,7 @@ matches with the documented hardened values:
                 - --pdf-deny-private-ips=true
                 - --webhook-deny-private-ips=true
               env: null
-              image: gotenberg/gotenberg:0.0.0
+              image: docker.io/gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
               lifecycle:
                 preStop:
@@ -1396,7 +1396,7 @@ matches with the documented hardened values:
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false

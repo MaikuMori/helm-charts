@@ -160,7 +160,7 @@ async function updateTestImage() {
     throw new Error(`No testImage repository in ${VALUES}, or no pinned tag and digest in ${HELPERS}`);
   }
 
-  const name = repository.replace(/^docker\.io\//, '');
+  const name = repository.replace(/^docker\.io\//, '').replace(/^library\//, '');
   const hubRepository = name.includes('/') ? name : `library/${name}`;
   const response = await fetch(
     `https://hub.docker.com/v2/repositories/${hubRepository}/tags?page_size=100&ordering=last_updated`,
@@ -186,7 +186,8 @@ async function updateTestImage() {
   write(HELPERS, helpers
     .replace(/(\$pinnedTag := ")[^"]+/, `$1${target.name}`)
     .replace(/(\$pinnedDigest := ")[^"]+/, `$1${target.digest}`));
-  const url = `https://hub.docker.com/r/${hubRepository.replace(/^library\//, '_/')}/tags?name=${target.name}`;
+  const page = hubRepository.startsWith('library/') ? `_/${name}` : `r/${name}`;
+  const url = `https://hub.docker.com/${page}/tags?name=${target.name}`;
   return `- **helm test image** (\`gotenberg.testImage\` in \`${HELPERS}\`) \`${name}:${tag}@${digest.slice(0, 19)}…\` → [\`${name}:${target.name}@${target.digest.slice(0, 19)}…\`](${url})`;
 }
 

@@ -60,6 +60,8 @@ annotations:
       description: securityContext keys merge onto the restricted default, the default probes follow api.tlsSecretName and api.rootPath, and testImage.tag alone pulls that tag
     - kind: fixed
       description: A preStop handler set in values replaces the default sleep, and the install refuses values Kubernetes would reject, such as an empty PDB budget, port 0 or an Ingress without hosts
+    - kind: changed
+      description: image.repository and testImage.repository default to fully qualified docker.io names, which CRI-O without a short-name registry needs
     - kind: added
       description: The install notes give the in-cluster URL, try-it commands and the metrics URL, and warn about risky settings
     - kind: security

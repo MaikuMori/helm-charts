@@ -10,7 +10,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: gotenberg/gotenberg:1.2.3@sha256:1111111111111111111111111111111111111111111111111111111111111111
+          value: docker.io/gotenberg/gotenberg:1.2.3@sha256:1111111111111111111111111111111111111111111111111111111111111111
 
   - it: mounts the TLS secret and points the API at it
     set:

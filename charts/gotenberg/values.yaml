@@ -10,7 +10,7 @@ enabled: true
 replicaCount: 1  # @schema minimum: 0
 
 image:  # @schema additionalProperties: false
-  repository: gotenberg/gotenberg  # @schema minLength: 1
+  repository: docker.io/gotenberg/gotenberg  # @schema minLength: 1
   pullPolicy: IfNotPresent  # @schema enum: [Always, IfNotPresent, Never]
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -40,7 +40,7 @@ testPodAnnotations: {}
 # -- Image configuration for the helm test pod
 testImage:  # @schema additionalProperties: false
   # -- Repository for the test image
-  repository: busybox  # @schema minLength: 1
+  repository: docker.io/library/busybox  # @schema minLength: 1
   # -- (string) Tag for the test image. Leave unset, with `digest`, for the chart's pinned busybox image.
   tag:  # @schema type: [string, null]
   # -- (string) Digest for the test image, e.g. `sha256:...`. Unset pulls the chart's pinned digest when `tag` is unset too, and pulls by tag otherwise.
@@ -184,7 +184,7 @@ extraEnv: []
 # -- List of init containers for the gotenberg pod
 initContainers: []
 #  - name: init-myservice
-#    image: busybox:1.28
+#    image: docker.io/library/busybox:1.28
 #    command: ['sh', '-c', 'echo init container']
 
 ingress:  # @schema additionalProperties: false
