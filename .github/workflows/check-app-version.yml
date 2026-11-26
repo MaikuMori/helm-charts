@@ -263,6 +263,32 @@ jobs:
               return;
             }
 
+            // A bump PR with maintainer changes gets one comment per release
+            // instead of a competing PR.
+            const owned = [];
+            for (const pr of bumpPRs) {
+              if (pr.head.ref !== branch && await maintainerOwned(pr)) owned.push(pr);
+            }
+            if (owned.length > 0) {
+              const marker = `<!-- gotenberg-release: ${LATEST} -->`;
+              for (const pr of owned) {
+                const comments = await github.paginate(github.rest.issues.listComments, {
+                  ...here, issue_number: pr.number, per_page: 100,
+                });
+                if (comments.some(c => c.user?.login === 'github-actions[bot]' && (c.body ?? '').includes(marker))) {
+                  core.info(`PR #${pr.number} already has a comment about ${LATEST}.`);
+                  continue;
+                }
+                core.info(`PR #${pr.number} has maintainer changes, commenting about ${LATEST} instead of opening a PR.`);
+                await github.rest.issues.createComment({
+                  ...here,
+                  issue_number: pr.number,
+                  body: `${marker}\nGotenberg [\`${LATEST}\`](https://github.com/${upstream.owner}/${upstream.repo}/releases/tag/v${LATEST}) is out. This PR has maintainer changes, so no separate bump PR was opened.`,
+                });
+              }
+              return;
+            }
+
             // --- Create the new branch + bump commit --------------------------
             await sh('git', ['config', 'user.name', 'github-actions[bot]']);
             await sh('git', ['config', 'user.email', BOT_EMAIL]);
@@ -295,15 +321,10 @@ jobs:
             core.info(`Opened ${newPrUrl}`);
 
             // --- Close superseded bump PRs ------------------------------------
-            // Skip ones with maintainer commits so we don't clobber in-progress
-            // work. The new PR's URL goes in the close comment so the trail is
-            // navigable both directions.
+            // Only the bot's own PRs are left at this point. The new PR's URL
+            // goes in the close comment so the trail is navigable both directions.
             for (const pr of bumpPRs) {
               if (pr.head.ref === branch) continue;
-              if (await maintainerOwned(pr)) {
-                core.info(`PR #${pr.number} (${pr.head.ref}) has maintainer changes, leaving it alone.`);
-                continue;
-              }
               const ref = pr.head.ref;
 
               core.info(`Closing superseded PR #${pr.number} (${ref}) — replaced by ${newPrUrl}.`);
