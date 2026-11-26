@@ -88,7 +88,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
         with:
-          version: v4.3.1
+          version: v4.3.2
 
       - name: Install helm-unittest
         run: helm plugin install https://github.com/helm-unittest/helm-unittest/releases/download/v1.2.1/unittest-1.2.1.tgz --verify=false
@@ -124,7 +124,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
         with:
-          version: v4.3.1
+          version: v4.3.2
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -161,7 +161,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
         with:
-          version: v4.3.1
+          version: v4.3.2
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -253,7 +253,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
         with:
-          version: v4.3.1
+          version: v4.3.2
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -277,7 +277,7 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         env:
           # Look up: https://github.com/microshift-io/microshift/releases
-          IMAGE: ghcr.io/microshift-io/microshift:4.20.0_g153ff0ca9_4.20.0_okd_scos.16@sha256:235980dd065b3b0ef9c3d8788ee72a8583fd4b0f1e5ac996c09d5cbf1900e1ce
+          IMAGE: ghcr.io/microshift-io/microshift:5.0.0_202610291612.p0_g0f0de241c_5.0.0_okd_scos.7@sha256:890c406f989388d744620cafc48ed184e2b5c3236608be08b80325ae6a8c2dfa
         run: |
           sudo podman run --privileged --detach --tty --name microshift --hostname 127.0.0.1.nip.io --publish 6443:6443 "$IMAGE"
           kubeconfig=/var/lib/microshift/resources/kubeadmin/kubeconfig
