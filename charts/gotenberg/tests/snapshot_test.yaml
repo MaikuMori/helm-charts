@@ -37,3 +37,20 @@ tests:
       vpa.enabled: true
     asserts:
       - matchSnapshot: {}
+
+  # Configs users shared, rendered as they run them.
+  - it: matches a user's LibreOffice-only release on OpenShift
+    values:
+      - values/user-openshift-libreoffice.yaml
+    capabilities:
+      apiVersions:
+        - security.openshift.io/v1
+        - monitoring.coreos.com/v1
+    asserts:
+      - matchSnapshot: {}
+
+  - it: matches a user's Chromium release with an allow list
+    values:
+      - values/user-subchart-chromium.yaml
+    asserts:
+      - matchSnapshot: {}

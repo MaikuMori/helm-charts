@@ -1,0 +1,15 @@
+# Shared in https://github.com/MaikuMori/helm-charts/pull/128#issuecomment-7133492245, as a subchart's values.
+image:
+  repository: gotenberg/gotenberg
+  tag: "9.9.3"
+chromium:
+  allowInsecureLocalhost: true
+  allowList:
+    - ^http://internal\.example\.com/
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi

@@ -1,0 +1,31 @@
+# Shared in https://github.com/MaikuMori/helm-charts/pull/128#issuecomment-7006821166, run on OpenShift.
+fullnameOverride: gotenberg
+image:
+  tag: "9.8.0-libreoffice"
+service:
+  port: 3000
+strategy:
+  type: Recreate
+libreOffice:
+  autoStart: true
+  enableMacros: false
+  maxMemory: "1536MB"
+  denyPrivateIps: true
+  denyPublicIps: true
+pdf:
+  denyPrivateIps: true
+  denyPublicIps: true
+api:
+  disableDownloadFrom: true
+webhook:
+  disable: true
+metrics:
+  serviceMonitor:
+    enabled: true
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: "2"
+    memory: 2Gi
