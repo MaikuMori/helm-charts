@@ -214,7 +214,9 @@
         },
         "port": {
           "description": "Set the port on which the API should listen, also the container's and the Service's target port",
-          "type": "integer"
+          "type": "integer",
+          "maximum": 65535,
+          "minimum": 1
         },
         "rootPath": {
           "description": "Set the root path of the API, e.g. \"/gotenberg/\" - for service discovery via URL paths (default \"/\"). `/health` moves under it: update the probe paths too.",
@@ -260,10 +262,12 @@
           "type": "array"
         },
         "maxReplicas": {
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1
         },
         "minReplicas": {
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1
         },
         "targetCPUUtilizationPercentage": {
           "type": "integer"
@@ -559,10 +563,16 @@
           "pattern": "^(sha256:[a-f0-9]{64})?$"
         },
         "pullPolicy": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "Always",
+            "IfNotPresent",
+            "Never"
+          ]
         },
         "repository": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "tag": {
           "description": "Overrides the image tag whose default is the chart appVersion.",
@@ -718,7 +728,7 @@
       "additionalProperties": false
     },
     "lifecycle": {
-      "description": "Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. Helm merges this with your value, so set `lifecycle.preStop: null` to drop the sleep.",
+      "description": "Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. A `preStop` handler of your own, e.g. `exec`, replaces the sleep; set `lifecycle.preStop: null` to drop it.",
       "type": "object",
       "properties": {
         "preStop": {
@@ -946,7 +956,9 @@
             "integer",
             "string",
             "null"
-          ]
+          ],
+          "minimum": 0,
+          "pattern": "^[0-9]+%$"
         },
         "minAvailable": {
           "description": "(int or string) Pods that must stay available, as a number or a percentage such as \"50%\". Set this or `maxUnavailable`; with neither, the PDB keeps 1 available.",
@@ -954,7 +966,9 @@
             "integer",
             "string",
             "null"
-          ]
+          ],
+          "minimum": 0,
+          "pattern": "^[0-9]+%$"
         },
         "unhealthyPodEvictionPolicy": {
           "description": "Unhealthy pod eviction policy for the PDB (e.g., AlwaysAllow)",
@@ -1107,7 +1121,8 @@
       }
     },
     "replicaCount": {
-      "type": "integer"
+      "type": "integer",
+      "minimum": 0
     },
     "resources": {
       "type": "object"
@@ -1124,10 +1139,17 @@
           "type": "object"
         },
         "port": {
-          "type": "integer"
+          "type": "integer",
+          "maximum": 65535,
+          "minimum": 1
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "ClusterIP",
+            "NodePort",
+            "LoadBalancer"
+          ]
         }
       },
       "additionalProperties": false
@@ -1205,7 +1227,8 @@
         },
         "repository": {
           "description": "Repository for the test image",
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "tag": {
           "description": "Tag for the test image. Leave unset, with `digest`, for the chart's pinned busybox image.",
@@ -1245,8 +1268,15 @@
           "type": "object"
         },
         "updateMode": {
-          "description": "Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only)",
-          "type": "string"
+          "description": "Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), InPlaceOrRecreate (resize in place, restarting only when that fails), Initial (set at creation only), Off (recommendations only)",
+          "type": "string",
+          "enum": [
+            "Auto",
+            "Recreate",
+            "Initial",
+            "InPlaceOrRecreate",
+            "Off"
+          ]
         }
       },
       "additionalProperties": false

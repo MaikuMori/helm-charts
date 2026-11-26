@@ -22,6 +22,7 @@ Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces c
 > - 1.x's `chromium.maxConcurrency: 0` and `pdfEngines.maxConcurrency: 0` defaults meant "upstream default". 0 now reaches Gotenberg, which refuses it, so the schema does too: delete them.
 > - Setting `chromium.denyList`, `[]` included, replaces Gotenberg's default `^file:(?!//\/tmp/).*`, which stops pages reading local files. Keep that entry when you add your own; the install notes now warn when the list has none.
 > - Keys set in `securityContext` now override the restricted default instead of replacing it, so setting `runAsUser` alone keeps the rest. Loosen a default by setting its key.
+> - The install refuses values Kubernetes would reject or ignore: an empty `image.repository`, an empty or unknown `service.type`, `image.pullPolicy` or `vpa.updateMode`, port 0, a negative `replicaCount`, `autoscaling.minReplicas` of 0 or above `maxReplicas`, a PDB budget that is neither a number nor a percentage, an Ingress without `hosts` and an HTTPRoute without `parentRefs`.
 > - Upgrade with `--reset-values -f values.yaml`, not `--reuse-values`, which brings back removed 1.x keys that the schema rejects.
 
 > [!IMPORTANT]
@@ -35,7 +36,7 @@ Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces c
 > - `networkPolicy.ingress` and `networkPolicy.egress` take the rules directly, defaulting to allow all, and `[]` denies all. 1.x ignored `extraIngress` and `extraEgress` while `allowIngress` or `allowEgress` was true, and couldn't render deny-all.
 > - Basic authentication moves to `api.basicAuth.*` and quotes inline credentials. The install fails on authentication Gotenberg refuses at startup: basic auth without credentials or together with OIDC, and OIDC without `api.oidcIssuer` and `api.oidcAudience`.
 > - `pdb.minAvailable` and `pdb.maxUnavailable` take a number or a percentage and default to `null`, which keeps 1 available; setting both fails. `pdb.create` and `vpa.create` become `pdb.enabled` and `vpa.enabled`.
-> - Rollouts keep connections: `lifecycle` defaults to a 5s `preStop` sleep, which `lifecycle.preStop: null` drops, and `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s. `progressDeadlineSeconds` defaults to `600`, Kubernetes' own default, so pulling the new image doesn't fail the rollout.
+> - Rollouts keep connections: `lifecycle` defaults to a 5s `preStop` sleep, which `lifecycle.preStop: null` drops and a `preStop` handler of your own, such as 1.x's `exec`, replaces, and `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s. `progressDeadlineSeconds` defaults to `600`, Kubernetes' own default, so pulling the new image doesn't fail the rollout.
 > - `enableServiceLinks` defaults to `false`: Gotenberg doesn't use service links, and a Service named `api` broke its startup.
 
 > [!TIP]
@@ -74,7 +75,7 @@ Gotenberg 9 refuses its removed flags, so their values are gone, and the values 
 | `networkPolicy.allowIngress: false` with `extraIngress` | `networkPolicy.ingress`, the rules alone |
 | `networkPolicy.allowEgress: false` with `extraEgress` | `networkPolicy.egress`, the rules alone |
 | `pdb.create`, `vpa.create` | `pdb.enabled`, `vpa.enabled` |
-| `pdb.maxUnavailable: ""` | Delete it, or set `pdb.minAvailable: null` with a `maxUnavailable` |
+| `pdb.maxUnavailable: ""` | Delete it: the schema refuses it |
 | `*.allowList`, `*.denyList`, `api.downloadFrom*List` strings | Lists of regular expressions, e.g. `allowList: ["^https://a\\.example\\.com/"]` |
 | `chromium.restartAfter`, `libreOffice.restartAfter`, `webhook.maxRetry` strings | Integers |
 | `securityContext` set to the 1.28.0 default, to opt out of 1.29.0's | Its keys now merge onto the restricted default: also set `runAsNonRoot: false`, `capabilities: {drop: []}` and `seccompProfile: {type: Unconfined}` |

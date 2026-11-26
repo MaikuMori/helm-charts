@@ -437,3 +437,38 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "api.enableOidcAuth needs api.oidcIssuer and api.oidcAudience"
+
+  - it: replaces the default preStop sleep with a preStop handler from values
+    set:
+      lifecycle:
+        preStop:
+          exec:
+            command: [sh, -c, sleep 15]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle
+          value:
+            preStop:
+              exec:
+                command: [sh, -c, sleep 15]
+
+  - it: keeps the default preStop sleep next to other hooks
+    set:
+      lifecycle:
+        postStart:
+          exec:
+            command: ["true"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle.preStop
+          value:
+            sleep:
+              seconds: 5
+
+  - it: drops the lifecycle hooks with a null preStop
+    set:
+      lifecycle:
+        preStop: null
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].lifecycle

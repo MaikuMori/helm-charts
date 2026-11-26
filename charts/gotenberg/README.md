@@ -349,7 +349,7 @@ Kubernetes: `>=1.30.0-0`
 | libreOffice.maxQueueSize | int | `nil` | Maximum request queue size for LibreOffice. Set to 0 to disable this feature. Leave unset for the upstream default (0). |
 | libreOffice.restartAfter | int | `nil` | Number of conversions after which LibreOffice will automatically restart. Set to 0 to disable this feature. Leave unset for the upstream default (10). |
 | libreOffice.startTimeout | string | `nil` | Maximum duration to wait for LibreOffice to start or restart (default 20s) |
-| lifecycle | object | `{"preStop":{"sleep":{"seconds":5}}}` | Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. Helm merges this with your value, so set `lifecycle.preStop: null` to drop the sleep. |
+| lifecycle | object | `{"preStop":{"sleep":{"seconds":5}}}` | Define the container lifecycle hooks. The default `preStop` sleep keeps the server accepting connections while Service endpoints propagate on shutdown, which prevents dropped connections during scale-down and rolling updates: an idle Gotenberg exits within milliseconds of SIGTERM. A `preStop` handler of your own, e.g. `exec`, replaces the sleep; set `lifecycle.preStop: null` to drop it. |
 | livenessProbe | object | `{"httpGet":{"path":"/health","port":"http"}}` | Define the liveness probe object for the container. |
 | logging.fieldsPrefix | string | `nil` | Prepend a specified prefix to each field in the logs |
 | logging.level | string | `nil` | Set the log level - error, warn, info, or debug (default "info") |
@@ -420,7 +420,7 @@ Kubernetes: `>=1.30.0-0`
 | volumes | list | `[]` |  |
 | vpa.enabled | bool | `false` | Create a VerticalPodAutoscaler resource for right-sizing pod resources. Requires the VPA controller to be installed in the cluster. See also: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler |
 | vpa.resourcePolicy | object | `{}` | Resource policy for VPA to control which containers and resources are autoscaled, see values.yaml for an example. |
-| vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), Initial (set at creation only), Off (recommendations only) |
+| vpa.updateMode | string | `"Auto"` | Update mode for VPA: Auto (resize in-place or restart), Recreate (restart to resize), InPlaceOrRecreate (resize in place, restarting only when that fails), Initial (set at creation only), Off (recommendations only) |
 | webhook.allowList | list | `nil` | List of regular expressions for the allowed webhook URLs. Terminate the host: a match skips the IP-class checks. An empty list clears Gotenberg's default. |
 | webhook.clientTimeout | string | `nil` | Set the time limit for requests to the webhook (default 30s) |
 | webhook.denyList | list | `nil` | List of regular expressions for the denied webhook URLs. An empty list clears Gotenberg's default. |

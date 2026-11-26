@@ -329,3 +329,15 @@ pin; .github/scripts/check-pinned-tools.js keeps it current.
 {{- end }}
 {{- printf "%s:%s" $image.repository $tag }}{{ with $digest }}@{{ . }}{{ end }}
 {{- end }}
+
+{{/*
+Container lifecycle hooks. A preStop handler set in values replaces the default sleep, since Helm merges the two and a hook takes one handler.
+*/}}
+{{- define "gotenberg.lifecycle" -}}
+{{- $lifecycle := deepCopy (.Values.lifecycle | default dict) }}
+{{- $preStop := get $lifecycle "preStop" }}
+{{- if and (kindIs "map" $preStop) (or (hasKey $preStop "exec") (hasKey $preStop "httpGet") (hasKey $preStop "tcpSocket")) }}
+{{- $_ := unset $preStop "sleep" }}
+{{- end }}
+{{- with $lifecycle }}{{ toYaml . }}{{ end }}
+{{- end }}

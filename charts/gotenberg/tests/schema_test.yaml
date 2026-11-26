@@ -184,3 +184,61 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: "/api/timeout"
+
+  - it: refuses a PDB budget that is neither a number nor a percentage
+    set:
+      pdb.enabled: true
+      pdb.maxUnavailable: ""
+    asserts:
+      - failedTemplate:
+          errorPattern: "/pdb/maxUnavailable"
+
+  - it: refuses a negative PDB budget
+    set:
+      pdb.enabled: true
+      pdb.minAvailable: -1
+    asserts:
+      - failedTemplate:
+          errorPattern: "/pdb/minAvailable"
+
+  - it: refuses an empty Service type
+    set:
+      service.type: ""
+    asserts:
+      - failedTemplate:
+          errorPattern: "/service/type"
+
+  - it: refuses an empty image pull policy
+    set:
+      image.pullPolicy: ""
+    asserts:
+      - failedTemplate:
+          errorPattern: "/image/pullPolicy"
+
+  - it: refuses an empty image repository
+    set:
+      image.repository: ""
+    asserts:
+      - failedTemplate:
+          errorPattern: "/image/repository"
+
+  - it: refuses an unknown VPA update mode
+    set:
+      vpa.updateMode: ""
+    asserts:
+      - failedTemplate:
+          errorPattern: "/vpa/updateMode"
+
+  - it: refuses port 0
+    set:
+      api.port: 0
+    asserts:
+      - failedTemplate:
+          errorPattern: "/api/port"
+
+  - it: refuses an autoscaler that scales to zero
+    set:
+      autoscaling.minReplicas: 0
+    asserts:
+      - failedTemplate:
+          errorPattern: "/autoscaling/minReplicas"

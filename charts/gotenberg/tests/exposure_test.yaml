@@ -1,0 +1,31 @@
+suite: autoscaler, ingress and HTTPRoute
+templates:
+  - templates/hpa.yaml
+  - templates/ingress.yaml
+  - templates/httproute.yaml
+tests:
+  - it: refuses minReplicas above maxReplicas
+    set:
+      autoscaling.enabled: true
+      autoscaling.minReplicas: 5
+      autoscaling.maxReplicas: 2
+    asserts:
+      - failedTemplate:
+          errorMessage: autoscaling.minReplicas must not exceed autoscaling.maxReplicas
+        template: templates/hpa.yaml
+
+  - it: refuses an Ingress without hosts
+    set:
+      ingress.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: ingress.enabled needs at least one entry in ingress.hosts
+        template: templates/ingress.yaml
+
+  - it: refuses an HTTPRoute without a parent Gateway
+    set:
+      gateway.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: gateway.enabled needs at least one entry in gateway.parentRefs, the Gateway to attach the HTTPRoute to
+        template: templates/httproute.yaml
