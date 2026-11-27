@@ -39,32 +39,34 @@ annotations:
     url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
   artifacthub.io/changes: |
     - kind: changed
-      description: Bump Gotenberg to 9.10.2, a major release. Routes, form fields, flags and metrics change, so read Gotenberg's upgrade guide and the chart's CHANGELOG before upgrading
+      description: Bump Gotenberg to 9.10.2, a major release. Read Gotenberg's upgrade guide before you upgrade
+    - kind: changed
+      description: The chart needs Kubernetes 1.30 or later
+    - kind: changed
+      description: Upgrade with --reset-values -f values.yaml. --reuse-values brings back 1.x keys the schema rejects
+    - kind: changed
+      description: Flag values default to unset, which leaves Gotenberg's default. A value you set is passed as is, including 0, false, empty strings and empty lists
+    - kind: changed
+      description: Allow and deny lists are YAML lists with one pattern per entry
+    - kind: changed
+      description: Basic auth moves to api.basicAuth, and networkPolicy.ingress and networkPolicy.egress take the rules directly
+    - kind: changed
+      description: Metrics are off by default. metrics.enabled serves /metrics on port 9464 through a separate Service, and metric names change
+    - kind: changed
+      description: Images are fully qualified as docker.io/gotenberg/gotenberg and docker.io/library/busybox
+    - kind: changed
+      description: lifecycle defaults to a 5s preStop sleep, which a preStop handler of your own replaces
+    - kind: changed
+      description: securityContext keys merge onto the restricted default instead of replacing it
     - kind: removed
-      description: Remove the values for flags Gotenberg 9 removed, the deprecated aliases and service.loadBalancerIP
-    - kind: changed
-      description: Metrics are off by default and served through Gotenberg's OpenTelemetry Prometheus exporter on a separate metrics Service when metrics.enabled or metrics.serviceMonitor.enabled is set
-    - kind: changed
-      description: Every Gotenberg flag that works in a pod has a value, unset leaves Gotenberg's default and any set value is passed as is, with the schema refusing what Gotenberg refuses. Allow and deny lists are YAML lists
-    - kind: changed
-      description: networkPolicy.ingress and networkPolicy.egress take the rules directly, basic auth moves to api.basicAuth, the PDB takes numbers or percentages, and pdb.create and vpa.create become enabled
-    - kind: changed
-      description: The chart requires Kubernetes 1.30 or later
-    - kind: changed
-      description: Rollouts keep connections with a default preStop sleep and a longer grace period, progressDeadlineSeconds defaults to 600, and enableServiceLinks defaults to false
-    - kind: added
-      description: Add the pdf values for Gotenberg 9's PDF module, metrics Service metadata, and values for the new archive, memory limit, macro and DevTools debug flags
+      description: Values for flags Gotenberg 9 removed, the deprecated aliases and service.loadBalancerIP
     - kind: fixed
-      description: Quote inline basic auth credentials, fail early on auth settings Gotenberg refuses, drop the default httpGet from probes with another handler, and run helm test over HTTPS and under api.rootPath
-    - kind: changed
-      description: securityContext keys merge onto the restricted default, the default probes follow api.tlsSecretName and api.rootPath, and testImage.tag alone pulls that tag
+      description: The install fails on values Kubernetes or Gotenberg would reject, such as an empty image.repository, port 0 or an Ingress without hosts
     - kind: fixed
-      description: A preStop handler set in values replaces the default sleep, and the install refuses values Kubernetes would reject, such as an empty PDB budget, port 0 or an Ingress without hosts
-    - kind: changed
-      description: image.repository and testImage.repository default to fully qualified docker.io names, which CRI-O without a short-name registry needs
+      description: A probe with an exec, tcpSocket or grpc handler drops the default httpGet
     - kind: added
-      description: The install notes give the in-cluster URL, try-it commands and the metrics URL, and warn about risky settings
+      description: pdf values for the new PDF module, and values for the new archive, memory, macro and debug protocol flags
+    - kind: added
+      description: The install notes show how to reach and test the release, and warn about risky settings
     - kind: security
-      description: The hardening example also denies private timestamp authority URLs
-    - kind: changed
-      description: Refresh the helm test busybox 1.38.0 image digest
+      description: The hardening example sets pdf.denyPrivateIps
