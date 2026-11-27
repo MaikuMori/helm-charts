@@ -92,14 +92,14 @@ jobs:
             // the boilerplate sections we always emit.
             const PR_BODY_MAX = 60000;
             const RELEASE_BODY_MAX = 8000;
-            // Strip GitHub issue/PR-closing keywords from inlined upstream content
-            // so an upstream "fixes #5" can't accidentally close issue #5 in *this*
-            // repo when the PR merges. See
-            // https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
-            const sanitizeUpstreamMarkdown = (s) => s.replace(
-              /\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+(#\d+|[\w.-]+\/[\w.-]+#\d+|GH-\d+)/gi,
-              '$1 `$2`',
-            );
+            // Code-formats closing keywords and @mentions in inlined upstream
+            // content, so it can't close issues here or notify upstream users.
+            const sanitizeUpstreamMarkdown = (s) => s
+              .replace(
+                /\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+(#\d+|[\w.-]+\/[\w.-]+#\d+|GH-\d+)/gi,
+                '$1 `$2`',
+              )
+              .replace(/(^|[^\w`/.@-])@([a-z\d](?:[a-z\d-]*[a-z\d])?(?:\/[\w.-]+)?)/gi, '$1`@$2`');
 
             const parts = (v) => v.replace(/^v/, '').split('.').map(Number);
             const cmpVer = (a, b) => {
