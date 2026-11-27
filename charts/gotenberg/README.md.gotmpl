@@ -92,18 +92,19 @@ helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --install
 
 ### Upgrading to 2.0.0
 
-Chart 2.0.0 moves to Gotenberg 9, which changes routes, form fields, flags and metrics. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) and the chart's [CHANGELOG](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#200), which maps every 1.x value that changed. Migrate your values file with that table, then upgrade with it and `--reset-values`: without it, Helm can reuse the release's 1.x values, which the values schema rejects.
+Chart 2.0.0 runs Gotenberg 9, which changes routes, form fields, flags and metrics. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) and the chart's [CHANGELOG](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#200) first.
+
+1. Check that the cluster runs Kubernetes 1.30 or later.
+2. Update your values file with the CHANGELOG's [Values to update](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#values-to-update) table. If it copies the 1.x defaults, delete the four `api.disable*RouteTelemetry: false` entries and `chromium.maxConcurrency: 0`.
+3. Remove any `image.tag` or `image.digest` that pins Gotenberg 8.
+4. Plan the rollout. Gotenberg 8 and 9 pods share the Service while it runs, and clients of the removed routes fail on the 9 pods. Migrate clients first, set `strategy.type: Recreate`, or install 2.0.0 as a separate release and switch clients over.
+5. Upgrade with `--reset-values`, so Helm doesn't reuse 1.x values that the schema rejects:
 
 ```console
 helm upgrade my-release oci://ghcr.io/maikumori/helm-charts/gotenberg --version 2.0.0 --reset-values -f values.yaml
 ```
 
-- Chart 2.0.0 needs Kubernetes 1.30 or later.
-- Drop any `image.tag` or `image.digest` that pins Gotenberg 8, and rebuild custom images based on `gotenberg/gotenberg:8`.
-- If your values file is a copy of the 1.x defaults, delete the four `api.disable*RouteTelemetry: false` entries, which now turn telemetry on for the health check, root, debug and version routes, and `chromium.maxConcurrency: 0`, which Gotenberg 9 refuses.
-- During the rollout, Gotenberg 8 and 9 pods serve behind one Service, and clients of the removed routes and fields fail on the 9 pods. Migrate the clients first, set `strategy.type: Recreate` for the upgrade, or install 2.0.0 as a separate release and switch clients over.
-
-To stay on Gotenberg 8, keep chart 1.31.0, which runs 8.40.0, the final Gotenberg 8 release.
+> To stay on Gotenberg 8, keep chart 1.31.0.
 
 ### Using a Newer Gotenberg Version
 

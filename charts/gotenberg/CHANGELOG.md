@@ -2,86 +2,98 @@
 
 ## 2.0.0
 
-Gotenberg 9 is a major release. Routes, form fields, flags, metrics and traces change: read the [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) before upgrading, and the README's [Upgrading to 2.0.0](https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg#upgrading-to-200).
+Chart 2.0.0 moves to Gotenberg 9, a major release. Read Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade) before you upgrade.
 
-- Bump `gotenberg` version `8.40.0` -> `9.10.2`. Gotenberg 8 gets no further fixes. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
-- Refresh the `busybox:1.38.0` digest of the `helm test` image, which upstream rebuilt.
+- Bump `gotenberg` version `8.40.0` -> `9.10.2`. See the [release notes](https://github.com/gotenberg/gotenberg/releases/tag/v9.0.0) from 9.0.0 on.
+- The chart needs Kubernetes 1.30 or later.
+- To stay on Gotenberg 8, use chart 1.31.0.
 
-> [!CAUTION]
-> **Breaking for API clients: Gotenberg 9**
-> - `/forms/pdfengines/*` routes answer `404`, replaced by `/forms/pdf/*`. Post-processing fields move to a `stages` list. The Webhook error URL and method headers are gone: errors reach `Gotenberg-Webhook-Events-Url`, now required with `Gotenberg-Webhook-Url`.
-> - PDF processing has limits by default, and a stream, image or rendered page over them answers `400` (see the `pdf.max*` values). A stage that rewrites a signed PDF answers `400` unless the request sets `dropSignatures`, and `remediate` can return a PDF with violations left, counted in `Gotenberg-Remediation-Residual`.
-> - Java, Python, unoconverter, QPDF, pdfcpu, pdftk and ExifTool leave the image, and `LOK_BIN_PATH` replaces `UNOCONVERTER_BIN_PATH`. Rebuild images based on `gotenberg/gotenberg:8`; probes and hooks that call those tools break.
-> - The Markdown routes no longer run `index.html` as a Go template: it holds text and `{{ toHTML "<file>" }}` actions only, each file named once, or the request answers `400`.
-> - During the rollout, Gotenberg 8 and 9 pods serve behind one Service: migrate clients first, set `strategy.type: Recreate`, or install 2.0.0 as a separate release.
+### Upgrade steps
 
-> [!WARNING]
-> **Check your values: copied 1.x defaults now take effect**
-> - **Every Gotenberg flag has a value, and one rule**, but for `--api-bind-ip` and `--api-port-from-env`, which would cut the pod off from its Service and probes: an unset value leaves Gotenberg's default, and a set value is passed as is, `0`, `false`, `""` and `[]` included. All flag values default to unset, so a default install passes only `--api-port`; `api.downloadFromMaxRetry` no longer pins `4`, nor `gotenberg.gracefulShutdownDurationSec` 30. The schema refuses what Gotenberg refuses at startup, such as an empty duration or log level: delete those if you copied the 1.x defaults. `gotenberg.buildDebugData` is new.
-> - `api.disableHealthCheckRouteTelemetry` and the root, debug and version route telemetry switches default to `null`, upstream's `true`. An explicit `false`, which 1.x ignored, now turns telemetry on for that route, so every health probe gets logged and traced. Delete these four keys if you copied the 1.x defaults.
-> - 1.x's `chromium.maxConcurrency: 0` and `pdfEngines.maxConcurrency: 0` defaults meant "upstream default". 0 now reaches Gotenberg, which refuses it, so the schema does too: delete them.
-> - Setting `chromium.denyList`, `[]` included, replaces Gotenberg's default `^file:(?!//\/tmp/).*`, which stops pages reading local files. Keep that entry when you add your own; the install notes now warn when the list has none.
-> - Keys set in `securityContext` now override the restricted default instead of replacing it, so setting `runAsUser` alone keeps the rest. Loosen a default by setting its key.
-> - The install refuses values Kubernetes would reject or ignore: an empty `image.repository`, an empty or unknown `service.type`, `image.pullPolicy` or `vpa.updateMode`, port 0, a negative `replicaCount`, `autoscaling.minReplicas` of 0 or above `maxReplicas`, a PDB budget that is neither a number nor a percentage, an Ingress without `hosts` and an HTTPRoute without `parentRefs`.
-> - Upgrade with `--reset-values -f values.yaml`, not `--reuse-values`, which brings back removed 1.x keys that the schema rejects.
+1. Check that the cluster runs Kubernetes 1.30 or later.
+2. Update your values file with the [Values to update](https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md#values-to-update) table below.
+3. Remove any `image.tag` or `image.digest` that pins Gotenberg 8.
+4. Plan the rollout: migrate clients first, set `strategy.type: Recreate`, or install 2.0.0 as a separate release.
+5. Upgrade with `--reset-values -f values.yaml`.
 
-> [!IMPORTANT]
-> **Behaviour changes**
-> - The chart requires Kubernetes 1.30 or later, for the `preStop` sleep action below: Helm refuses to install it on older clusters.
-> - **Metrics are off by default**: 1.x served `/prometheus/metrics` on the API port by default. `metrics.enabled` serves Gotenberg's OpenTelemetry Prometheus exporter at `/metrics` on `metrics.port` (default `9464`), through a ClusterIP `<fullname>-metrics` Service. `metrics.serviceMonitor.enabled` turns it on too and scrapes it.
-> - **Metric names change**, e.g. `gotenberg_chromium_requests_queue_size` is now `gotenberg_chromium_queue_size`, restarts become counters and the errors counter is gone, and the ServiceMonitor's `job`, `service` and `endpoint` labels change with the new Service: update dashboards, alerts, recording rules and `autoscaling.extraMetrics`. Gotenberg exports metrics to one exporter, so `metrics.enabled` and an `OTEL_METRICS_EXPORTER` in `extraEnv` now fail the install. A NetworkPolicy with custom `ingress` rules must allow the metrics port.
-> - Upstream: the page sent to the Chromium HTML and Markdown routes skips `chromium.allowList` and `chromium.denyList`, which 8.x applied to it. Its uploaded files still load from `file:///tmp/`: an allow-list without `^file:///tmp/` drops them.
-> - Upstream: Gotenberg logs to stderr, and prints its banner only to a terminal.
-> - Allow and deny lists are YAML lists, one flag per entry: Gotenberg splits the old strings on commas, which broke patterns such as `[a-z]{1,10}` into two unsafe entries. `[]` clears a list's default; empty entries are rejected.
-> - `networkPolicy.ingress` and `networkPolicy.egress` take the rules directly, defaulting to allow all, and `[]` denies all. 1.x ignored `extraIngress` and `extraEgress` while `allowIngress` or `allowEgress` was true, and couldn't render deny-all.
-> - Basic authentication moves to `api.basicAuth.*` and quotes inline credentials. The install fails on authentication Gotenberg refuses at startup: basic auth without credentials or together with OIDC, and OIDC without `api.oidcIssuer` and `api.oidcAudience`.
-> - `pdb.minAvailable` and `pdb.maxUnavailable` take a number or a percentage and default to `null`, which keeps 1 available; setting both fails. `pdb.create` and `vpa.create` become `pdb.enabled` and `vpa.enabled`.
-> - Rollouts keep connections: `lifecycle` defaults to a 5s `preStop` sleep, which `lifecycle.preStop: null` drops and a `preStop` handler of your own, such as 1.x's `exec`, replaces, and `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s. `progressDeadlineSeconds` defaults to `600`, Kubernetes' own default, so pulling the new image doesn't fail the rollout.
-> - `image.repository` and `testImage.repository` default to the fully qualified `docker.io/gotenberg/gotenberg` and `docker.io/library/busybox`. CRI-O without a short-name registry, as on MicroShift 5, can't pull `gotenberg/gotenberg`.
-> - `enableServiceLinks` defaults to `false`: Gotenberg doesn't use service links, and a Service named `api` broke its startup.
+### Breaking: API clients
 
-> [!TIP]
-> **New**
-> - Add `pdf.*` values for the new PDF module, `metrics.service.annotations` and `metrics.service.labels`, and `api.archiveMaxEntries`, `api.archiveMaxRatio`, `chromium.maxMemory`, `chromium.debugProtocol`, `libreOffice.maxMemory` and `libreOffice.enableMacros`.
-> - The install notes give the in-cluster URL, a port-forward with a health check and a conversion, and the metrics URL, and warn about an exposed release without authentication, the debug route without it, `chromium.debugProtocol`, `libreOffice.enableMacros`, `chromium.proxyServer`, and a deny list without a `file:` rule.
-> - A probe with an `exec`, `tcpSocket` or `grpc` handler drops the default `httpGet`, which Kubernetes refused next to it, and the default `/health` check follows `api.tlsSecretName` and `api.rootPath`.
-> - `helm test` checks `/health` over HTTPS with `api.tlsSecretName`, and under `api.rootPath`.
-> - `testImage.tag` and `testImage.digest` default to unset, which pulls the chart's pinned busybox. Setting only the tag pulls that tag, rather than the pinned digest under a new name.
-> - The hardening example sets `pdf.denyPrivateIps`: the `sign` and `timestamp` stages call caller-chosen timestamp authorities.
-> - **Chart 1.31.0 (Gotenberg 8.40.0, the final 8.x) is out for anyone staying on Gotenberg 8.**
+- **During a rolling upgrade, Gotenberg 8 and 9 pods sit behind the same Service.** Migrate clients first, set `strategy.type: Recreate`, or install 2.0.0 as a separate release.
+- `/forms/pdfengines/*` is gone. Use `/forms/pdf/*`.
+- Form fields, webhook headers, PDF limits and the Markdown routes also change. See Gotenberg's [upgrade guide](https://gotenberg.dev/docs/getting-started/upgrade).
+
+### Breaking: values
+
+- **Upgrade with `--reset-values -f values.yaml`.** `--reuse-values` brings back 1.x keys the schema rejects.
+- The Values to update table below lists every removed or renamed value.
+- Flag values default to unset, which leaves Gotenberg's default. A value you set is passed as is, including `0`, `false`, `""` and `[]`. This means copied 1.x defaults now behave differently:
+  - `api.disable*RouteTelemetry: false` turns telemetry on for that route, so every health probe is logged and traced. Delete these four keys.
+  - `chromium.maxConcurrency: 0` and `pdfEngines.maxConcurrency: 0` are refused. Delete them.
+  - Empty durations and log levels are refused. Delete them.
+- Setting `chromium.denyList` replaces Gotenberg's default `^file:(?!//\/tmp/).*`, which blocks local files. Keep that entry when you add your own.
+- Allow and deny lists are YAML lists with one pattern per entry. Comma-separated strings are refused.
+- Keys in `securityContext` merge onto the restricted default instead of replacing it.
+- `networkPolicy.ingress` and `networkPolicy.egress` take the rules directly. The default allows all, and `[]` denies all.
+- Basic auth moves to `api.basicAuth.*`.
+- The install fails on values Kubernetes or Gotenberg would reject, such as an empty `image.repository`, port 0 or an Ingress without `hosts`.
+
+### Breaking: metrics
+
+- Metrics are off by default. `metrics.enabled` serves `/metrics` on port `9464` through a `<fullname>-metrics` Service. `metrics.serviceMonitor.enabled` also scrapes it.
+- Metric names change. For example, `gotenberg_chromium_requests_queue_size` is now `gotenberg_chromium_queue_size`. Restarts are counters, and the errors counter is gone.
+- The ServiceMonitor's `job`, `service` and `endpoint` labels change. Update dashboards, alerts and `autoscaling.extraMetrics`.
+- `metrics.enabled` fails the install if `extraEnv` sets `OTEL_METRICS_EXPORTER`.
+- A NetworkPolicy with custom `ingress` rules must allow the metrics port.
+
+### Changed
+
+- Images are fully qualified as `docker.io/gotenberg/gotenberg` and `docker.io/library/busybox`, so CRI-O without short-name aliases, as on MicroShift 5, can pull them.
+- `lifecycle` defaults to a 5s `preStop` sleep. A `preStop` handler of your own replaces it, and `lifecycle.preStop: null` removes it.
+- `terminationGracePeriodSeconds` defaults to the graceful shutdown duration plus 10s.
+- `progressDeadlineSeconds` defaults to `600`.
+- `enableServiceLinks` defaults to `false`.
+- `pdb.minAvailable` and `pdb.maxUnavailable` take a number or a percentage. By default, the PDB keeps 1 pod available.
+- A probe with an `exec`, `tcpSocket` or `grpc` handler drops the default `httpGet`.
+- The default `/health` probe and `helm test` follow `api.tlsSecretName` and `api.rootPath`.
+- `testImage.tag` and `testImage.digest` default to unset, which pulls the chart's pinned busybox.
+- Upstream: the page sent to the Chromium HTML and Markdown routes skips `chromium.allowList` and `chromium.denyList`. Its files still load from `file:///tmp/`, so an allow list needs `^file:///tmp/`.
+
+### Added
+
+- `pdf.*` values for the new PDF module.
+- `api.archiveMaxEntries`, `api.archiveMaxRatio`, `chromium.maxMemory`, `chromium.debugProtocol`, `libreOffice.maxMemory`, `libreOffice.enableMacros` and `gotenberg.buildDebugData`.
+- `metrics.service.annotations` and `metrics.service.labels`.
+- The install notes are more useful. They show how to reach and test the release, and warn about risky settings.
+- The hardening example sets `pdf.denyPrivateIps`.
 
 ### Values to update
 
-Gotenberg 9 refuses its removed flags, so their values are gone, and the values schema rejects them. Their environment variables, set through `extraEnv`, are ignored silently: remove them too.
+The schema rejects removed values. If you set any of them as environment variables in `extraEnv`, remove those too, because Gotenberg ignores them silently.
 
-| 1.x value | 2.0.0 |
-| --- | --- |
-| `pdfEngines.maxConcurrency` | `pdf.maxConcurrency`, now per request. Delete a `0` |
-| `pdfEngines.disableRoutes` | `pdf.disableRoutes` |
-| `pdfEngines.*Engines`, `pdfEngines.engines` | Removed: one PDF engine does all the work |
-| `prometheus.*` | Removed: see `metrics.enabled`. The namespace, path and collect interval have no replacement |
-| `chromium.incognito` | Removed |
-| `chromium.maxConcurrency: 0` | Delete it: Gotenberg allows 1 to 6 |
-| `webhook.errorAllowList`, `webhook.errorDenyList` | Removed with the error URL: `webhook.allowList` and `webhook.denyList` cover every webhook URL |
-| `logging.enableGcpSeverity` | Removed: Gotenberg 8.39.0 already refused its flag |
-| `api.traceHeader` | `api.correlationIdHeader` |
-| `api.disableHealthCheckLogging` | `api.disableHealthCheckRouteTelemetry` |
-| `api.disableHealthCheckRouteTelemetry`, `api.disableRootRouteTelemetry`, `api.disableDebugRouteTelemetry`, `api.disableVersionRouteTelemetry` set to `false` | Delete them: `false` now turns route telemetry on |
-| `api.enableBasicAuth` | `api.basicAuth.enabled` |
-| `api.basicAuthUsername`, `api.basicAuthPassword` | `api.basicAuth.username`, `api.basicAuth.password` |
-| `api.existingSecret`, `api.existingSecretUsernameKey`, `api.existingSecretPasswordKey` | `api.basicAuth.existingSecret`, `api.basicAuth.usernameKey`, `api.basicAuth.passwordKey` |
-| `logging.format` | `logging.stdFormat` |
-| `logging.enableGcpFields` | `logging.stdEnableGcpFields` |
-| `service.loadBalancerIP` | Removed: use your provider's Service annotations |
-| `networkPolicy.allowIngress: false` with `extraIngress` | `networkPolicy.ingress`, the rules alone |
-| `networkPolicy.allowEgress: false` with `extraEgress` | `networkPolicy.egress`, the rules alone |
-| `pdb.create`, `vpa.create` | `pdb.enabled`, `vpa.enabled` |
-| `pdb.maxUnavailable: ""` | Delete it: the schema refuses it |
-| `*.allowList`, `*.denyList`, `api.downloadFrom*List` strings | Lists of regular expressions, e.g. `allowList: ["^https://a\\.example\\.com/"]` |
-| `chromium.restartAfter`, `libreOffice.restartAfter`, `webhook.maxRetry` strings | Integers |
-| `securityContext` set to the 1.28.0 default, to opt out of 1.29.0's | Its keys now merge onto the restricted default: also set `runAsNonRoot: false`, `capabilities: {drop: []}` and `seccompProfile: {type: Unconfined}` |
-| `testImage.tag: "1.38.0"` and `testImage.digest` copied from 1.x | Delete them to keep the chart's pin |
-| `""` for a duration, `logging.*`, `api.rootPath` or `api.correlationIdHeader`, and `[]` you didn't mean to clear a default with | Delete them: unset leaves Gotenberg's default, and these are now passed |
+| Action | 1.x | 2.0.0 |
+| --- | --- | --- |
+| Rename | `pdfEngines.maxConcurrency` | `pdf.maxConcurrency`, now per request |
+| Rename | `pdfEngines.disableRoutes` | `pdf.disableRoutes` |
+| Rename | `logging.format` | `logging.stdFormat` |
+| Rename | `logging.enableGcpFields` | `logging.stdEnableGcpFields` |
+| Rename | `api.traceHeader` | `api.correlationIdHeader` |
+| Rename | `api.disableHealthCheckLogging` | `api.disableHealthCheckRouteTelemetry` |
+| Rename | `api.enableBasicAuth` | `api.basicAuth.enabled` |
+| Rename | `api.basicAuthUsername`, `api.basicAuthPassword` | `api.basicAuth.username`, `api.basicAuth.password` |
+| Rename | `api.existingSecret`, `api.existingSecretUsernameKey`, `api.existingSecretPasswordKey` | `api.basicAuth.existingSecret`, `api.basicAuth.usernameKey`, `api.basicAuth.passwordKey` |
+| Rename | `pdb.create`, `vpa.create` | `pdb.enabled`, `vpa.enabled` |
+| Replace | `networkPolicy.allowIngress: false` with `extraIngress` | `networkPolicy.ingress` |
+| Replace | `networkPolicy.allowEgress: false` with `extraEgress` | `networkPolicy.egress` |
+| Replace | `prometheus.*` | `metrics.enabled` |
+| Delete | `pdfEngines.*Engines`, `pdfEngines.engines` | — |
+| Delete | `chromium.incognito` | — |
+| Delete | `webhook.errorAllowList`, `webhook.errorDenyList` | `webhook.allowList` and `webhook.denyList` cover every webhook URL |
+| Delete | `logging.enableGcpSeverity` | — |
+| Delete | `service.loadBalancerIP` | Use your provider's Service annotations |
+| Delete | Copied 1.x defaults: `chromium.maxConcurrency: 0`, the four `api.disable*RouteTelemetry: false`, `pdb.maxUnavailable: ""`, `testImage.tag`, `testImage.digest`, and `""` for a duration, `logging.*`, `api.rootPath` or `api.correlationIdHeader` | — |
+| Convert | Allow and deny lists as strings | YAML lists, such as `allowList: ["^https://a\\.example\\.com/"]` |
+| Convert | `chromium.restartAfter`, `libreOffice.restartAfter`, `webhook.maxRetry` as strings | Integers |
+| Add | `securityContext` set to the 1.28.0 default | Also set `runAsNonRoot: false`, `capabilities: {drop: []}` and `seccompProfile: {type: Unconfined}` |
 
 ## 1.31.0
 
