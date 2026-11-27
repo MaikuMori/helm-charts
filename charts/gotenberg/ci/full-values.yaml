@@ -1,7 +1,6 @@
 pdb:
-  create: true
+  enabled: true
   minAvailable: 1
-  maxUnavailable: ""
   # This is a beta feature, so it's not enabled by default.
   unhealthyPodEvictionPolicy:
 
@@ -26,3 +25,6 @@ gateway:
       namespace: default
   hostnames:
     - gotenberg.test.local
+
+metrics:
+  enabled: true

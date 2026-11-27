@@ -1,4 +1,4 @@
-matches with default values:
+matches a user's Chromium release with an allow list:
   1: |
     apiVersion: apps/v1
     kind: Deployment
@@ -11,7 +11,7 @@ matches with default values:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       replicas: 1
       selector:
         matchLabels:
@@ -28,11 +28,15 @@ matches with default values:
             - args:
                 - gotenberg
                 - --api-port=3000
-                - --api-download-from-max-retry=4
-                - --gotenberg-graceful-shutdown-duration=30s
+                - --chromium-allow-insecure-localhost=true
+                - --chromium-allow-list=^http://internal\.example\.com/
               env: null
-              image: gotenberg/gotenberg:0.0.0
+              image: gotenberg/gotenberg:9.9.3
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
                   path: /health
@@ -46,7 +50,13 @@ matches with default values:
                 httpGet:
                   path: /health
                   port: http
-              resources: {}
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 1Gi
+                requests:
+                  cpu: 500m
+                  memory: 512Mi
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
@@ -64,10 +74,10 @@ matches with default values:
                   path: /health
                   port: http
                 periodSeconds: 10
-          enableServiceLinks: true
+          enableServiceLinks: false
           securityContext: {}
           serviceAccountName: default
-          terminationGracePeriodSeconds: 30
+          terminationGracePeriodSeconds: 40
   2: |
     apiVersion: v1
     kind: Service
@@ -108,14 +118,351 @@ matches with default values:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/health' && exit 0
                 sleep 3
               done
               exit 1
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          name: wget
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+      restartPolicy: Never
+      securityContext:
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+matches a user's LibreOffice-only release on OpenShift:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: gotenberg
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: gotenberg
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: gotenberg
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - gotenberg
+                - --api-port=3000
+                - --api-disable-download-from=true
+                - --libreoffice-auto-start=true
+                - --libreoffice-deny-private-ips=true
+                - --libreoffice-deny-public-ips=true
+                - --libreoffice-max-memory=1536MB
+                - --libreoffice-enable-macros=false
+                - --pdf-deny-private-ips=true
+                - --pdf-deny-public-ips=true
+                - --webhook-disable=true
+              env:
+                - name: OTEL_METRICS_EXPORTER
+                  value: prometheus
+                - name: OTEL_EXPORTER_PROMETHEUS_HOST
+                  value: 0.0.0.0
+                - name: OTEL_EXPORTER_PROMETHEUS_PORT
+                  value: "9464"
+                - name: HOME
+                  value: /home/gotenberg
+              image: docker.io/gotenberg/gotenberg:9.8.0-libreoffice
+              imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: http
+              name: gotenberg
+              ports:
+                - containerPort: 3000
+                  name: http
+                  protocol: TCP
+                - containerPort: 9464
+                  name: metrics
+                  protocol: TCP
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: http
+              resources:
+                limits:
+                  cpu: "2"
+                  memory: 2Gi
+                requests:
+                  cpu: 100m
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                privileged: false
+                readOnlyRootFilesystem: false
+              startupProbe:
+                failureThreshold: 30
+                httpGet:
+                  path: /health
+                  port: http
+                periodSeconds: 10
+          enableServiceLinks: false
+          securityContext: {}
+          serviceAccountName: default
+          terminationGracePeriodSeconds: 40
+  2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: metrics
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: gotenberg-metrics
+    spec:
+      ports:
+        - name: metrics
+          port: 9464
+          protocol: TCP
+          targetPort: metrics
+      selector:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: gotenberg
+      type: ClusterIP
+  3: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: gotenberg
+    spec:
+      ports:
+        - name: http
+          port: 3000
+          protocol: TCP
+          targetPort: http
+      selector:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: gotenberg
+      type: ClusterIP
+  4: |
+    apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: gotenberg
+      namespace: NAMESPACE
+    spec:
+      endpoints:
+        - path: /metrics
+          port: metrics
+          scheme: http
+      namespaceSelector:
+        matchNames:
+          - NAMESPACE
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: metrics
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: gotenberg
+  5: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      annotations:
+        helm.sh/hook: test
+      labels:
+        app.kubernetes.io/component: test
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg-test
+        helm.sh/chart: gotenberg-0.0.0
+      name: gotenberg-test-connection
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - args:
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'http://gotenberg:3000/health' && exit 0
+                sleep 3
+              done
+              exit 1
+          command:
+            - /bin/sh
+            - -c
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
+          name: wget
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+matches with default values:
+  1: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: RELEASE-NAME-gotenberg
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: RELEASE-NAME
+          app.kubernetes.io/name: gotenberg
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/name: gotenberg
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - gotenberg
+                - --api-port=3000
+              env: null
+              image: docker.io/gotenberg/gotenberg:0.0.0
+              imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: http
+              name: gotenberg
+              ports:
+                - containerPort: 3000
+                  name: http
+                  protocol: TCP
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: http
+              resources: {}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                privileged: false
+                readOnlyRootFilesystem: false
+                runAsNonRoot: true
+                runAsUser: 1001
+                seccompProfile:
+                  type: RuntimeDefault
+              startupProbe:
+                failureThreshold: 30
+                httpGet:
+                  path: /health
+                  port: http
+                periodSeconds: 10
+          enableServiceLinks: false
+          securityContext: {}
+          serviceAccountName: default
+          terminationGracePeriodSeconds: 40
+  2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: RELEASE-NAME-gotenberg
+    spec:
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: http
+      selector:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: gotenberg
+      type: ClusterIP
+  3: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      annotations:
+        helm.sh/hook: test
+      labels:
+        app.kubernetes.io/component: test
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg-test
+        helm.sh/chart: gotenberg-0.0.0
+      name: RELEASE-NAME-gotenberg-test-connection
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - args:
+            - |
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/health' && exit 0
+                sleep 3
+              done
+              exit 1
+          command:
+            - /bin/sh
+            - -c
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -143,7 +490,7 @@ matches with every flag set:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       replicas: 1
       selector:
         matchLabels:
@@ -160,116 +507,125 @@ matches with every flag set:
             - args:
                 - gotenberg
                 - --api-port=3007
-                - --api-timeout=timeout-value
-                - --api-body-limit=bodyLimit-value
-                - --api-root-path=rootPath-value
-                - --api-correlation-id-header=correlationIdHeader-value
-                - --api-disable-health-check-route-telemetry
-                - --api-enable-debug-route
-                - --api-start-timeout=startTimeout-value
                 - --api-enable-basic-auth
-                - --api-enable-oidc-auth
+                - --api-timeout=7s
+                - --api-body-limit=bodyLimit-value
+                - --api-root-path=/rootPath-value/
+                - --api-correlation-id-header=correlationIdHeader-value
+                - --api-disable-health-check-route-telemetry=false
+                - --api-enable-debug-route=true
+                - --api-start-timeout=7s
+                - --api-enable-oidc-auth=false
                 - --api-oidc-issuer=oidcIssuer-value
                 - --api-oidc-audience=oidcAudience-value
                 - --api-oidc-jwks-url=oidcJwksUrl-value
-                - --api-download-from-allow-list=downloadFromAllowList-value
-                - --api-download-from-deny-list=downloadFromDenyList-value
-                - --api-download-from-deny-private-ips
-                - --api-download-from-deny-public-ips
+                - --api-download-from-allow-list="^https://[a-z]{1,10}\.downloadFromAllowList\.example\.com(:|/|$)"
+                - --api-download-from-allow-list=^https://downloadFromAllowList\.example\.com/
+                - --api-download-from-deny-list="^https://[a-z]{1,10}\.downloadFromDenyList\.example\.com(:|/|$)"
+                - --api-download-from-deny-list=^https://downloadFromDenyList\.example\.com/
+                - --api-download-from-deny-private-ips=true
+                - --api-download-from-deny-public-ips=true
                 - --api-download-from-max-retry=11
                 - --api-download-from-max-concurrency=7
                 - --api-download-from-max-entries=7
-                - --api-download-from-enable-environment-proxy
-                - --api-disable-download-from
-                - --api-disable-root-route-telemetry
-                - --api-disable-debug-route-telemetry
-                - --api-disable-version-route-telemetry
-                - --chromium-restart-after=restartAfter-value
-                - --chromium-auto-start
-                - --chromium-start-timeout=startTimeout-value
-                - --chromium-allow-file-access-from-files
-                - --chromium-allow-insecure-localhost
-                - --chromium-allow-list=allowList-value
-                - --chromium-deny-list=denyList-value
-                - --chromium-deny-private-ips
-                - --chromium-deny-public-ips
-                - --chromium-ignore-certificate-errors
-                - --chromium-disable-web-security
-                - --chromium-incognito
+                - --api-download-from-enable-environment-proxy=true
+                - --api-disable-download-from=true
+                - --api-archive-max-entries=20000000
+                - --api-archive-max-ratio=7
+                - --api-disable-root-route-telemetry=true
+                - --api-disable-debug-route-telemetry=true
+                - --api-disable-version-route-telemetry=true
+                - --chromium-restart-after=7
+                - --chromium-auto-start=true
+                - --chromium-start-timeout=7s
+                - --chromium-allow-file-access-from-files=true
+                - --chromium-allow-insecure-localhost=true
+                - --chromium-allow-list="^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)"
+                - --chromium-allow-list=^https://allowList\.example\.com/
+                - --chromium-deny-list="^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)"
+                - --chromium-deny-list=^https://denyList\.example\.com/
+                - --chromium-deny-private-ips=true
+                - --chromium-deny-public-ips=true
+                - --chromium-ignore-certificate-errors=true
+                - --chromium-disable-web-security=true
                 - --chromium-host-resolver-rules=hostResolverRules-value
                 - --chromium-proxy-server=proxyServer-value
-                - --chromium-enable-environment-proxy
-                - --chromium-disable-javascript
-                - --chromium-disable-routes
-                - --chromium-shared-browser-context
-                - --chromium-clear-cache
-                - --chromium-clear-cookies
-                - --chromium-clear-storage
+                - --chromium-enable-environment-proxy=true
+                - --chromium-disable-javascript=true
+                - --chromium-disable-routes=true
+                - --chromium-shared-browser-context=true
+                - --chromium-clear-cache=true
+                - --chromium-clear-cookies=true
+                - --chromium-clear-storage=true
                 - --chromium-max-queue-size=7
-                - --chromium-max-concurrency=7
-                - --chromium-idle-shutdown-timeout=idleShutdownTimeout-value
-                - --libreoffice-restart-after=restartAfter-value
-                - --libreoffice-auto-start
-                - --libreoffice-start-timeout=startTimeout-value
-                - --libreoffice-disable-routes
+                - --chromium-max-concurrency=4
+                - --chromium-idle-shutdown-timeout=7s
+                - --chromium-max-memory=maxMemory-value
+                - --chromium-debug-protocol=true
+                - --libreoffice-restart-after=7
+                - --libreoffice-auto-start=true
+                - --libreoffice-start-timeout=7s
+                - --libreoffice-disable-routes=true
                 - --libreoffice-max-queue-size=7
-                - --libreoffice-idle-shutdown-timeout=idleShutdownTimeout-value
-                - --libreoffice-allow-list=allowList-value
-                - --libreoffice-deny-list=denyList-value
-                - --libreoffice-deny-private-ips
-                - --libreoffice-deny-public-ips
-                - --libreoffice-enable-environment-proxy
-                - --pdfengines-engines=engines-value
-                - --pdfengines-merge-engines=mergeEngines-value
-                - --pdfengines-split-engines=splitEngines-value
-                - --pdfengines-flatten-engines=flattenEngines-value
-                - --pdfengines-convert-engines=convertEngines-value
-                - --pdfengines-read-metadata-engines=readMetadataEngines-value
-                - --pdfengines-write-metadata-engines=writeMetadataEngines-value
-                - --pdfengines-encrypt-engines=encryptEngines-value
-                - --pdfengines-embed-engines=embedEngines-value
-                - --pdfengines-embed-metadata-engines=embedMetadataEngines-value
-                - --pdfengines-watermark-engines=watermarkEngines-value
-                - --pdfengines-stamp-engines=stampEngines-value
-                - --pdfengines-rotate-engines=rotateEngines-value
-                - --pdfengines-read-bookmarks-engines=readBookmarksEngines-value
-                - --pdfengines-write-bookmarks-engines=writeBookmarksEngines-value
-                - --pdfengines-factur-x-engines=facturXEngines-value
-                - --pdfengines-optimize-images-engines=optimizeImagesEngines-value
-                - --pdfengines-max-concurrency=7
-                - --pdfengines-disable-routes
-                - --webhook-enable-sync-mode
-                - --webhook-allow-list=allowList-value
-                - --webhook-deny-list=denyList-value
-                - --webhook-deny-private-ips
-                - --webhook-deny-public-ips
-                - --webhook-error-allow-list=errorAllowList-value
-                - --webhook-error-deny-list=errorDenyList-value
-                - --webhook-max-retry=maxRetry-value
-                - --webhook-retry-min-wait=retryMinWait-value
-                - --webhook-retry-max-wait=retryMaxWait-value
-                - --webhook-client-timeout=clientTimeout-value
-                - --webhook-enable-environment-proxy
-                - --webhook-disable
-                - --prometheus-collect-interval=collectInterval-value
-                - --prometheus-namespace=namespace-value
-                - --prometheus-metrics-path=metricsPath-value
-                - --prometheus-disable-collect
-                - --prometheus-disable-route-telemetry
-                - --log-std-format=stdFormat-value
-                - --log-std-level-case=stdLevelCase-value
-                - --log-level=level-value
+                - --libreoffice-idle-shutdown-timeout=7s
+                - --libreoffice-allow-list="^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)"
+                - --libreoffice-allow-list=^https://allowList\.example\.com/
+                - --libreoffice-deny-list="^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)"
+                - --libreoffice-deny-list=^https://denyList\.example\.com/
+                - --libreoffice-deny-private-ips=true
+                - --libreoffice-deny-public-ips=true
+                - --libreoffice-enable-environment-proxy=true
+                - --libreoffice-max-memory=maxMemory-value
+                - --libreoffice-enable-macros=true
+                - --pdf-max-concurrency=7
+                - --pdf-disable-routes=true
+                - --pdf-disable-stages=true
+                - --pdf-max-stream-bytes=maxStreamBytes-value
+                - --pdf-max-embedded-file-bytes=maxEmbeddedFileBytes-value
+                - --pdf-max-image-pixels=200000000
+                - --pdf-max-render-pixels=50000000
+                - --pdf-allow-list="^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)"
+                - --pdf-allow-list=^https://allowList\.example\.com/
+                - --pdf-deny-list="^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)"
+                - --pdf-deny-list=^https://denyList\.example\.com/
+                - --pdf-deny-private-ips=true
+                - --pdf-deny-public-ips=true
+                - --pdf-enable-environment-proxy=true
+                - --webhook-enable-sync-mode=true
+                - --webhook-allow-list="^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)"
+                - --webhook-allow-list=^https://allowList\.example\.com/
+                - --webhook-deny-list="^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)"
+                - --webhook-deny-list=^https://denyList\.example\.com/
+                - --webhook-deny-private-ips=true
+                - --webhook-deny-public-ips=true
+                - --webhook-max-retry=7
+                - --webhook-retry-min-wait=7s
+                - --webhook-retry-max-wait=7s
+                - --webhook-client-timeout=7s
+                - --webhook-enable-environment-proxy=true
+                - --webhook-disable=true
+                - --log-std-format=json
+                - --log-std-level-case=upper
+                - --log-level=debug
                 - --log-fields-prefix=fieldsPrefix-value
-                - --log-std-enable-gcp-fields
-                - --log-enable-gcp-severity
+                - --log-std-enable-gcp-fields=true
+                - --gotenberg-hide-banner=true
+                - --gotenberg-build-debug-data=false
                 - --gotenberg-graceful-shutdown-duration=37s
-                - --gotenberg-hide-banner
-              env: null
-              image: gotenberg/gotenberg:0.0.0
+              env:
+                - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+                  value: username-value
+                - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+                  value: password-value
+              image: docker.io/gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
-                  path: /health
+                  path: /rootPath-value/health
                   port: http
               name: gotenberg
               ports:
@@ -278,7 +634,7 @@ matches with every flag set:
                   protocol: TCP
               readinessProbe:
                 httpGet:
-                  path: /health
+                  path: /rootPath-value/health
                   port: http
               resources: {}
               securityContext:
@@ -295,13 +651,13 @@ matches with every flag set:
               startupProbe:
                 failureThreshold: 30
                 httpGet:
-                  path: /health
+                  path: /rootPath-value/health
                   port: http
                 periodSeconds: 10
-          enableServiceLinks: true
+          enableServiceLinks: false
           securityContext: {}
           serviceAccountName: default
-          terminationGracePeriodSeconds: 37
+          terminationGracePeriodSeconds: 47
   2: |
     apiVersion: v1
     kind: Service
@@ -342,14 +698,14 @@ matches with every flag set:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/rootPath-value/health' && exit 0
                 sleep 3
               done
               exit 1
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -377,7 +733,7 @@ matches with every optional resource enabled:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       selector:
         matchLabels:
           app.kubernetes.io/instance: RELEASE-NAME
@@ -393,11 +749,19 @@ matches with every optional resource enabled:
             - args:
                 - gotenberg
                 - --api-port=3000
-                - --api-download-from-max-retry=4
-                - --gotenberg-graceful-shutdown-duration=30s
-              env: null
-              image: gotenberg/gotenberg:0.0.0
+              env:
+                - name: OTEL_METRICS_EXPORTER
+                  value: prometheus
+                - name: OTEL_EXPORTER_PROMETHEUS_HOST
+                  value: 0.0.0.0
+                - name: OTEL_EXPORTER_PROMETHEUS_PORT
+                  value: "9464"
+              image: docker.io/gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
                   path: /health
@@ -406,6 +770,9 @@ matches with every optional resource enabled:
               ports:
                 - containerPort: 3000
                   name: http
+                  protocol: TCP
+                - containerPort: 9464
+                  name: metrics
                   protocol: TCP
               readinessProbe:
                 httpGet:
@@ -429,10 +796,10 @@ matches with every optional resource enabled:
                   path: /health
                   port: http
                 periodSeconds: 10
-          enableServiceLinks: true
+          enableServiceLinks: false
           securityContext: {}
           serviceAccountName: RELEASE-NAME-gotenberg
-          terminationGracePeriodSeconds: 30
+          terminationGracePeriodSeconds: 40
   2: |
     apiVersion: autoscaling/v2
     kind: HorizontalPodAutoscaler
@@ -503,6 +870,28 @@ matches with every optional resource enabled:
                 path: /
                 pathType: ImplementationSpecific
   5: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: metrics
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: RELEASE-NAME-gotenberg-metrics
+    spec:
+      ports:
+        - name: metrics
+          port: 9464
+          protocol: TCP
+          targetPort: metrics
+      selector:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: gotenberg
+      type: ClusterIP
+  6: |
     apiVersion: policy/v1
     kind: PodDisruptionBudget
     metadata:
@@ -519,7 +908,7 @@ matches with every optional resource enabled:
         matchLabels:
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: gotenberg
-  6: |
+  7: |
     apiVersion: v1
     kind: Service
     metadata:
@@ -540,7 +929,7 @@ matches with every optional resource enabled:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: gotenberg
       type: ClusterIP
-  7: |
+  8: |
     apiVersion: v1
     automountServiceAccountToken: false
     kind: ServiceAccount
@@ -552,7 +941,7 @@ matches with every optional resource enabled:
         app.kubernetes.io/version: 0.0.0
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
-  8: |
+  9: |
     apiVersion: v1
     kind: Pod
     metadata:
@@ -571,14 +960,14 @@ matches with every optional resource enabled:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/health' && exit 0
                 sleep 3
               done
               exit 1
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -606,7 +995,7 @@ matches with the CRD-backed and policy resources enabled:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       replicas: 1
       selector:
         matchLabels:
@@ -623,11 +1012,19 @@ matches with the CRD-backed and policy resources enabled:
             - args:
                 - gotenberg
                 - --api-port=3000
-                - --api-download-from-max-retry=4
-                - --gotenberg-graceful-shutdown-duration=30s
-              env: null
-              image: gotenberg/gotenberg:0.0.0
+              env:
+                - name: OTEL_METRICS_EXPORTER
+                  value: prometheus
+                - name: OTEL_EXPORTER_PROMETHEUS_HOST
+                  value: 0.0.0.0
+                - name: OTEL_EXPORTER_PROMETHEUS_PORT
+                  value: "9464"
+              image: docker.io/gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
                   path: /health
@@ -636,6 +1033,9 @@ matches with the CRD-backed and policy resources enabled:
               ports:
                 - containerPort: 3000
                   name: http
+                  protocol: TCP
+                - containerPort: 9464
+                  name: metrics
                   protocol: TCP
               readinessProbe:
                 httpGet:
@@ -659,11 +1059,33 @@ matches with the CRD-backed and policy resources enabled:
                   path: /health
                   port: http
                 periodSeconds: 10
-          enableServiceLinks: true
+          enableServiceLinks: false
           securityContext: {}
           serviceAccountName: default
-          terminationGracePeriodSeconds: 30
+          terminationGracePeriodSeconds: 40
   2: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: metrics
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: gotenberg
+        app.kubernetes.io/version: 0.0.0
+        helm.sh/chart: gotenberg-0.0.0
+      name: RELEASE-NAME-gotenberg-metrics
+    spec:
+      ports:
+        - name: metrics
+          port: 9464
+          protocol: TCP
+          targetPort: metrics
+      selector:
+        app.kubernetes.io/instance: RELEASE-NAME
+        app.kubernetes.io/name: gotenberg
+      type: ClusterIP
+  3: |
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
@@ -686,7 +1108,7 @@ matches with the CRD-backed and policy resources enabled:
       policyTypes:
         - Ingress
         - Egress
-  3: |
+  4: |
     apiVersion: v1
     kind: Service
     metadata:
@@ -707,7 +1129,7 @@ matches with the CRD-backed and policy resources enabled:
         app.kubernetes.io/instance: RELEASE-NAME
         app.kubernetes.io/name: gotenberg
       type: ClusterIP
-  4: |
+  5: |
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
@@ -721,17 +1143,18 @@ matches with the CRD-backed and policy resources enabled:
       namespace: NAMESPACE
     spec:
       endpoints:
-        - path: /prometheus/metrics
-          port: http
+        - path: /metrics
+          port: metrics
           scheme: http
       namespaceSelector:
         matchNames:
           - NAMESPACE
       selector:
         matchLabels:
+          app.kubernetes.io/component: metrics
           app.kubernetes.io/instance: RELEASE-NAME
           app.kubernetes.io/name: gotenberg
-  5: |
+  6: |
     apiVersion: v1
     kind: Pod
     metadata:
@@ -750,14 +1173,14 @@ matches with the CRD-backed and policy resources enabled:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/health' && exit 0
                 sleep 3
               done
               exit 1
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false
@@ -772,7 +1195,7 @@ matches with the CRD-backed and policy resources enabled:
         runAsUser: 65534
         seccompProfile:
           type: RuntimeDefault
-  6: |
+  7: |
     apiVersion: autoscaling.k8s.io/v1
     kind: VerticalPodAutoscaler
     metadata:
@@ -803,7 +1226,7 @@ matches with the documented hardened values:
         helm.sh/chart: gotenberg-0.0.0
       name: RELEASE-NAME-gotenberg
     spec:
-      progressDeadlineSeconds: 120
+      progressDeadlineSeconds: 600
       replicas: 1
       selector:
         matchLabels:
@@ -820,15 +1243,18 @@ matches with the documented hardened values:
             - args:
                 - gotenberg
                 - --api-port=3000
-                - --api-download-from-deny-private-ips
-                - --api-download-from-max-retry=4
-                - --chromium-deny-private-ips
-                - --libreoffice-deny-private-ips
-                - --webhook-deny-private-ips
-                - --gotenberg-graceful-shutdown-duration=30s
+                - --api-download-from-deny-private-ips=true
+                - --chromium-deny-private-ips=true
+                - --libreoffice-deny-private-ips=true
+                - --pdf-deny-private-ips=true
+                - --webhook-deny-private-ips=true
               env: null
-              image: gotenberg/gotenberg:0.0.0
+              image: docker.io/gotenberg/gotenberg:0.0.0
               imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  sleep:
+                    seconds: 5
               livenessProbe:
                 httpGet:
                   path: /health
@@ -860,10 +1286,10 @@ matches with the documented hardened values:
                   path: /health
                   port: http
                 periodSeconds: 10
-          enableServiceLinks: true
+          enableServiceLinks: false
           securityContext: {}
           serviceAccountName: default
-          terminationGracePeriodSeconds: 30
+          terminationGracePeriodSeconds: 40
   2: |
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
@@ -963,14 +1389,14 @@ matches with the documented hardened values:
         - args:
             - |
               for attempt in 1 2 3 4 5 6 7 8 9 10; do
-                wget -q -T 5 -O /dev/null 'RELEASE-NAME-gotenberg:80/health' && exit 0
+                wget -q -T 5 -O /dev/null 'http://RELEASE-NAME-gotenberg:80/health' && exit 0
                 sleep 3
               done
               exit 1
           command:
             - /bin/sh
             - -c
-          image: busybox:1.38.0@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
+          image: docker.io/library/busybox:1.38.0@sha256:a46257e06c82ad85242d0d38077d0a52d9896389ca60a1a59d3463db586e5fa4
           name: wget
           securityContext:
             allowPrivilegeEscalation: false

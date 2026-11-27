@@ -1,0 +1,176 @@
+suite: metrics
+templates:
+  - templates/deployment.yaml
+  - templates/metrics-service.yaml
+  - templates/service.yaml
+  - templates/servicemonitor.yaml
+capabilities:
+  apiVersions:
+    - monitoring.coreos.com/v1
+tests:
+  - it: serves no metrics by default
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: metrics
+            containerPort: 9464
+            protocol: TCP
+        template: templates/deployment.yaml
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].env
+        template: templates/deployment.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/metrics-service.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/servicemonitor.yaml
+
+  - it: turns on the Prometheus exporter and exposes its port
+    set:
+      metrics.enabled: true
+      metrics.port: 9500
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_METRICS_EXPORTER
+            value: prometheus
+        template: templates/deployment.yaml
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_EXPORTER_PROMETHEUS_HOST
+            value: "0.0.0.0"
+        template: templates/deployment.yaml
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_EXPORTER_PROMETHEUS_PORT
+            value: "9500"
+        template: templates/deployment.yaml
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: metrics
+            containerPort: 9500
+            protocol: TCP
+        template: templates/deployment.yaml
+      - equal:
+          path: spec
+          value:
+            type: ClusterIP
+            ports:
+              - port: 9500
+                targetPort: metrics
+                protocol: TCP
+                name: metrics
+            selector:
+              app.kubernetes.io/name: gotenberg
+              app.kubernetes.io/instance: RELEASE-NAME
+        template: templates/metrics-service.yaml
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: metrics
+        template: templates/metrics-service.yaml
+      - lengthEqual:
+          path: spec.ports
+          count: 1
+        template: templates/service.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/servicemonitor.yaml
+
+  - it: turns on the exporter for the ServiceMonitor and scrapes it
+    set:
+      metrics.serviceMonitor.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_METRICS_EXPORTER
+            value: prometheus
+        template: templates/deployment.yaml
+      - equal:
+          path: spec.endpoints[0].port
+          value: metrics
+        template: templates/servicemonitor.yaml
+      - equal:
+          path: spec.endpoints[0].path
+          value: /metrics
+        template: templates/servicemonitor.yaml
+      - equal:
+          path: spec.selector.matchLabels["app.kubernetes.io/component"]
+          value: metrics
+        template: templates/servicemonitor.yaml
+
+  - it: refuses an exporter set in extraEnv
+    set:
+      metrics.enabled: true
+      extraEnv:
+        - name: OTEL_METRICS_EXPORTER
+          value: otlp
+    asserts:
+      - failedTemplate:
+          errorPattern: "extraEnv sets OTEL_METRICS_EXPORTER"
+        template: templates/deployment.yaml
+
+  - it: leaves the exporter to extraEnv with metrics off
+    set:
+      extraEnv:
+        - name: OTEL_METRICS_EXPORTER
+          value: otlp
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_METRICS_EXPORTER
+            value: otlp
+        template: templates/deployment.yaml
+
+  - it: refuses a metrics port that collides with the API
+    set:
+      metrics.enabled: true
+      metrics.port: 3000
+    asserts:
+      - failedTemplate:
+          errorPattern: "metrics.port must differ from api.port"
+        template: templates/deployment.yaml
+
+  - it: renders with the metrics section nulled by a parent chart
+    set:
+      metrics: null
+    asserts:
+      - notFailedTemplate: {}
+        template: templates/deployment.yaml
+      - hasDocuments:
+          count: 0
+        template: templates/servicemonitor.yaml
+
+  - it: adds metrics Service annotations and labels
+    set:
+      metrics.enabled: true
+      metrics.service.annotations:
+        prometheus.io/scrape: "true"
+      metrics.service.labels:
+        team: docs
+    asserts:
+      - equal:
+          path: metadata.annotations["prometheus.io/scrape"]
+          value: "true"
+        template: templates/metrics-service.yaml
+      - equal:
+          path: metadata.labels.team
+          value: docs
+        template: templates/metrics-service.yaml
+
+  - it: never names the metrics Service like the API Service
+    set:
+      metrics.enabled: true
+      fullnameOverride: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-metrics
+    asserts:
+      - equal:
+          path: metadata.name
+          value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-metrics
+        template: templates/metrics-service.yaml

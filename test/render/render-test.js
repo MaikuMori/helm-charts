@@ -1,9 +1,11 @@
 // Exercises every Gotenberg release installed in the current cluster with the
 // fixtures in test/render: Chromium and LibreOffice conversions, a Chromium
-// screenshot, and merging, PDF/A conversion and metadata reading with the PDF
-// engines. PDFs are checked for the fixture's text and page count, the
-// screenshot for its format, dimensions and size. Releases running with
-// --chromium-deny-private-ips must also refuse to render a private address.
+// screenshot, a conversion with a stage, and merging, PDF/A remediation and
+// reading document info on the PDF routes. PDFs are checked for the fixture's
+// text and page count, the screenshot for its format, dimensions and size.
+// Releases with a metrics Service must serve Gotenberg's metrics. Releases running with
+// --chromium-deny-private-ips must refuse to render a private address, and
+// releases running with --pdf-deny-private-ips to timestamp against one.
 // Every release must resolve and reach a public address, and reach another
 // release's Service and pod only when no NetworkPolicy restricts its egress.
 // Needs pdftotext and pdfinfo (poppler-utils).
@@ -46,6 +48,7 @@ async function post(baseUrl, route, files, fields = {}) {
       const response = await fetch(`${baseUrl}${route}`, { method: 'POST', body: form });
       const body = Buffer.from(await response.arrayBuffer());
       if (!response.ok) throw new Error(`HTTP ${response.status}: ${body.toString('utf8', 0, 300)}`);
+      body.headers = response.headers;
       return body;
     } catch (e) {
       if (attempt === 5) throw e;
@@ -108,20 +111,28 @@ const STEPS = [
     if (png.length < MIN_SCREENSHOT_BYTES) throw new Error(`screenshot is ${png.length} bytes, looks blank`);
     return `${width}x${height}, ${png.length} bytes`;
   }],
-  ['PDF engines merge two PDFs', async (api, out) => {
-    out.merged = await api('/forms/pdfengines/merge', [
+  ['Chromium converts HTML with a stamp-text stage', async api => {
+    const stages = JSON.stringify([{ op: 'stamp-text', text: 'STAGE MARKER' }]);
+    const pdf = await api('/forms/chromium/convert/html', [fixture('index.html')], { stages });
+    return expectPdf(pdf, ['Chromium render test', 'STAGE MARKER'], 1);
+  }],
+  ['PDF routes merge two PDFs', async (api, out) => {
+    out.merged = await api('/forms/pdf/merge', [
       { name: '1.pdf', data: out.chromium }, { name: '2.pdf', data: out.libreoffice },
     ]);
     return expectPdf(out.merged, ['Chromium render test', 'LibreOffice render test'], 2);
   }],
-  ['PDF engines read metadata', async (api, out) => {
-    const metadata = JSON.parse((await api('/forms/pdfengines/metadata/read', [{ name: 'merged.pdf', data: out.merged }])).toString());
-    const pages = metadata['merged.pdf']?.PageCount;
-    if (pages !== 2) throw new Error(`metadata PageCount is ${pages}, want 2`);
-    return `PageCount ${pages}`;
+  ['PDF routes read document info', async (api, out) => {
+    const info = JSON.parse((await api('/forms/pdf/info', [{ name: 'merged.pdf', data: out.merged }])).toString());
+    const pages = info['merged.pdf']?.pages;
+    if (pages !== 2) throw new Error(`info pages is ${pages}, want 2`);
+    return `${pages} pages`;
   }],
-  ['PDF engines convert to PDF/A-2b', async (api, out) => {
-    const pdf = await api('/forms/pdfengines/convert', [{ name: 'in.pdf', data: out.libreoffice }], { pdfa: 'PDF/A-2b' });
+  ['PDF routes remediate to PDF/A-2b', async (api, out) => {
+    const pdf = await api('/forms/pdf/remediate', [{ name: 'in.pdf', data: out.libreoffice }], { profile: 'PDF/A-2b' });
+    for (const header of ['Gotenberg-Remediation-Residual', 'Gotenberg-Remediation-Rolled-Back']) {
+      if (pdf.headers.get(header) !== '0') throw new Error(`${header} is ${pdf.headers.get(header)}, want 0`);
+    }
     const xmp = poppler('pdfinfo', pdf, ['-meta']);
     if (!/<pdfaid:part>2<\/pdfaid:part>/.test(xmp)) throw new Error('PDF has no PDF/A-2 identification');
     return expectPdf(pdf, ['LibreOffice render test']);
@@ -140,11 +151,13 @@ async function main() {
 
   const installed = releases.map(({ name, namespace }) => {
     const get = kind => releaseObjects(kind, namespace, name);
-    const services = get('service');
-    if (services.length !== 1) throw new Error(`Expected one Service for ${namespace}/${name}, found ${services.length}`);
+    const component = s => s.metadata.labels?.['app.kubernetes.io/component'];
+    const services = get('service').filter(s => component(s) !== 'metrics');
+    if (services.length !== 1) throw new Error(`Expected one API Service for ${namespace}/${name}, found ${services.length}`);
+    const metricsService = get('service').find(s => component(s) === 'metrics');
     const pod = get('pod').find(p => p.status.phase === 'Running' && p.metadata.labels['app.kubernetes.io/component'] !== 'test');
     return {
-      name, namespace, service: services[0], deployment: get('deployment')[0], podIP: pod?.status.podIP,
+      name, namespace, service: services[0], metricsService, deployment: get('deployment')[0], podIP: pod?.status.podIP,
       networkPolicies: get('networkpolicy'),
     };
   });
@@ -153,7 +166,7 @@ async function main() {
     .map(r => ({ release: r, host: `${r.service.metadata.name}.${r.namespace}.svc`, port: r.service.spec.ports[0].port, podIP: r.podIP }));
 
   let failures = 0;
-  for (const { name, namespace, service, deployment, networkPolicies } of installed) {
+  for (const { name, namespace, service, metricsService, deployment, networkPolicies } of installed) {
     const args = deployment.spec.template.spec.containers[0].args ?? [];
     const { localPort, stop } = await portForward(namespace, service.metadata.name, service.spec.ports[0].port);
     const baseUrl = `http://127.0.0.1:${localPort}`;
@@ -167,6 +180,35 @@ async function main() {
         } catch (e) {
           failures++;
           console.log(`FAIL ${namespace}/${name}: ${label}: ${e.message}`);
+        }
+      }
+
+      if (metricsService) {
+        const label = 'serves Prometheus metrics';
+        const metrics = await portForward(namespace, metricsService.metadata.name, metricsService.spec.ports[0].port);
+        try {
+          const body = await (await fetch(`http://127.0.0.1:${metrics.localPort}/metrics`)).text();
+          if (!/^gotenberg_chromium_queue_size\b/m.test(body)) throw new Error('no gotenberg_chromium_queue_size metric');
+          console.log(`ok   ${namespace}/${name}: ${label}`);
+        } catch (e) {
+          failures++;
+          console.log(`FAIL ${namespace}/${name}: ${label}: ${e.message}`);
+        } finally {
+          metrics.stop();
+        }
+      }
+
+      if (args.includes('--pdf-deny-private-ips')) {
+        const label = `PDF timestamp stage refuses ${PRIVATE_URL}`;
+        const form = new FormData();
+        form.append('files', new Blob([fs.readFileSync(path.join(FIXTURES, 'index.html'))]), 'index.html');
+        form.append('stages', JSON.stringify([{ op: 'timestamp', timestampUrl: PRIVATE_URL }]));
+        const response = await fetch(`${baseUrl}/forms/chromium/convert/html`, { method: 'POST', body: form });
+        if (response.status === 403) {
+          console.log(`ok   ${namespace}/${name}: ${label}`);
+        } else {
+          failures++;
+          console.log(`FAIL ${namespace}/${name}: ${label}: got HTTP ${response.status}, want 403`);
         }
       }
 

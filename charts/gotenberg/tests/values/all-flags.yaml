@@ -1,42 +1,54 @@
 # Sets every value that maps to a Gotenberg flag, so the snapshot covers each one.
 # Add a value here when adding a flag; values are placeholders and only need to render.
 api:
+  archiveMaxEntries: 20000000
+  archiveMaxRatio: 7
   bodyLimit: bodyLimit-value
   correlationIdHeader: correlationIdHeader-value
   disableDebugRouteTelemetry: true
   disableDownloadFrom: true
-  disableHealthCheckLogging: true
-  disableHealthCheckRouteTelemetry: true
+  disableHealthCheckRouteTelemetry: false
   disableRootRouteTelemetry: true
   disableVersionRouteTelemetry: true
-  downloadFromAllowList: downloadFromAllowList-value
-  downloadFromDenyList: downloadFromDenyList-value
+  downloadFromAllowList:
+    - ^https://[a-z]{1,10}\.downloadFromAllowList\.example\.com(:|/|$)
+    - ^https://downloadFromAllowList\.example\.com/
+  downloadFromDenyList:
+    - ^https://[a-z]{1,10}\.downloadFromDenyList\.example\.com(:|/|$)
+    - ^https://downloadFromDenyList\.example\.com/
   downloadFromDenyPrivateIps: true
   downloadFromDenyPublicIps: true
   downloadFromEnableEnvironmentProxy: true
   downloadFromMaxConcurrency: 7
   downloadFromMaxEntries: 7
   downloadFromMaxRetry: 11
-  enableBasicAuth: true
+  basicAuth:
+    enabled: true
+    password: password-value
+    username: username-value
   enableDebugRoute: true
-  enableOidcAuth: true
+  enableOidcAuth: false
   oidcAudience: oidcAudience-value
   oidcIssuer: oidcIssuer-value
   oidcJwksUrl: oidcJwksUrl-value
   port: 3007
-  rootPath: rootPath-value
-  startTimeout: startTimeout-value
-  timeout: timeout-value
-  traceHeader: traceHeader-value
+  rootPath: /rootPath-value/
+  startTimeout: 7s
+  timeout: 7s
 chromium:
   allowFileAccessFromFiles: true
   allowInsecureLocalhost: true
-  allowList: allowList-value
+  allowList:
+    - ^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)
+    - ^https://allowList\.example\.com/
   autoStart: true
   clearCache: true
   clearCookies: true
   clearStorage: true
-  denyList: denyList-value
+  debugProtocol: true
+  denyList:
+    - ^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)
+    - ^https://denyList\.example\.com/
   denyPrivateIps: true
   denyPublicIps: true
   disableJavaScript: true
@@ -44,77 +56,73 @@ chromium:
   disableWebSecurity: true
   enableEnvironmentProxy: true
   hostResolverRules: hostResolverRules-value
-  idleShutdownTimeout: idleShutdownTimeout-value
+  idleShutdownTimeout: 7s
   ignoreCertificateErrors: true
-  incognito: true
-  maxConcurrency: 7
+  maxConcurrency: 4
+  maxMemory: maxMemory-value
   maxQueueSize: 7
   proxyServer: proxyServer-value
-  restartAfter: restartAfter-value
+  restartAfter: 7
   sharedBrowserContext: true
-  startTimeout: startTimeout-value
+  startTimeout: 7s
 gotenberg:
+  buildDebugData: false
   gracefulShutdownDurationSec: 37
   hideBanner: true
 libreOffice:
-  allowList: allowList-value
+  allowList:
+    - ^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)
+    - ^https://allowList\.example\.com/
   autoStart: true
-  denyList: denyList-value
+  denyList:
+    - ^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)
+    - ^https://denyList\.example\.com/
   denyPrivateIps: true
   denyPublicIps: true
   disableRoutes: true
   enableEnvironmentProxy: true
-  idleShutdownTimeout: idleShutdownTimeout-value
+  enableMacros: true
+  idleShutdownTimeout: 7s
+  maxMemory: maxMemory-value
   maxQueueSize: 7
-  restartAfter: restartAfter-value
-  startTimeout: startTimeout-value
+  restartAfter: 7
+  startTimeout: 7s
 logging:
-  enableGcpFields: true
-  enableGcpSeverity: true
   fieldsPrefix: fieldsPrefix-value
-  format: format-value
-  level: level-value
+  level: debug
   stdEnableGcpFields: true
-  stdFormat: stdFormat-value
-  stdLevelCase: stdLevelCase-value
-pdfEngines:
-  convertEngines: convertEngines-value
+  stdFormat: json
+  stdLevelCase: upper
+pdf:
+  allowList:
+    - ^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)
+    - ^https://allowList\.example\.com/
+  denyList:
+    - ^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)
+    - ^https://denyList\.example\.com/
+  denyPrivateIps: true
+  denyPublicIps: true
   disableRoutes: true
-  embedEngines: embedEngines-value
-  embedMetadataEngines: embedMetadataEngines-value
-  encryptEngines: encryptEngines-value
-  engines: engines-value
-  facturXEngines: facturXEngines-value
-  flattenEngines: flattenEngines-value
+  disableStages: true
+  enableEnvironmentProxy: true
   maxConcurrency: 7
-  mergeEngines: mergeEngines-value
-  optimizeImagesEngines: optimizeImagesEngines-value
-  readBookmarksEngines: readBookmarksEngines-value
-  readMetadataEngines: readMetadataEngines-value
-  rotateEngines: rotateEngines-value
-  splitEngines: splitEngines-value
-  stampEngines: stampEngines-value
-  watermarkEngines: watermarkEngines-value
-  writeBookmarksEngines: writeBookmarksEngines-value
-  writeMetadataEngines: writeMetadataEngines-value
-prometheus:
-  collectInterval: collectInterval-value
-  disableCollect: true
-  disableRouteTelemetry: true
-  disableRouterLogging: true
-  metricsPath: metricsPath-value
-  namespace: namespace-value
+  maxEmbeddedFileBytes: maxEmbeddedFileBytes-value
+  maxImagePixels: 200000000
+  maxRenderPixels: 50000000
+  maxStreamBytes: maxStreamBytes-value
 webhook:
-  allowList: allowList-value
-  clientTimeout: clientTimeout-value
-  denyList: denyList-value
+  allowList:
+    - ^https://[a-z]{1,10}\.allowList\.example\.com(:|/|$)
+    - ^https://allowList\.example\.com/
+  clientTimeout: 7s
+  denyList:
+    - ^https://[a-z]{1,10}\.denyList\.example\.com(:|/|$)
+    - ^https://denyList\.example\.com/
   denyPrivateIps: true
   denyPublicIps: true
   disable: true
   enableEnvironmentProxy: true
   enableSyncMode: true
-  errorAllowList: errorAllowList-value
-  errorDenyList: errorDenyList-value
-  maxRetry: maxRetry-value
-  retryMaxWait: retryMaxWait-value
-  retryMinWait: retryMinWait-value
+  maxRetry: 7
+  retryMaxWait: 7s
+  retryMinWait: 7s

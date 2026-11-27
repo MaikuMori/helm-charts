@@ -10,6 +10,7 @@ const path = require('path');
 const WORKFLOWS = '.github/workflows';
 const TEST_WORKFLOW = `${WORKFLOWS}/test.yml`;
 const VALUES = 'charts/gotenberg/values.yaml';
+const HELPERS = 'charts/gotenberg/templates/_helpers.tpl';
 const BRANCH = 'update-pinned-test-tools';
 const TITLE = 'Update pinned test tools';
 const LABEL = 'dependencies';
@@ -151,16 +152,16 @@ const compareVersions = (a, b) => {
 // when it was rebuilt under a different digest.
 async function updateTestImage() {
   const values = read(VALUES);
-  const block = values.match(/^testImage:.*\n((?:[ #].*\n|\n)*)/m)?.[1];
-  const field = key => block?.match(new RegExp(`^  ${key}: *"?([^"\\s]+)"?`, 'm'))?.[1];
-  const repository = field('repository');
-  const tag = field('tag');
-  const digest = field('digest');
+  const helpers = read(HELPERS);
+  const repository = values.match(/^testImage:.*\n(?:[ #].*\n)*?  repository: *"?([^"\s]+)"?/m)?.[1];
+  const tag = helpers.match(/\$pinnedTag := "([^"]+)"/)?.[1];
+  const digest = helpers.match(/\$pinnedDigest := "([^"]+)"/)?.[1];
   if (!repository || !tag || !digest) {
-    throw new Error(`No testImage repository, tag and digest in ${VALUES}`);
+    throw new Error(`No testImage repository in ${VALUES}, or no pinned tag and digest in ${HELPERS}`);
   }
 
-  const hubRepository = repository.includes('/') ? repository : `library/${repository}`;
+  const name = repository.replace(/^docker\.io\//, '').replace(/^library\//, '');
+  const hubRepository = name.includes('/') ? name : `library/${name}`;
   const response = await fetch(
     `https://hub.docker.com/v2/repositories/${hubRepository}/tags?page_size=100&ordering=last_updated`,
   );
@@ -182,12 +183,12 @@ async function updateTestImage() {
   }
   if (!target) return null;
 
-  const updated = block
-    .replace(/^(  tag: *"?)[^"\s]+/m, `$1${target.name}`)
-    .replace(/^(  digest: *"?)[^"\s]+/m, `$1${target.digest}`);
-  write(VALUES, values.replace(block, updated));
-  const url = `https://hub.docker.com/_/${repository}/tags?name=${target.name}`;
-  return `- **helm test image** (\`testImage\` in \`${VALUES}\`) \`${repository}:${tag}@${digest.slice(0, 19)}…\` → [\`${repository}:${target.name}@${target.digest.slice(0, 19)}…\`](${url})`;
+  write(HELPERS, helpers
+    .replace(/(\$pinnedTag := ")[^"]+/, `$1${target.name}`)
+    .replace(/(\$pinnedDigest := ")[^"]+/, `$1${target.digest}`));
+  const page = hubRepository.startsWith('library/') ? `_/${name}` : `r/${name}`;
+  const url = `https://hub.docker.com/${page}/tags?name=${target.name}`;
+  return `- **helm test image** (\`gotenberg.testImage\` in \`${HELPERS}\`) \`${name}:${tag}@${digest.slice(0, 19)}…\` → [\`${name}:${target.name}@${target.digest.slice(0, 19)}…\`](${url})`;
 }
 
 // Commits the updated files on top of the default branch, through the API so

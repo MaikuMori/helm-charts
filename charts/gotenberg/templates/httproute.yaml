@@ -1,4 +1,7 @@
 {{- if .Values.gateway.enabled -}}
+{{- if not .Values.gateway.parentRefs }}
+{{- fail "gateway.enabled needs at least one entry in gateway.parentRefs, the Gateway to attach the HTTPRoute to" }}
+{{- end }}
 {{- $fullName := include "gotenberg.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 apiVersion: gateway.networking.k8s.io/v1

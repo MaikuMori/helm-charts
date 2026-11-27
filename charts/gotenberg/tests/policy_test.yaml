@@ -1,0 +1,91 @@
+suite: disruption budget and network policy
+templates:
+  - templates/pdb.yaml
+  - templates/networkpolicy.yaml
+tests:
+  - it: keeps one pod available by default
+    set:
+      pdb.enabled: true
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 1
+        template: templates/pdb.yaml
+      - notExists:
+          path: spec.maxUnavailable
+        template: templates/pdb.yaml
+
+  - it: takes percentages and 0
+    set:
+      pdb.enabled: true
+      pdb.maxUnavailable: "25%"
+    asserts:
+      - equal:
+          path: spec.maxUnavailable
+          value: 25%
+        template: templates/pdb.yaml
+      - notExists:
+          path: spec.minAvailable
+        template: templates/pdb.yaml
+
+  - it: keeps a minAvailable of 0
+    set:
+      pdb.enabled: true
+      pdb.minAvailable: 0
+    asserts:
+      - equal:
+          path: spec.minAvailable
+          value: 0
+        template: templates/pdb.yaml
+
+  - it: refuses both PDB thresholds
+    set:
+      pdb.enabled: true
+      pdb.minAvailable: 1
+      pdb.maxUnavailable: 1
+    asserts:
+      - failedTemplate:
+          errorPattern: "not both"
+        template: templates/pdb.yaml
+
+  - it: allows all traffic by default
+    set:
+      networkPolicy.enabled: true
+    asserts:
+      - equal:
+          path: spec.ingress
+          value: [{}]
+        template: templates/networkpolicy.yaml
+      - equal:
+          path: spec.egress
+          value: [{}]
+        template: templates/networkpolicy.yaml
+
+  - it: denies all traffic with empty rule lists
+    set:
+      networkPolicy.enabled: true
+      networkPolicy.ingress: []
+      networkPolicy.egress: []
+    asserts:
+      - equal:
+          path: spec.ingress
+          value: []
+        template: templates/networkpolicy.yaml
+      - equal:
+          path: spec.egress
+          value: []
+        template: templates/networkpolicy.yaml
+
+  - it: uses the given rules
+    set:
+      networkPolicy.enabled: true
+      networkPolicy.ingress:
+        - ports:
+            - port: 3000
+    asserts:
+      - equal:
+          path: spec.ingress
+          value:
+            - ports:
+                - port: 3000
+        template: templates/networkpolicy.yaml

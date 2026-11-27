@@ -40,7 +40,7 @@ tests:
     asserts:
       - matchRegex:
           path: spec.containers[0].image
-          pattern: ^busybox:[0-9.]+@sha256:[a-f0-9]{64}$
+          pattern: ^docker\.io/library/busybox:[0-9.]+@sha256:[a-f0-9]{64}$
 
   - it: pulls the test image by tag when the digest is cleared
     set:
@@ -48,7 +48,7 @@ tests:
     asserts:
       - equal:
           path: spec.containers[0].image
-          value: busybox:1.38.0
+          value: docker.io/library/busybox:1.38.0
 
   - it: isn't selected by the chart's Service, PodDisruptionBudget or NetworkPolicy
     asserts:
@@ -71,3 +71,20 @@ tests:
       - equal:
           path: metadata.labels["app.kubernetes.io/name"]
           value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-hook
+
+  - it: checks health over HTTPS under the root path
+    set:
+      api.tlsSecretName: gotenberg-tls
+      api.rootPath: /gotenberg/
+    asserts:
+      - matchRegex:
+          path: spec.containers[0].args[0]
+          pattern: "'https://RELEASE-NAME-gotenberg:80/gotenberg/health'"
+
+  - it: pulls a tag you set without the chart's digest
+    set:
+      testImage.tag: 1.37.0
+    asserts:
+      - equal:
+          path: spec.containers[0].image
+          value: docker.io/library/busybox:1.37.0

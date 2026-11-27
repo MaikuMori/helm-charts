@@ -10,35 +10,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: gotenberg/gotenberg:1.2.3@sha256:1111111111111111111111111111111111111111111111111111111111111111
-
-  - it: falls back to the deprecated traceHeader for the correlation ID header
-    set:
-      api.traceHeader: X-Trace
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].args
-          content: --api-correlation-id-header=X-Trace
-
-  - it: prefers correlationIdHeader over traceHeader
-    set:
-      api.traceHeader: X-Trace
-      api.correlationIdHeader: X-Correlation
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].args
-          content: --api-correlation-id-header=X-Correlation
-      - notContains:
-          path: spec.template.spec.containers[0].args
-          content: --api-correlation-id-header=X-Trace
-
-  - it: falls back to the deprecated logging.format for the log format
-    set:
-      logging.format: json
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].args
-          content: --log-std-format=json
+          value: docker.io/gotenberg/gotenberg:1.2.3@sha256:1111111111111111111111111111111111111111111111111111111111111111
 
   - it: mounts the TLS secret and points the API at it
     set:
@@ -75,10 +47,10 @@ tests:
 
   - it: reads basic auth credentials from an existing secret with default keys
     set:
-      api.enableBasicAuth: true
-      api.existingSecret: creds
-      api.basicAuthUsername: ignored
-      api.basicAuthPassword: ignored
+      api.basicAuth.enabled: true
+      api.basicAuth.existingSecret: creds
+      api.basicAuth.username: ignored
+      api.basicAuth.password: ignored
     asserts:
       - equal:
           path: spec.template.spec.containers[0].env
@@ -96,10 +68,10 @@ tests:
 
   - it: uses custom secret keys for basic auth
     set:
-      api.enableBasicAuth: true
-      api.existingSecret: creds
-      api.existingSecretUsernameKey: user
-      api.existingSecretPasswordKey: pass
+      api.basicAuth.enabled: true
+      api.basicAuth.existingSecret: creds
+      api.basicAuth.usernameKey: user
+      api.basicAuth.passwordKey: pass
     asserts:
       - equal:
           path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.key
@@ -108,21 +80,74 @@ tests:
           path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.key
           value: pass
 
-  - it: sets inline basic auth credentials only when both are given
+  - it: refuses basic auth without credentials
     set:
-      api.enableBasicAuth: true
-      api.basicAuthUsername: admin
+      api.basicAuth.enabled: true
+      api.basicAuth.username: admin
+    asserts:
+      - failedTemplate:
+          errorPattern: "api.basicAuth.enabled needs"
+
+  - it: accepts basic auth credentials from extraEnv
+    set:
+      api.basicAuth.enabled: true
+      extraEnv:
+        - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+          value: admin
+        - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+          value: secret
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
           content: --api-enable-basic-auth
-      - isNullOrEmpty:
+
+  - it: refuses basic auth together with OIDC
+    set:
+      api.basicAuth.enabled: true
+      api.basicAuth.existingSecret: creds
+      api.enableOidcAuth: true
+    asserts:
+      - failedTemplate:
+          errorPattern: "mutually exclusive"
+
+  - it: quotes inline basic auth credentials
+    set:
+      api.basicAuth.enabled: true
+      api.basicAuth.username: "123456"
+      api.basicAuth.password: "p@ss #1"
+    asserts:
+      - equal:
           path: spec.template.spec.containers[0].env
+          value:
+            - name: GOTENBERG_API_BASIC_AUTH_USERNAME
+              value: "123456"
+            - name: GOTENBERG_API_BASIC_AUTH_PASSWORD
+              value: "p@ss #1"
+
+  - it: passes the OIDC flags
+    set:
+      api.enableOidcAuth: true
+      api.oidcIssuer: https://issuer.example.com/
+      api.oidcAudience: gotenberg
+      api.oidcJwksUrl: https://issuer.example.com/jwks
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-enable-oidc-auth=true
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-oidc-issuer=https://issuer.example.com/
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-oidc-audience=gotenberg
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-oidc-jwks-url=https://issuer.example.com/jwks
 
   - it: ignores basic auth credentials when basic auth is disabled
     set:
-      api.basicAuthUsername: admin
-      api.basicAuthPassword: secret
+      api.basicAuth.username: admin
+      api.basicAuth.password: secret
     asserts:
       - isNullOrEmpty:
           path: spec.template.spec.containers[0].env
@@ -179,7 +204,7 @@ tests:
           path: spec.template.spec.securityContext.seccompProfile.type
           value: Localhost
 
-  - it: uses a custom securityContext as is and sets HOME for another user
+  - it: keeps the restricted defaults under a custom securityContext and sets HOME for another user
     set:
       securityContext:
         runAsUser: 2000
@@ -187,7 +212,16 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].securityContext
           value:
+            privileged: false
             runAsUser: 2000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+            readOnlyRootFilesystem: false
       - contains:
           path: spec.template.spec.containers[0].env
           content:
@@ -222,7 +256,7 @@ tests:
   - it: passes 0 for restart, retry and shutdown values
     set:
       chromium.restartAfter: 0
-      libreOffice.restartAfter: "0"
+      libreOffice.restartAfter: 0
       api.downloadFromMaxRetry: 0
       webhook.maxRetry: 0
       gotenberg.gracefulShutdownDurationSec: 0
@@ -244,4 +278,197 @@ tests:
           content: --gotenberg-graceful-shutdown-duration=0s
       - equal:
           path: spec.template.spec.terminationGracePeriodSeconds
+          value: 10
+
+  - it: passes each list entry as its own flag, quoting entries with commas
+    set:
+      chromium.allowList:
+        - ^https://[a-z]{1,10}\.example\.com(:|/|$)
+        - ^https://other\.example\.com/
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --chromium-allow-list="^https://[a-z]{1,10}\.example\.com(:|/|$)"
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --chromium-allow-list=^https://other\.example\.com/
+
+  - it: renders large integers without an exponent
+    set:
+      pdf.maxImagePixels: 200000000
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --pdf-max-image-pixels=200000000
+
+  - it: passes false for route telemetry switches that default to true upstream
+    set:
+      api.disableHealthCheckRouteTelemetry: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --api-disable-health-check-route-telemetry=false
+
+  - it: leaves upstream defaults to Gotenberg
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - gotenberg
+            - --api-port=3000
+
+  - it: rejects empty list entries, which would clear Chromium's default deny list
+    set:
+      chromium.denyList: [""]
+    asserts:
+      - failedTemplate:
+          errorPattern: "/chromium/denyList"
+
+  - it: gives the pod 10 seconds more than Gotenberg's shutdown by default
+    set:
+      gotenberg.gracefulShutdownDurationSec: 45
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 55
+
+  - it: uses an explicit terminationGracePeriodSeconds
+    set:
+      terminationGracePeriodSeconds: 120
+    asserts:
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 120
+
+  - it: leaves Gotenberg's shutdown duration to upstream when unset
+    set:
+      gotenberg.gracefulShutdownDurationSec: null
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --gotenberg-graceful-shutdown-duration=0s
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 40
+
+  - it: sleeps before stopping by default
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle
+          value:
+            preStop:
+              sleep:
+                seconds: 5
+
+  - it: clears a list's upstream default with an empty list
+    set:
+      chromium.denyList: []
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --chromium-deny-list=
+
+  - it: loosens the security context only where it is set
+    set:
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        capabilities:
+          drop: []
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsNonRoot
+          value: false
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
           value: 0
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.capabilities.drop
+          value: []
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+
+  - it: drops the default HTTP check from a probe with another handler
+    set:
+      readinessProbe:
+        exec:
+          command: [cat, /tmp/ready]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe
+          value:
+            exec:
+              command: [cat, /tmp/ready]
+
+  - it: points the default probes at HTTPS under the root path
+    set:
+      api.tlsSecretName: gotenberg-tls
+      api.rootPath: /gotenberg/
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet
+          value:
+            path: /gotenberg/health
+            port: http
+            scheme: HTTPS
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.httpGet.path
+          value: /gotenberg/health
+
+  - it: leaves a probe path and scheme you set
+    set:
+      api.tlsSecretName: gotenberg-tls
+      api.rootPath: /gotenberg/
+      livenessProbe.httpGet.path: /custom
+      livenessProbe.httpGet.scheme: HTTP
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet
+          value:
+            path: /custom
+            port: http
+            scheme: HTTP
+
+  - it: refuses OIDC without an issuer and an audience
+    set:
+      api.enableOidcAuth: true
+      api.oidcIssuer: https://issuer.example.com/
+    asserts:
+      - failedTemplate:
+          errorPattern: "api.enableOidcAuth needs api.oidcIssuer and api.oidcAudience"
+
+  - it: replaces the default preStop sleep with a preStop handler from values
+    set:
+      lifecycle:
+        preStop:
+          exec:
+            command: [sh, -c, sleep 15]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle
+          value:
+            preStop:
+              exec:
+                command: [sh, -c, sleep 15]
+
+  - it: keeps the default preStop sleep next to other hooks
+    set:
+      lifecycle:
+        postStart:
+          exec:
+            command: ["true"]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].lifecycle.preStop
+          value:
+            sleep:
+              seconds: 5
+
+  - it: drops the lifecycle hooks with a null preStop
+    set:
+      lifecycle:
+        preStop: null
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].lifecycle

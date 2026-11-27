@@ -1,4 +1,4 @@
-{{- if and (not .Values.prometheus.disableCollect) .Values.metrics .Values.metrics.serviceMonitor .Values.metrics.serviceMonitor.enabled }}
+{{- if and .Values.metrics .Values.metrics.serviceMonitor .Values.metrics.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -20,9 +20,10 @@ spec:
   selector:
     matchLabels:
       {{- include "gotenberg.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: metrics
   endpoints:
-    - path: {{ .Values.prometheus.metricsPath | default "/prometheus/metrics" }}
-      port: http
+    - path: /metrics
+      port: metrics
       scheme: http
       {{- with .Values.metrics.serviceMonitor.interval }}
       interval: {{ . }}
