@@ -18,11 +18,22 @@ jobs:
   check-version:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
     steps:
+      # The app's PRs, unlike the Actions token's, trigger the test workflows.
+      - name: Get the updater app's token
+        id: app-token
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          client-id: ${{ vars.UPDATER_CLIENT_ID }}
+          private-key: ${{ secrets.UPDATER_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 # zizmor: ignore[artipacked] later steps push with git
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Check for new Gotenberg release
         id: check
@@ -73,7 +84,9 @@ jobs:
         env:
           CURRENT: ${{ steps.check.outputs.current }}
           LATEST: ${{ steps.check.outputs.latest }}
+          BOT: ${{ steps.app-token.outputs.app-slug }}[bot]
         with:
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             const fs = require('fs');
             const { promisify } = require('util');
@@ -86,20 +99,22 @@ jobs:
             const branch = `bump-gotenberg-${LATEST}`;
             const chartPath = 'charts/gotenberg/Chart.yaml';
             const COMMIT_LIMIT = 100;
-            const BOT_EMAIL = 'github-actions[bot]@users.noreply.github.com';
+            const { BOT } = process.env;
+            const { data: botUser } = await github.rest.users.getByUsername({ username: BOT });
+            const BOT_EMAIL = `${botUser.id}+${BOT}@users.noreply.github.com`;
             const BOT_INTRO = 'Automated bump of Gotenberg';
             // Total PR-body cap. GitHub's hard limit is 65 536; leave headroom for
             // the boilerplate sections we always emit.
             const PR_BODY_MAX = 60000;
             const RELEASE_BODY_MAX = 8000;
-            // Strip GitHub issue/PR-closing keywords from inlined upstream content
-            // so an upstream "fixes #5" can't accidentally close issue #5 in *this*
-            // repo when the PR merges. See
-            // https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue
-            const sanitizeUpstreamMarkdown = (s) => s.replace(
-              /\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+(#\d+|[\w.-]+\/[\w.-]+#\d+|GH-\d+)/gi,
-              '$1 `$2`',
-            );
+            // Code-formats closing keywords and @mentions in inlined upstream
+            // content, so it can't close issues here or notify upstream users.
+            const sanitizeUpstreamMarkdown = (s) => s
+              .replace(
+                /\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+(#\d+|[\w.-]+\/[\w.-]+#\d+|GH-\d+)/gi,
+                '$1 `$2`',
+              )
+              .replace(/(^|[^\w`/.@-])@([a-z\d](?:[a-z\d-]*[a-z\d])?(?:\/[\w.-]+)?)/gi, '$1`@$2`');
 
             const parts = (v) => v.replace(/^v/, '').split('.').map(Number);
             const cmpVer = (a, b) => {
@@ -171,8 +186,6 @@ jobs:
               : `${s.slice(0, max)}\n\n_…release body truncated (${s.length - max} chars omitted)_`;
 
             const sections = [];
-            sections.push(`${BOT_INTRO} from \`${CURRENT}\` to \`${LATEST}\`.`);
-
             sections.push('## Release notes');
             if (releases.length > 0) {
               // Newest first, like Dependabot. Release bodies pass through
@@ -201,22 +214,37 @@ jobs:
               sections.push(`[See the full diff](https://github.com/${upstream.owner}/${upstream.repo}/compare/v${CURRENT}...v${LATEST})`);
             }
 
-            sections.push([
+            const intro = `${BOT_INTRO} from \`${CURRENT}\` to \`${LATEST}\`.`;
+            const tasks = [
               '**Remaining tasks:**',
               '- [ ] Review upstream release notes for breaking changes',
               '- [ ] Update `CHANGELOG.md`',
               '- [ ] Update `Chart.yaml` version and `artifacthub.io/changes` annotation',
               '- [ ] Run `helm-docs` and `helm schema` (in `charts/gotenberg`)',
-            ].join('\n'));
+            ].join('\n');
 
-            // Final hard cap on the assembled body so pulls.create can't fail
-            // *after* we've already pushed the branch. If we land here, per-
-            // release truncation wasn't enough on its own.
-            let body = sections.join('\n\n');
-            if (body.length > PR_BODY_MAX) {
-              const note = `\n\n_…PR body truncated to fit GitHub's size limit. See the full diff link above._`;
-              body = body.slice(0, PR_BODY_MAX - note.length) + note;
-            }
+            // The notes sit between markers, so a later release can replace
+            // them in a PR body a maintainer has rewritten.
+            const NOTES_START = '<!-- gotenberg-release-notes -->';
+            const NOTES_END = '<!-- /gotenberg-release-notes -->';
+            const notes = sections.join('\n\n');
+            // Caps the whole body, so pulls.create can't fail after the push.
+            const notesBlock = (room) => {
+              const note = `\n\n_…release notes truncated to fit GitHub's size limit. See the full diff link._`;
+              const fitted = notes.length <= room ? notes : notes.slice(0, Math.max(0, room - note.length)) + note;
+              return `${NOTES_START}\n${fitted}\n${NOTES_END}`;
+            };
+            const markers = NOTES_START.length + NOTES_END.length + 2;
+            const body = [intro, notesBlock(PR_BODY_MAX - intro.length - tasks.length - markers - 4), tasks].join('\n\n');
+            // Null when the body has no notes block.
+            const withNotes = (prBody) => {
+              const a = prBody.indexOf(NOTES_START);
+              const b = prBody.indexOf(NOTES_END, a);
+              if (a < 0 || b < 0) return null;
+              const before = prBody.slice(0, a);
+              const after = prBody.slice(b + NOTES_END.length);
+              return before + notesBlock(PR_BODY_MAX - before.length - after.length - markers) + after;
+            };
 
             // --- Manage open bump PRs -----------------------------------------
             // Restrict to same-repo PRs so a fork PR named bump-gotenberg-X.Y.Z
@@ -250,10 +278,24 @@ jobs:
               return parseInt(countOut.trim(), 10) !== 1 || authorOut.trim() !== BOT_EMAIL;
             };
 
+            // Replaces the notes block of a maintainer's PR, keeping the rest of its body.
+            const refreshNotes = async (pr) => {
+              const updated = withNotes(pr.body ?? '');
+              if (updated === null) {
+                core.info(`PR #${pr.number} has no release notes block, leaving its body alone.`);
+                return false;
+              }
+              if (updated !== pr.body) {
+                await github.rest.pulls.update({ ...here, pull_number: pr.number, body: updated });
+              }
+              return true;
+            };
+
             const existing = bumpPRs.find(pr => pr.head.ref === branch);
             if (existing) {
               if (await maintainerOwned(existing)) {
-                core.info(`PR #${existing.number} already targets ${LATEST} and has maintainer changes, leaving it alone.`);
+                core.info(`PR #${existing.number} already targets ${LATEST} and has maintainer changes, refreshing only its release notes.`);
+                await refreshNotes(existing);
               } else {
                 core.info(`PR #${existing.number} already targets ${LATEST}, refreshing body.`);
                 await github.rest.pulls.update({
@@ -263,19 +305,21 @@ jobs:
               return;
             }
 
-            // A bump PR with maintainer changes gets one comment per release
-            // instead of a competing PR.
+            // A bump PR with maintainer changes gets the new release notes and
+            // one comment per release instead of a competing PR.
             const owned = [];
             for (const pr of bumpPRs) {
               if (pr.head.ref !== branch && await maintainerOwned(pr)) owned.push(pr);
             }
             if (owned.length > 0) {
               const marker = `<!-- gotenberg-release: ${LATEST} -->`;
+              const releaseLink = `[\`${LATEST}\`](https://github.com/${upstream.owner}/${upstream.repo}/releases/tag/v${LATEST})`;
               for (const pr of owned) {
+                const refreshed = await refreshNotes(pr);
                 const comments = await github.paginate(github.rest.issues.listComments, {
                   ...here, issue_number: pr.number, per_page: 100,
                 });
-                if (comments.some(c => c.user?.login === 'github-actions[bot]' && (c.body ?? '').includes(marker))) {
+                if (comments.some(c => c.user?.login === BOT && (c.body ?? '').includes(marker))) {
                   core.info(`PR #${pr.number} already has a comment about ${LATEST}.`);
                   continue;
                 }
@@ -283,14 +327,16 @@ jobs:
                 await github.rest.issues.createComment({
                   ...here,
                   issue_number: pr.number,
-                  body: `${marker}\nGotenberg [\`${LATEST}\`](https://github.com/${upstream.owner}/${upstream.repo}/releases/tag/v${LATEST}) is out. This PR has maintainer changes, so no separate bump PR was opened.`,
+                  body: refreshed
+                    ? `${marker}\nGotenberg ${releaseLink} is out. The release notes in the description now run from \`${CURRENT}\` to \`${LATEST}\`.`
+                    : `${marker}\nGotenberg ${releaseLink} is out. This PR has maintainer changes, so no separate bump PR was opened.`,
                 });
               }
               return;
             }
 
             // --- Create the new branch + bump commit --------------------------
-            await sh('git', ['config', 'user.name', 'github-actions[bot]']);
+            await sh('git', ['config', 'user.name', BOT]);
             await sh('git', ['config', 'user.email', BOT_EMAIL]);
             await sh('git', ['checkout', '-b', branch]);
 
