@@ -102,10 +102,6 @@ jobs:
             const { BOT } = process.env;
             const { data: botUser } = await github.rest.users.getByUsername({ username: BOT });
             const BOT_EMAIL = `${botUser.id}+${BOT}@users.noreply.github.com`;
-            // Bump PRs opened before the app took over.
-            const LEGACY_BOT = 'github-actions[bot]';
-            const BOT_LOGINS = [BOT, LEGACY_BOT];
-            const BOT_EMAILS = [BOT_EMAIL, `${LEGACY_BOT}@users.noreply.github.com`];
             const BOT_INTRO = 'Automated bump of Gotenberg';
             // Total PR-body cap. GitHub's hard limit is 65 536; leave headroom for
             // the boilerplate sections we always emit.
@@ -279,7 +275,7 @@ jobs:
               const { stdout: authorOut } = await execFile('git', [
                 'log', '-1', '--pretty=%ae', `origin/${ref}`,
               ]);
-              return parseInt(countOut.trim(), 10) !== 1 || !BOT_EMAILS.includes(authorOut.trim());
+              return parseInt(countOut.trim(), 10) !== 1 || authorOut.trim() !== BOT_EMAIL;
             };
 
             // Replaces the notes block of a maintainer's PR, keeping the rest of its body.
@@ -323,7 +319,7 @@ jobs:
                 const comments = await github.paginate(github.rest.issues.listComments, {
                   ...here, issue_number: pr.number, per_page: 100,
                 });
-                if (comments.some(c => BOT_LOGINS.includes(c.user?.login) && (c.body ?? '').includes(marker))) {
+                if (comments.some(c => c.user?.login === BOT && (c.body ?? '').includes(marker))) {
                   core.info(`PR #${pr.number} already has a comment about ${LATEST}.`);
                   continue;
                 }
