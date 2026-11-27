@@ -3,6 +3,74 @@ entries:
   gotenberg:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: Bump Gotenberg to 9.10.2, a major release. Read Gotenberg's upgrade guide before you upgrade
+        - kind: changed
+          description: The chart needs Kubernetes 1.30 or later
+        - kind: changed
+          description: Upgrade with --reset-values -f values.yaml. --reuse-values brings back 1.x keys the schema rejects
+        - kind: changed
+          description: Flag values default to unset, which leaves Gotenberg's default. A value you set is passed as is, including 0, false, empty strings and empty lists
+        - kind: changed
+          description: Allow and deny lists are YAML lists with one pattern per entry
+        - kind: changed
+          description: Basic auth moves to api.basicAuth, and networkPolicy.ingress and networkPolicy.egress take the rules directly
+        - kind: changed
+          description: Metrics are off by default. metrics.enabled serves /metrics on port 9464 through a separate Service, and metric names change
+        - kind: changed
+          description: Images are fully qualified as docker.io/gotenberg/gotenberg and docker.io/library/busybox
+        - kind: changed
+          description: lifecycle defaults to a 5s preStop sleep, which a preStop handler of your own replaces
+        - kind: changed
+          description: securityContext keys merge onto the restricted default instead of replacing it
+        - kind: removed
+          description: Values for flags Gotenberg 9 removed, the deprecated aliases and service.loadBalancerIP
+        - kind: fixed
+          description: The install fails on values Kubernetes or Gotenberg would reject, such as an empty image.repository, port 0 or an Ingress without hosts
+        - kind: fixed
+          description: A probe with an exec, tcpSocket or grpc handler drops the default httpGet
+        - kind: added
+          description: pdf values for the new PDF module, and values for the new archive, memory, macro and debug protocol flags
+        - kind: added
+          description: The install notes show how to reach and test the release, and warn about risky settings
+        - kind: security
+          description: The hardening example sets pdf.denyPrivateIps
+      artifacthub.io/links: |
+        - name: Projects Homepage
+          url: https://gotenberg.dev/
+        - name: Projects GitHub
+          url: https://github.com/gotenberg/gotenberg
+        - name: Chart's GitHub
+          url: https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+        - name: Chart's Changelog
+          url: https://github.com/MaikuMori/helm-charts/blob/master/charts/gotenberg/CHANGELOG.md
+      artifacthub.io/signKey: |
+        fingerprint: F29F20C1CBD1FDE9566828E0641F7D67BC03019B
+        url: https://raw.githubusercontent.com/MaikuMori/helm-charts/master/pubkey.asc
+    apiVersion: v2
+    appVersion: 9.10.2
+    created: "2026-11-27T03:18:12.299972861Z"
+    description: A Helm chart for Gotenberg
+    digest: 350ee7034cb631a9d96d60870a2efbe9dd50b935488faeb8055391b0d7b4ce86
+    icon: https://user-images.githubusercontent.com/8983173/130322857-185831e2-f041-46eb-a17f-0a69d066c4e5.png
+    keywords:
+    - gotenberg
+    - pdf
+    kubeVersion: '>=1.30.0-0'
+    maintainers:
+    - email: mikskalnins@maikumori.com
+      name: MaikuMori
+      url: maikumori.com
+    name: gotenberg
+    sources:
+    - https://github.com/gotenberg/gotenberg
+    - https://github.com/MaikuMori/helm-charts/tree/master/charts/gotenberg
+    type: application
+    urls:
+    - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-2.0.0/gotenberg-2.0.0.tgz
+    version: 2.0.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: security
           description: Bump Gotenberg to 8.40.0, the final Gotenberg 8 release, which fixes a QPDF password argument injection that could embed any file the gotenberg user can read, refuses every special-purpose IP range in the private-IP checks, distrusts the compromised eMudhra roots in Chromium from the first request and keeps the pinning proxy on with host-resolver rules
         - kind: changed
@@ -1824,4 +1892,4 @@ entries:
     urls:
     - https://github.com/MaikuMori/helm-charts/releases/download/gotenberg-0.1.0/gotenberg-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-17T00:11:00.717037428Z"
+generated: "2026-11-27T03:18:12.3000911Z"
